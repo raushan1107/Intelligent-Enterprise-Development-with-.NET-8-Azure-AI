@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Intelligent Enterprise Development with .NET 8 & Azure AI | Raushan Ranjan MCT</title>
+<meta name="description" content="11-day professional training on .NET 8, C#, ASP.NET Core, Blazor, EF Core, and Azure OpenAI. Koenig Solutions | By Raushan Ranjan (MCT)"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════════
+   CSS VARIABLES & RESET
+══════════════════════════════════════════════ */
+:root {
+  --bg:         #050a12;
+  --bg2:        #080f1c;
+  --surface:    #0d1726;
+  --surface2:   #111f33;
+  --border:     rgba(99,179,255,0.1);
+  --text:       #e2eaf5;
+  --muted:      #7a93b4;
+  --accent:     #3b82f6;
+  --accent2:    #60a5fa;
+
+  /* Day colours */
+  --d1: #6366f1; /* Day 1 – indigo */
+  --d2: #06b6d4; /* Day 2 – cyan */
+  --d3: #10b981; /* Day 3 – emerald */
+  --d4: #f59e0b; /* Day 4 – amber */
+  --d5: #f43f5e; /* Day 5 – rose */
+  --d7: #a855f7; /* Day 7 – purple */
+  --d8: #0ea5e9; /* Day 8 – sky */
+  --d10:#22d3ee; /* Day 10 – teal */
+  --d11:#ff6b35; /* Day 11 – orange */
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'Space Grotesk', sans-serif;
+  --font-code:    'Fira Code', monospace;
+  --radius: 12px;
+  --nav-h: 64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+img{max-width:100%}
+
+/* ══════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--nav-h);
+  background:rgba(5,10,18,0.88);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 32px;
+  z-index:1000;
+  gap:24px;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--font-display);font-size:17px;font-weight:800;
+  color:#fff;white-space:nowrap;margin-right:auto;
+}
+.nav-hex{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;font-family:var(--font-code);
+  flex-shrink:0;
+}
+.nav-badge{
+  background:rgba(59,130,246,0.15);
+  border:1px solid rgba(59,130,246,0.3);
+  color:var(--accent2);
+  font-size:10px;font-weight:600;letter-spacing:.08em;
+  padding:2px 8px;border-radius:20px;
+}
+.nav-links{display:flex;gap:6px;align-items:center}
+.nav-links a{
+  font-size:13px;font-weight:500;color:var(--muted);
+  padding:6px 14px;border-radius:8px;
+  transition:all .2s;
+}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-links a.active{color:var(--accent2);background:rgba(59,130,246,0.1)}
+
+/* ══════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(var(--nav-h) + 60px) 32px 80px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+canvas#grid{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:.35;pointer-events:none;
+}
+.hero-glow{
+  position:absolute;
+  width:700px;height:700px;
+  background:radial-gradient(ellipse,rgba(59,130,246,0.18) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(59,130,246,0.1);
+  border:1px solid rgba(59,130,246,0.25);
+  border-radius:20px;padding:6px 16px;
+  font-size:12px;font-weight:600;letter-spacing:.1em;
+  color:var(--accent2);text-transform:uppercase;
+  margin-bottom:28px;position:relative;
+}
+.dot-live{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  animation:pulse-live 2s infinite;
+}
+@keyframes pulse-live{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero h1{
+  font-family:var(--font-display);
+  font-size:clamp(32px,5.5vw,68px);
+  font-weight:800;line-height:1.08;
+  color:#fff;
+  position:relative;margin-bottom:12px;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-size:clamp(15px,2vw,20px);color:var(--muted);
+  max-width:640px;margin:0 auto 40px;position:relative;
+}
+.hero-stats{
+  display:flex;gap:40px;justify-content:center;
+  flex-wrap:wrap;margin-bottom:48px;position:relative;
+}
+.stat{text-align:center}
+.stat-num{
+  font-family:var(--font-display);font-size:clamp(28px,4vw,44px);font-weight:800;
+  color:#fff;line-height:1;
+}
+.stat-num span{color:var(--accent2)}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:.05em;margin-top:4px}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-weight:600;font-size:14px;
+  padding:12px 28px;border-radius:10px;
+  transition:all .25s;border:none;cursor:pointer;
+  box-shadow:0 0 30px rgba(59,130,246,0.25);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(59,130,246,0.4)}
+.btn-ghost{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.15);
+  color:var(--text);font-weight:600;font-size:14px;
+  padding:12px 28px;border-radius:10px;
+  transition:all .25s;cursor:pointer;
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.05)}
+
+/* ══════════════════════════════════════════════
+   SECTIONS
+══════════════════════════════════════════════ */
+.section{padding:80px 32px;max-width:1280px;margin:0 auto}
+.section-title{
+  font-family:var(--font-display);font-size:clamp(22px,3vw,36px);font-weight:800;
+  color:#fff;margin-bottom:8px;
+}
+.section-sub{color:var(--muted);margin-bottom:48px;font-size:15px}
+
+/* ══════════════════════════════════════════════
+   DAY TIMELINE (TOC)
+══════════════════════════════════════════════ */
+.toc-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;
+}
+.toc-card{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px 18px;
+  background:var(--surface);
+  transition:all .2s;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.toc-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--day-color,var(--accent));
+  opacity:.7;
+}
+.toc-card:hover{
+  background:var(--surface2);
+  border-color:var(--day-color,var(--accent));
+  transform:translateY(-2px);
+}
+.toc-card-day{
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  color:var(--day-color,var(--accent));text-transform:uppercase;
+  margin-bottom:4px;font-family:var(--font-code);
+}
+.toc-card-title{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
+.toc-card-count{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ══════════════════════════════════════════════
+   MODULE CARDS
+══════════════════════════════════════════════ */
+.day-section{margin-bottom:64px}
+.day-header{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:24px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.day-badge{
+  font-family:var(--font-code);font-size:11px;font-weight:600;
+  padding:4px 12px;border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--day-color,var(--accent));
+  color:var(--day-color,var(--accent));
+  white-space:nowrap;
+}
+.day-title{font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff}
+.modules-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(310px,1fr));
+  gap:16px;
+}
+.module-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  cursor:pointer;
+  transition:all .25s;
+  position:relative;
+  overflow:hidden;
+}
+.module-card::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.02) 0%,transparent 60%);
+  pointer-events:none;
+}
+.module-card:hover{
+  background:var(--surface2);
+  border-color:var(--day-color,var(--accent));
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.4),0 0 0 1px var(--day-color,var(--accent))20;
+}
+.module-number{
+  font-family:var(--font-code);font-size:11px;font-weight:600;
+  color:var(--day-color,var(--accent));
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.module-number::after{
+  content:'';flex:1;height:1px;
+  background:var(--day-color,var(--accent));opacity:.2;
+}
+.module-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3}
+.module-topics{display:flex;flex-direction:column;gap:4px}
+.module-topic{
+  font-size:12px;color:var(--muted);
+  display:flex;align-items:flex-start;gap:6px;
+  line-height:1.4;
+}
+.module-topic::before{content:'›';color:var(--day-color,var(--accent));flex-shrink:0}
+.module-actions{
+  display:flex;gap:8px;margin-top:16px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+.btn-sm{
+  font-size:12px;font-weight:600;padding:7px 14px;border-radius:8px;
+  cursor:pointer;transition:all .2s;flex:1;text-align:center;
+  border:1px solid var(--border);color:var(--muted);
+  background:rgba(255,255,255,0.03);
+}
+.btn-sm:hover{border-color:var(--day-color,var(--accent));color:var(--day-color,var(--accent));background:rgba(255,255,255,0.06)}
+.btn-sm.primary-sm{
+  background:var(--day-color,var(--accent));
+  color:#fff;border-color:transparent;
+  opacity:.85;
+}
+.btn-sm.primary-sm:hover{opacity:1;transform:scale(1.03)}
+
+/* LAB CARD */
+.lab-card{
+  background:rgba(255,255,255,0.02);
+  border:1px dashed rgba(255,255,255,0.12);
+  border-radius:var(--radius);
+  padding:20px 24px;
+  margin-top:12px;
+  display:flex;align-items:center;gap:16px;
+}
+.lab-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.lab-text{flex:1}
+.lab-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.lab-desc{font-size:12px;color:var(--muted);line-height:1.4}
+
+/* ══════════════════════════════════════════════
+   PANEL (SLIDE-IN)
+══════════════════════════════════════════════ */
+.panel-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:2000;opacity:0;pointer-events:none;
+  transition:opacity .3s;
+  backdrop-filter:blur(4px);
+}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.panel{
+  position:fixed;top:0;right:0;bottom:0;
+  width:min(660px,100vw);
+  background:var(--bg2);
+  border-left:1px solid var(--border);
+  z-index:2001;
+  transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.25,.8,.25,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.panel.open{transform:translateX(0)}
+.panel-head{
+  padding:24px 28px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;
+  flex-shrink:0;
+}
+.panel-day-badge{
+  font-family:var(--font-code);font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  border:1px solid var(--panel-color,var(--accent));
+  color:var(--panel-color,var(--accent));white-space:nowrap;margin-top:4px;
+}
+.panel-title{font-family:var(--font-display);font-size:20px;font-weight:800;color:#fff;flex:1;line-height:1.25}
+.panel-close{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  width:36px;height:36px;border-radius:8px;cursor:pointer;
+  font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.panel-close:hover{color:#fff;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05)}
+.panel-body{padding:28px;overflow-y:auto;flex:1}
+.panel-section{margin-bottom:28px}
+.panel-section-title{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--panel-color,var(--accent));margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel-section-title::after{content:'';flex:1;height:1px;background:var(--panel-color,var(--accent));opacity:.2}
+.panel-topic-list{display:flex;flex-direction:column;gap:8px}
+.panel-topic{
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;font-size:13px;color:var(--text);
+}
+.panel-topic-icon{color:var(--panel-color,var(--accent));flex-shrink:0;font-size:15px}
+.panel-callout{
+  background:rgba(255,255,255,0.04);
+  border-left:3px solid var(--panel-color,var(--accent));
+  border-radius:0 8px 8px 0;
+  padding:14px 18px;font-size:13px;color:var(--muted);
+  line-height:1.65;
+}
+.panel-callout strong{color:var(--text)}
+.code-block{
+  background:#060e1a;
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:8px;padding:16px;
+  font-family:var(--font-code);font-size:12px;
+  color:#a5b4fc;line-height:1.7;overflow-x:auto;
+  white-space:pre;
+}
+
+/* ══════════════════════════════════════════════
+   TECH STACK
+══════════════════════════════════════════════ */
+.stack-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;
+}
+.stack-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.stack-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.stack-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.stack-role{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ══════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════ */
+footer{
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  padding:36px 32px;
+  text-align:center;
+}
+.footer-brand{font-family:var(--font-display);font-size:16px;font-weight:800;color:#fff;margin-bottom:6px}
+.footer-meta{font-size:13px;color:var(--muted)}
+.footer-meta a{color:var(--accent2);transition:color .2s}
+.footer-meta a:hover{color:#fff}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(max-width:700px){
+  .nav-links{display:none}
+  .hero-stats{gap:24px}
+  .section{padding:56px 20px}
+}
+
+/* ══════════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(24px);transition:all .55s cubic-bezier(.25,.8,.25,1)}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-hex">.N8</div>
+    <div>
+      <div>RR .NET &amp; Azure AI Lab</div>
+      <div style="font-size:10px;font-weight:500;color:var(--muted);font-family:var(--font-body)">Raushan Ranjan · MCT | Koenig Solutions</div>
+    </div>
+    <div class="nav-badge">MCT</div>
+  </div>
+  <div class="nav-links">
+    <a href="#overview" class="active">Overview</a>
+    <a href="#modules">Modules</a>
+    <a href="#stack">Tech Stack</a>
+    <a href="labs.html">Labs</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────── -->
+<section class="hero">
+  <canvas id="grid"></canvas>
+  <div class="hero-glow"></div>
+
+  <div class="hero-eyebrow">
+    <span class="dot-live"></span>
+    Koenig Original AI-Courseware · 2026
+  </div>
+
+  <h1>Intelligent Enterprise<br/>Development with<br/><span>.NET 8 &amp; Azure AI</span></h1>
+
+  <p class="hero-sub">
+    Build production-grade enterprise applications — from C# fundamentals to
+    AI-powered ERP systems using Azure OpenAI, EF Core, Blazor, and Clean Architecture.
+  </p>
+
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">11<span>d</span></div><div class="stat-label">Training Days</div></div>
+    <div class="stat"><div class="stat-num">28<span>+</span></div><div class="stat-label">Modules</div></div>
+    <div class="stat"><div class="stat-num">9<span>+</span></div><div class="stat-label">Hands-on Labs</div></div>
+    <div class="stat"><div class="stat-num">1<span>×</span></div><div class="stat-label">Capstone ERP</div></div>
+  </div>
+
+  <div class="hero-ctas">
+    <a href="#modules" class="btn-primary">Explore Modules</a>
+    <a href="labs.html" class="btn-ghost">View Labs →</a>
+  </div>
+</section>
+
+<!-- ─── TOC ───────────────────────────────────── -->
+<div class="section" id="overview">
+  <h2 class="section-title reveal">Course Roadmap</h2>
+  <p class="section-sub reveal">Click any day to jump directly to that section</p>
+  <div class="toc-grid reveal">
+    <div class="toc-card" style="--day-color:var(--d1)" onclick="document.getElementById('day1').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 1</div>
+      <div class="toc-card-title">C# Foundations &amp; .NET Runtime</div>
+      <div class="toc-card-count">3 modules · Lab: Enrollment Console</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d2)" onclick="document.getElementById('day2').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 2</div>
+      <div class="toc-card-title">Methods, Exceptions &amp; Monitoring</div>
+      <div class="toc-card-count">2 modules · Lab: Validation + Logging</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d3)" onclick="document.getElementById('day3').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 3</div>
+      <div class="toc-card-title">Structures, Collections &amp; Events</div>
+      <div class="toc-card-count">4 modules · Lab: Grades Prototype</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d4)" onclick="document.getElementById('day4').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 4</div>
+      <div class="toc-card-title">Inheritance, Polymorphism &amp; Generics</div>
+      <div class="toc-card-count">3 modules · Lab: ERP Refactor</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d5)" onclick="document.getElementById('day5').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 5</div>
+      <div class="toc-card-title">Database Access with EF Core</div>
+      <div class="toc-card-count">3 modules · Lab: ERP Database + CRUD</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d7)" onclick="document.getElementById('day7').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 7</div>
+      <div class="toc-card-title">REST APIs &amp; API Security</div>
+      <div class="toc-card-count">3 modules · Lab: Secure ERP APIs</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d8)" onclick="document.getElementById('day8').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 8</div>
+      <div class="toc-card-title">Blazor Fundamentals (.NET 8)</div>
+      <div class="toc-card-count">3 modules · Lab: ERP Dashboard UI</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d10)" onclick="document.getElementById('day10').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 10</div>
+      <div class="toc-card-title">Advanced Blazor &amp; EF Integration</div>
+      <div class="toc-card-count">4 modules · Lab: Enrollment UI</div>
+    </div>
+    <div class="toc-card" style="--day-color:var(--d11)" onclick="document.getElementById('day11').scrollIntoView({behavior:'smooth'})">
+      <div class="toc-card-day">Day 11</div>
+      <div class="toc-card-title">Azure AI Services &amp; Integration</div>
+      <div class="toc-card-count">3 modules · Capstone: AI-Powered ERP</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODULES ───────────────────────────────── -->
+<div class="section" id="modules">
+  <h2 class="section-title reveal">All Modules</h2>
+  <p class="section-sub reveal">Day-by-day breakdown · click any module card for full details</p>
+
+  <!-- DAY 1 -->
+  <div class="day-section reveal" id="day1">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d1)">DAY 1</div>
+      <div class="day-title">C# Foundations &amp; .NET Runtime</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d1)" onclick="openPanel('m1')">
+        <div class="module-number">MODULE 01</div>
+        <div class="module-title">Writing Applications in C# and .NET 8</div>
+        <div class="module-topics">
+          <div class="module-topic">.NET 8 ecosystem overview &amp; evolution</div>
+          <div class="module-topic">CLR &amp; runtime fundamentals</div>
+          <div class="module-topic">Project structure &amp; build/run lifecycle</div>
+          <div class="module-topic">Introduction to Visual Studio 2022</div>
+        </div>
+        <div class="module-actions">
+          <span class="btn-sm primary-sm">View Details</span>
+          <span class="btn-sm">Day 1 Lab →</span>
+        </div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d1)" onclick="openPanel('m2')">
+        <div class="module-number">MODULE 02</div>
+        <div class="module-title">Types of Data and Expressions</div>
+        <div class="module-topics">
+          <div class="module-topic">Value types vs reference types</div>
+          <div class="module-topic">Variables, constants &amp; expressions</div>
+          <div class="module-topic">Operators &amp; type conversion</div>
+          <div class="module-topic">Nullable types</div>
+        </div>
+        <div class="module-actions">
+          <span class="btn-sm primary-sm">View Details</span>
+          <span class="btn-sm">Day 1 Lab →</span>
+        </div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d1)" onclick="openPanel('m3')">
+        <div class="module-number">MODULE 03</div>
+        <div class="module-title">C# Language Constructs</div>
+        <div class="module-topics">
+          <div class="module-topic">Conditions &amp; branching</div>
+          <div class="module-topic">Loops (for, while, foreach)</div>
+          <div class="module-topic">Exception handling basics</div>
+        </div>
+        <div class="module-actions">
+          <span class="btn-sm primary-sm">View Details</span>
+          <span class="btn-sm">Day 1 Lab →</span>
+        </div>
+      </div>
+    </div>
+    <div class="lab-card" style="margin-top:16px">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: Class Enrollment Module (Console ERP)</div>
+        <div class="lab-desc">Develop a console-based ERP enrollment component applying all Day 1 concepts end-to-end.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-section reveal" id="day2">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d2)">DAY 2</div>
+      <div class="day-title">Methods, Exceptions &amp; Monitoring</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d2)" onclick="openPanel('m4')">
+        <div class="module-number">MODULE 04</div>
+        <div class="module-title">Methods &amp; Overloading</div>
+        <div class="module-topics">
+          <div class="module-topic">Defining methods, parameters &amp; return types</div>
+          <div class="module-topic">Method overloading</div>
+          <div class="module-topic">Refactoring for reusability</div>
+        </div>
+        <div class="module-actions">
+          <span class="btn-sm primary-sm">View Details</span>
+        </div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d2)" onclick="openPanel('m5')">
+        <div class="module-number">MODULE 05</div>
+        <div class="module-title">Exception Handling &amp; Logging</div>
+        <div class="module-topics">
+          <div class="module-topic">try / catch / finally patterns</div>
+          <div class="module-topic">Custom exception classes</div>
+          <div class="module-topic">Monitoring &amp; structured logging fundamentals</div>
+        </div>
+        <div class="module-actions">
+          <span class="btn-sm primary-sm">View Details</span>
+        </div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: Extend Enrollment — Validation, Logging &amp; Persistence</div>
+        <div class="lab-desc">Add input validation, structured logging, and file/database persistence to Day 1 app.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-section reveal" id="day3">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d3)">DAY 3</div>
+      <div class="day-title">Structures, Collections &amp; Events</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d3)" onclick="openPanel('m6')">
+        <div class="module-number">MODULE 06</div>
+        <div class="module-title">Structs &amp; Enums</div>
+        <div class="module-topics">
+          <div class="module-topic">When to use struct vs class</div>
+          <div class="module-topic">Enums in domain modeling</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d3)" onclick="openPanel('m7')">
+        <div class="module-number">MODULE 07</div>
+        <div class="module-title">Built-in Collections &amp; LINQ</div>
+        <div class="module-topics">
+          <div class="module-topic">Lists, Dictionaries, IEnumerable</div>
+          <div class="module-topic">LINQ queries — filter, project, aggregate</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d3)" onclick="openPanel('m8')">
+        <div class="module-number">MODULE 08</div>
+        <div class="module-title">Events &amp; Delegates</div>
+        <div class="module-topics">
+          <div class="module-topic">Event-driven programming model</div>
+          <div class="module-topic">Subscribing to &amp; raising events</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d3)" onclick="openPanel('m9')">
+        <div class="module-number">MODULE 09</div>
+        <div class="module-title">Creating Classes &amp; Interfaces</div>
+        <div class="module-topics">
+          <div class="module-topic">Designing reusable domain models</div>
+          <div class="module-topic">Interfaces for abstraction</div>
+          <div class="module-topic">SOLID principles introduction</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: Grades Prototype Application</div>
+        <div class="lab-desc">Use collections and LINQ; implement event-based grade change notifications.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 4 -->
+  <div class="day-section reveal" id="day4">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d4)">DAY 4</div>
+      <div class="day-title">Inheritance, Polymorphism, I/O &amp; Generics</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d4)" onclick="openPanel('m10')">
+        <div class="module-number">MODULE 10</div>
+        <div class="module-title">Inheritance &amp; Polymorphism</div>
+        <div class="module-topics">
+          <div class="module-topic">Base classes, abstract methods &amp; overriding</div>
+          <div class="module-topic">Custom exception class hierarchies</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d4)" onclick="openPanel('m11')">
+        <div class="module-number">MODULE 11</div>
+        <div class="module-title">Input &amp; Output</div>
+        <div class="module-topics">
+          <div class="module-topic">File I/O &amp; Streams</div>
+          <div class="module-topic">JSON Serialization &amp; Deserialization</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d4)" onclick="openPanel('m12')">
+        <div class="module-number">MODULE 12</div>
+        <div class="module-title">Generics in C#</div>
+        <div class="module-topics">
+          <div class="module-topic">Type-safe generic collections</div>
+          <div class="module-topic">Generic repositories pattern</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: ERP Model Refactor</div>
+        <div class="lab-desc">Refactor ERP models using interfaces, generics, and robust data validation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 5 -->
+  <div class="day-section reveal" id="day5">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d5)">DAY 5</div>
+      <div class="day-title">Database Access with EF Core</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d5)" onclick="openPanel('m13')">
+        <div class="module-number">MODULE 13</div>
+        <div class="module-title">Entity Framework Core 8</div>
+        <div class="module-topics">
+          <div class="module-topic">DbContext, Migrations, Data Annotations</div>
+          <div class="module-topic">Fluent API &amp; Relationships</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d5)" onclick="openPanel('m14')">
+        <div class="module-number">MODULE 14</div>
+        <div class="module-title">LINQ &amp; Data Querying</div>
+        <div class="module-topics">
+          <div class="module-topic">Filtering, projection &amp; aggregation</div>
+          <div class="module-topic">Query performance considerations</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d5)" onclick="openPanel('m15')">
+        <div class="module-number">MODULE 15</div>
+        <div class="module-title">ASP.NET Core Fundamentals</div>
+        <div class="module-topics">
+          <div class="module-topic">Web architecture &amp; Middleware pipeline</div>
+          <div class="module-topic">Dependency Injection &amp; Configuration</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: ERP Database — Migrations &amp; CRUD</div>
+        <div class="lab-desc">Create the ERP database schema, add EF Core migrations, implement full CRUD operations.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 7 -->
+  <div class="day-section reveal" id="day7">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d7)">DAY 7</div>
+      <div class="day-title">REST APIs &amp; API Security</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d7)" onclick="openPanel('m16')">
+        <div class="module-number">MODULE 16</div>
+        <div class="module-title">Building RESTful APIs</div>
+        <div class="module-topics">
+          <div class="module-topic">Controllers, Routing, Model Binding &amp; DTOs</div>
+          <div class="module-topic">Global exception handling &amp; API versioning</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d7)" onclick="openPanel('m17')">
+        <div class="module-number">MODULE 17</div>
+        <div class="module-title">Authentication &amp; Authorization</div>
+        <div class="module-topics">
+          <div class="module-topic">JWT authentication &amp; Claims</div>
+          <div class="module-topic">Role-based &amp; policy-based authorization</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d7)" onclick="openPanel('m18')">
+        <div class="module-number">MODULE 18</div>
+        <div class="module-title">API Security Best Practices</div>
+        <div class="module-topics">
+          <div class="module-topic">OWASP API threats &amp; secure password hashing</div>
+          <div class="module-topic">Rate limiting &amp; logging security events</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: Build &amp; Secure ERP Web APIs</div>
+        <div class="lab-desc">Enrollment, Grade &amp; Inventory APIs with Admin / Manager / User roles and JWT authentication.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 8 -->
+  <div class="day-section reveal" id="day8">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d8)">DAY 8</div>
+      <div class="day-title">Blazor Fundamentals (.NET 8)</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d8)" onclick="openPanel('m19')">
+        <div class="module-number">MODULE 19</div>
+        <div class="module-title">Overview of Blazor</div>
+        <div class="module-topics">
+          <div class="module-topic">Blazor as SPA — Server vs WebAssembly</div>
+          <div class="module-topic">Unified rendering model in .NET 8</div>
+          <div class="module-topic">Lazy loading</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d8)" onclick="openPanel('m20')">
+        <div class="module-number">MODULE 20</div>
+        <div class="module-title">Razor Components</div>
+        <div class="module-topics">
+          <div class="module-topic">Razor syntax, routing &amp; data binding</div>
+          <div class="module-topic">Events, component communication &amp; parameters</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d8)" onclick="openPanel('m21')">
+        <div class="module-number">MODULE 21</div>
+        <div class="module-title">Validation in Blazor</div>
+        <div class="module-topics">
+          <div class="module-topic">EditForm &amp; Input components</div>
+          <div class="module-topic">Validation components &amp; annotations</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: ERP Dashboard UI</div>
+        <div class="lab-desc">Display live API data in Blazor; implement navigation and role-based page visibility.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 10 -->
+  <div class="day-section reveal" id="day10">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d10)">DAY 10</div>
+      <div class="day-title">Advanced Blazor &amp; EF Integration</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d10)" onclick="openPanel('m22')">
+        <div class="module-number">MODULE 22</div>
+        <div class="module-title">Using REST Services in Blazor</div>
+        <div class="module-topics">
+          <div class="module-topic">HttpClient injection &amp; GET/POST/PUT/DELETE</div>
+          <div class="module-topic">Token handling &amp; error handling</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d10)" onclick="openPanel('m23')">
+        <div class="module-number">MODULE 23</div>
+        <div class="module-title">Razor Class Library (RCL)</div>
+        <div class="module-topics">
+          <div class="module-topic">Creating reusable UI libraries</div>
+          <div class="module-topic">Shared components across projects</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d10)" onclick="openPanel('m24')">
+        <div class="module-number">MODULE 24</div>
+        <div class="module-title">Advanced Blazor Concepts</div>
+        <div class="module-topics">
+          <div class="module-topic">State management &amp; performance optimization</div>
+          <div class="module-topic">Component lifecycle &amp; Virtualization</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d10)" onclick="openPanel('m25')">
+        <div class="module-number">MODULE 25</div>
+        <div class="module-title">Clean Architecture in .NET</div>
+        <div class="module-topics">
+          <div class="module-topic">Domain / Application / Infrastructure / Presentation layers</div>
+          <div class="module-topic">Repository pattern &amp; service abstraction</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-icon">🧪</div>
+      <div class="lab-text">
+        <div class="lab-title">Lab: Enrollment UI, Role Security &amp; Reusable Component Library</div>
+        <div class="lab-desc">Build the full Enrollment UI, secure pages by role, and create a shared RCL form component library.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY 11 -->
+  <div class="day-section reveal" id="day11">
+    <div class="day-header">
+      <div class="day-badge" style="--day-color:var(--d11)">DAY 11</div>
+      <div class="day-title">Azure AI Services &amp; AI Integration</div>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card" style="--day-color:var(--d11)" onclick="openPanel('m26')">
+        <div class="module-number">MODULE 26</div>
+        <div class="module-title">Introduction to Azure AI Services</div>
+        <div class="module-topics">
+          <div class="module-topic">Azure AI services overview &amp; Azure OpenAI</div>
+          <div class="module-topic">AI integration patterns &amp; AI-ready API design</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d11)" onclick="openPanel('m27')">
+        <div class="module-number">MODULE 27</div>
+        <div class="module-title">AI Integration in .NET Applications</div>
+        <div class="module-topics">
+          <div class="module-topic">Calling Azure OpenAI from .NET &amp; prompt management</div>
+          <div class="module-topic">Secure key handling, AI abstraction &amp; cost monitoring</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+      <div class="module-card" style="--day-color:var(--d11)" onclick="openPanel('m28')">
+        <div class="module-number">MODULE 28</div>
+        <div class="module-title">AI-Powered ERP Features</div>
+        <div class="module-topics">
+          <div class="module-topic">AI-based summary reports &amp; grade analysis</div>
+          <div class="module-topic">Intelligent inventory recommendations &amp; AI assistant</div>
+        </div>
+        <div class="module-actions"><span class="btn-sm primary-sm">View Details</span></div>
+      </div>
+    </div>
+    <div class="lab-card" style="border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.04)">
+      <div class="lab-icon">🚀</div>
+      <div class="lab-text">
+        <div class="lab-title">Capstone: AI-Powered ERP System</div>
+        <div class="lab-desc">Enhance the ERP with AI-driven reporting, an AI approval assistant, recommendation engine, and a secure AI interaction layer.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TECH STACK ────────────────────────────── -->
+<div class="section" id="stack" style="border-top:1px solid var(--border);padding-top:80px">
+  <h2 class="section-title reveal">Technology Stack</h2>
+  <p class="section-sub reveal">Everything you'll install, use, and master during this course</p>
+  <div class="stack-grid reveal">
+    <div class="stack-card">
+      <div class="stack-icon">⚙️</div>
+      <div><div class="stack-name">.NET 8 SDK</div><div class="stack-role">Core runtime, CLR, project build system and CLI tooling</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🏗️</div>
+      <div><div class="stack-name">Visual Studio 2022</div><div class="stack-role">Primary IDE for C# development, debugging and profiling</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🗄️</div>
+      <div><div class="stack-name">SQL Server / Azure SQL</div><div class="stack-role">Relational database backend for the ERP system</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🌿</div>
+      <div><div class="stack-name">Entity Framework Core 8</div><div class="stack-role">ORM for migrations, relationships and data querying</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🌐</div>
+      <div><div class="stack-name">ASP.NET Core 8</div><div class="stack-role">Web framework — REST APIs, middleware, DI</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🔷</div>
+      <div><div class="stack-name">Blazor (.NET 8)</div><div class="stack-role">Full-stack SPA UI — Server, WASM and unified rendering</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🔑</div>
+      <div><div class="stack-name">JWT &amp; ASP.NET Identity</div><div class="stack-role">Token auth, role-based access and claims management</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🤖</div>
+      <div><div class="stack-name">Azure OpenAI GPT-4o</div><div class="stack-role">AI engine powering reports, recommendations and assistant</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">☁️</div>
+      <div><div class="stack-name">Azure AI Services</div><div class="stack-role">Managed cloud AI services, integration patterns</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">📦</div>
+      <div><div class="stack-name">Postman / Swagger</div><div class="stack-role">API testing, documentation and exploration</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">🔧</div>
+      <div><div class="stack-name">Git &amp; GitHub</div><div class="stack-role">Version control and source code management</div></div>
+    </div>
+    <div class="stack-card">
+      <div class="stack-icon">📊</div>
+      <div><div class="stack-name">Serilog / ILogger</div><div class="stack-role">Structured logging, monitoring and observability</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FOOTER ────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">RR .NET 8 &amp; Azure AI Lab · Koenig Solutions</div>
+  <div class="footer-meta">
+    By <strong>Raushan Ranjan</strong> (MCT | Senior Corporate Trainer) ·
+    <a href="mailto:raushanr1107@gmail.com">raushanr1107@gmail.com</a> ·
+    <a href="https://wa.me/918285862455" target="_blank">WhatsApp +91 82858 62455</a>
+  </div>
+  <div class="footer-meta" style="margin-top:6px;font-size:11px">
+    Koenig Original AI-Courseware · Version 1.0 · May 2026 · © 2026 Koenig Solutions. All rights reserved.
+  </div>
+</footer>
+
+<!-- ─── DETAIL PANEL ──────────────────────────── -->
+<div class="panel-overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div>
+      <div class="panel-day-badge" id="panel-day-badge">MODULE</div>
+      <div class="panel-title" id="panel-title">Module Title</div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</div>
+
+<!-- ─── SCRIPTS ───────────────────────────────── -->
+<script>
+/* ── ANIMATED GRID CANVAS ── */
+const canvas = document.getElementById('grid');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+const COLS=40,ROWS=25;
+const cells=[];
+for(let i=0;i<COLS*ROWS;i++)cells.push({v:Math.random(),s:Math.random()*0.01+0.002,phase:Math.random()*Math.PI*2});
+
+function drawGrid(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cw=canvas.width/COLS,ch=canvas.height/ROWS;
+  cells.forEach((c,i)=>{
+    c.v+=c.s;if(c.v>1||c.v<0)c.s*=-1;
+    const x=(i%COLS)*cw,y=Math.floor(i/COLS)*ch;
+    ctx.fillStyle=`rgba(59,130,246,${c.v*0.12})`;
+    ctx.fillRect(x+1,y+1,cw-2,ch-2);
+  });
+  requestAnimationFrame(drawGrid);
+}
+drawGrid();
+
+/* ── SCROLL REVEAL ── */
+const reveals=document.querySelectorAll('.reveal');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:0.1});
+reveals.forEach(el=>obs.observe(el));
+
+/* ── PANEL DATA ── */
+const modules={
+  m1:{
+    day:'DAY 1 · MODULE 01',
+    color:'var(--d1)',
+    title:'Writing Applications in C# and .NET 8',
+    overview:'.NET 8 is the latest LTS release of the cross-platform successor to the .NET Framework. At its core is the Common Language Runtime (CLR) — the virtual machine that compiles C# Intermediate Language (IL) to native machine code via JIT, manages memory through the Garbage Collector, and enforces type safety.',
+    topics:[
+      {icon:'🌐',text:'.NET 8 ecosystem overview — SDK, Runtime, NuGet, and the evolution from .NET Framework → .NET Core → .NET 5-8'},
+      {icon:'⚙️',text:'CLR & runtime fundamentals — JIT compilation, GC generations, managed heap, and thread safety'},
+      {icon:'📁',text:'Project structure — .csproj file, Program.cs, top-level statements, build artifacts'},
+      {icon:'▶️',text:'Building & running — dotnet new, dotnet build, dotnet run, publish profiles'},
+      {icon:'🏗️',text:'Introduction to Visual Studio 2022 — Solution Explorer, IntelliSense, debugger, hot reload'},
+    ],
+    code:`// Minimal .NET 8 console app — top-level statements
+Console.WriteLine("Hello from .NET 8!");
+
+// String interpolation + var inference
+var name = "Raushan";
+Console.WriteLine($"Welcome, {name}!");
+
+// dotnet commands:
+// dotnet new console -n MyApp
+// dotnet build
+// dotnet run`
+  },
+  m2:{
+    day:'DAY 1 · MODULE 02',color:'var(--d1)',
+    title:'Types of Data and Expressions',
+    overview:'C# is a strongly typed language. Every variable has a type determined at compile time. Understanding the distinction between value types (stored on the stack) and reference types (stored on the heap with a pointer) is foundational to writing efficient and correct code.',
+    topics:[
+      {icon:'📦',text:'Value types — int, double, bool, char, struct; stored on the stack, copied on assignment'},
+      {icon:'🔗',text:'Reference types — class, string, array, object; stored on the heap, copied by reference'},
+      {icon:'🔢',text:'Variables & constants — var, const, readonly; naming conventions'},
+      {icon:'➕',text:'Expressions & operators — arithmetic, comparison, logical, bitwise, ternary'},
+      {icon:'🔄',text:'Type conversion — implicit, explicit (cast), Convert class, Parse, TryParse'},
+      {icon:'❓',text:'Nullable types — int?, Nullable<T>, null coalescing ??, null-conditional ?.'},
+    ],
+    code:`int count = 42;          // value type
+string name = "Alice";   // reference type
+
+// Nullable
+int? maybe = null;
+int result = maybe ?? 0; // null-coalescing
+
+// Pattern matching (C# 9+)
+object obj = 3.14;
+if (obj is double d && d > 3)
+    Console.WriteLine($"Large double: {d}");
+
+// Type conversion
+string s = "123";
+if (int.TryParse(s, out int n))
+    Console.WriteLine($"Parsed: {n}");`
+  },
+  m3:{
+    day:'DAY 1 · MODULE 03',color:'var(--d1)',
+    title:'C# Language Constructs',
+    overview:'Control flow, loops, and exceptions are the backbone of any program logic. C# provides clean, expressive syntax for branching, iteration, and structured error handling that scales from console apps to enterprise services.',
+    topics:[
+      {icon:'🔀',text:'Conditions — if/else, switch expressions, pattern matching switch (C# 9/10)'},
+      {icon:'🔁',text:'Loops — for, while, do-while, foreach; break/continue; infinite loop guard'},
+      {icon:'💥',text:'Exception handling — try/catch/finally, specific exception types, throw vs throw ex'},
+    ],
+    code:`// Switch expression (C# 9+)
+var grade = score switch {
+    >= 90 => "A",
+    >= 80 => "B",
+    >= 70 => "C",
+    _      => "F"
+};
+
+// Exception handling
+try {
+    int x = int.Parse(Console.ReadLine()!);
+    Console.WriteLine(10 / x);
+} catch (FormatException) {
+    Console.WriteLine("Not a number.");
+} catch (DivideByZeroException) {
+    Console.WriteLine("Cannot divide by zero.");
+} finally {
+    Console.WriteLine("Always runs.");
+}`
+  },
+  m4:{
+    day:'DAY 2 · MODULE 04',color:'var(--d2)',
+    title:'Methods & Overloading',
+    overview:'Methods are the primary mechanism for code reuse in C#. Overloading allows the same method name to serve multiple signatures, reducing cognitive load for the caller. Proper method design following SRP (Single Responsibility Principle) is the first step toward clean architecture.',
+    topics:[
+      {icon:'🔧',text:'Defining methods — access modifiers, return types, void, static vs instance'},
+      {icon:'📥',text:'Parameters — value, ref, out, in, params; optional parameters with defaults'},
+      {icon:'🔁',text:'Method overloading — same name, different signatures; compiler resolution rules'},
+      {icon:'♻️',text:'Refactoring for reusability — DRY principle, extracting helper methods'},
+    ],
+    code:`// Method overloading
+static double Area(double r) => Math.PI * r * r;
+static double Area(double w, double h) => w * h;
+static double Area(double a, double b, double c) {
+    double s = (a + b + c) / 2;
+    return Math.Sqrt(s*(s-a)*(s-b)*(s-c));
+}
+
+// Params
+static int Sum(params int[] nums) => nums.Sum();
+
+// Out parameter
+static bool TryDivide(int a, int b, out double result) {
+    result = 0;
+    if (b == 0) return false;
+    result = (double)a / b;
+    return true;
+}`
+  },
+  m5:{
+    day:'DAY 2 · MODULE 05',color:'var(--d2)',
+    title:'Exception Handling & Logging',
+    overview:'Production software must be resilient and observable. Custom exceptions communicate domain-specific failures clearly, while structured logging (using Serilog or Microsoft.Extensions.Logging) enables distributed tracing, dashboards, and alerts in Azure Monitor.',
+    topics:[
+      {icon:'💥',text:'try/catch/finally — exception filters (when clause), re-throw patterns'},
+      {icon:'🏷️',text:'Custom exceptions — inheriting from Exception, adding properties, serialization'},
+      {icon:'📊',text:'Monitoring & logging fundamentals — log levels, correlation IDs, scopes'},
+      {icon:'📝',text:'Structured logging — ILogger<T>, message templates, Serilog enrichers'},
+    ],
+    code:`// Custom exception
+public class EnrollmentException : Exception {
+    public string StudentId { get; }
+    public EnrollmentException(string studentId, string msg)
+        : base(msg) => StudentId = studentId;
+}
+
+// Structured logging with ILogger
+public class EnrollmentService {
+    private readonly ILogger<EnrollmentService> _log;
+    public EnrollmentService(ILogger<EnrollmentService> log)
+        => _log = log;
+
+    public void Enroll(string studentId) {
+        using var scope = _log.BeginScope(
+            "StudentId: {StudentId}", studentId);
+        _log.LogInformation("Enrollment started");
+        // ...
+        _log.LogWarning("Course {Course} is near capacity", "CS101");
+    }
+}`
+  },
+  m7:{
+    day:'DAY 3 · MODULE 07',color:'var(--d3)',
+    title:'Built-in Collections & LINQ',
+    overview:'The .NET collection library (List<T>, Dictionary<TKey,TValue>, HashSet<T>, Queue<T>, Stack<T>) forms the toolkit of daily data manipulation. LINQ (Language Integrated Query) provides a composable, readable query syntax over any IEnumerable<T> source.',
+    topics:[
+      {icon:'📋',text:'List<T> — Add, Remove, Insert, Sort, BinarySearch, capacity vs count'},
+      {icon:'📖',text:'Dictionary<TKey,TValue> — TryGetValue, ContainsKey, indexer, iteration'},
+      {icon:'🔍',text:'IEnumerable<T> — deferred execution, yield return, lazy evaluation'},
+      {icon:'⚡',text:'LINQ — Where, Select, OrderBy, GroupBy, Join, Aggregate, First/FirstOrDefault'},
+    ],
+    code:`// LINQ chaining
+var topStudents = students
+    .Where(s => s.GPA >= 3.5)
+    .OrderByDescending(s => s.GPA)
+    .Select(s => new { s.Name, s.GPA })
+    .Take(10)
+    .ToList();
+
+// GroupBy
+var byDept = students
+    .GroupBy(s => s.Department)
+    .Select(g => new {
+        Dept  = g.Key,
+        Count = g.Count(),
+        Avg   = g.Average(s => s.GPA)
+    });`
+  },
+  m13:{
+    day:'DAY 5 · MODULE 13',color:'var(--d5)',
+    title:'Entity Framework Core 8',
+    overview:'EF Core 8 is a modern, cross-platform ORM that bridges C# objects to relational databases. It handles schema migrations, relationship mapping, and query translation — letting you write domain-centric code without raw SQL.',
+    topics:[
+      {icon:'🗄️',text:'DbContext — the unit of work; DbSet<T> as repository; connection string configuration'},
+      {icon:'🔄',text:'Migrations — dotnet ef migrations add, update-database, snapshot, rollback'},
+      {icon:'🏷️',text:'Data Annotations — [Key], [Required], [MaxLength], [Index] — model validation at DB level'},
+      {icon:'⚙️',text:'Fluent API — OnModelCreating, HasMany/WithOne, HasOne/WithMany, cascade delete'},
+      {icon:'🔗',text:'Relationships — one-to-one, one-to-many, many-to-many with join entities'},
+    ],
+    code:`// EF Core 8 — DbContext & migrations
+public class ErpDbContext : DbContext {
+    public DbSet<Student>    Students   { get; set; }
+    public DbSet<Course>     Courses    { get; set; }
+    public DbSet<Enrollment> Enrollments{ get; set; }
+
+    protected override void OnModelCreating(ModelBuilder mb) {
+        mb.Entity<Enrollment>()
+          .HasOne(e => e.Student)
+          .WithMany(s => s.Enrollments)
+          .HasForeignKey(e => e.StudentId)
+          .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+// CLI
+// dotnet ef migrations add InitialCreate
+// dotnet ef database update`
+  },
+  m16:{
+    day:'DAY 7 · MODULE 16',color:'var(--d7)',
+    title:'Building RESTful APIs',
+    overview:'ASP.NET Core\'s controller-based and minimal API models let you build fast, standards-compliant REST APIs. Correct use of routing, model binding, DTOs, and versioning is essential for maintainable enterprise APIs.',
+    topics:[
+      {icon:'🌐',text:'Controllers — ApiController attribute, ActionResult<T>, HTTP verb attributes'},
+      {icon:'🗺️',text:'Routing — attribute routing, route constraints, route parameters'},
+      {icon:'📦',text:'Model Binding & DTOs — [FromBody], [FromRoute], AutoMapper, record types'},
+      {icon:'✅',text:'Validation — Data Annotations, FluentValidation, ModelState'},
+      {icon:'💥',text:'Global exception handling — IExceptionHandler, ProblemDetails, RFC 7807'},
+      {icon:'📌',text:'API versioning — URL segment, header-based, query string strategies'},
+    ],
+    code:`// Minimal API (ASP.NET Core 8)
+app.MapGet("/api/students/{id}", async (
+    int id, ErpDbContext db) => {
+    var s = await db.Students.FindAsync(id);
+    return s is null ? Results.NotFound() : Results.Ok(s);
+})
+.WithName("GetStudent")
+.WithOpenApi();
+
+// Controller-based
+[ApiController]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class StudentsController : ControllerBase {
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromBody] CreateStudentDto dto) {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        // ...
+    }
+}`
+  },
+  m17:{
+    day:'DAY 7 · MODULE 17',color:'var(--d7)',
+    title:'Authentication & Authorization',
+    overview:'JWT (JSON Web Tokens) provide stateless, scalable authentication for REST APIs. ASP.NET Core\'s policy and role-based authorization then gates access to specific endpoints and actions based on the claims embedded in the token.',
+    topics:[
+      {icon:'🔑',text:'JWT — header.payload.signature structure, signing with HMAC-SHA256, expiry, refresh tokens'},
+      {icon:'👤',text:'Claims — sub, name, role claims; custom claims; ClaimsPrincipal'},
+      {icon:'🛡️',text:'Role-based access — [Authorize(Roles="Admin")], role hierarchy'},
+      {icon:'📋',text:'Policy-based authorization — requirements, handlers, AddPolicy in DI'},
+    ],
+    code:`// JWT generation
+var claims = new[] {
+    new Claim(ClaimTypes.NameIdentifier, user.Id),
+    new Claim(ClaimTypes.Name, user.Username),
+    new Claim(ClaimTypes.Role, user.Role),
+};
+var key = new SymmetricSecurityKey(
+    Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+var token = new JwtSecurityToken(
+    issuer: config["Jwt:Issuer"],
+    audience: config["Jwt:Audience"],
+    claims: claims,
+    expires: DateTime.UtcNow.AddHours(8),
+    signingCredentials: new SigningCredentials(
+        key, SecurityAlgorithms.HmacSha256));
+
+// Policy usage
+[Authorize(Policy = "ManagerOrAbove")]
+[HttpDelete("{id}")]
+public IActionResult Delete(int id) { ... }`
+  },
+  m25:{
+    day:'DAY 10 · MODULE 25',color:'var(--d10)',
+    title:'Clean Architecture in .NET',
+    overview:'Clean Architecture (Uncle Bob) separates concerns into concentric layers where outer layers depend on inner ones — never vice versa. This makes each layer independently testable, the domain free from framework concerns, and the whole system adaptable to changing infrastructure.',
+    topics:[
+      {icon:'🎯',text:'Domain layer — entities, value objects, domain events; zero external dependencies'},
+      {icon:'⚙️',text:'Application layer — use cases, CQRS (MediatR), DTOs, interfaces for infra'},
+      {icon:'🗄️',text:'Infrastructure layer — EF Core repositories, email services, Azure SDK, file storage'},
+      {icon:'🌐',text:'Presentation layer — ASP.NET Core controllers or Blazor; maps HTTP ↔ application'},
+      {icon:'📦',text:'Repository pattern — IRepository<T>, UnitOfWork, separating persistence concerns'},
+      {icon:'🔧',text:'Service abstraction — interface-first design, DI registration, testability'},
+    ],
+    code:`// Clean Architecture project structure
+// ERP.Domain      — Student.cs, Course.cs, ICourseRepository.cs
+// ERP.Application — EnrollStudentCommand, EnrollStudentHandler
+// ERP.Infrastructure — EfCourseRepository, EmailService
+// ERP.API         — StudentsController, Program.cs
+
+// Application layer — MediatR command
+public record EnrollStudentCommand(
+    string StudentId, string CourseId) : IRequest<Result>;
+
+public class EnrollStudentHandler
+    : IRequestHandler<EnrollStudentCommand, Result> {
+    private readonly ICourseRepository _courses;
+    public async Task<Result> Handle(
+        EnrollStudentCommand cmd, CancellationToken ct) {
+        var course = await _courses.GetByIdAsync(cmd.CourseId, ct);
+        if (course is null) return Result.NotFound();
+        course.Enroll(cmd.StudentId);
+        await _courses.SaveChangesAsync(ct);
+        return Result.Ok();
+    }
+}`
+  },
+  m26:{
+    day:'DAY 11 · MODULE 26',color:'var(--d11)',
+    title:'Introduction to Azure AI Services',
+    overview:'Azure AI Services is Microsoft\'s managed AI platform — a family of pre-built cognitive capabilities (vision, speech, language) and foundation model endpoints (Azure OpenAI). Understanding where each service fits and how to design AI-ready APIs is the first step toward building intelligent applications.',
+    topics:[
+      {icon:'☁️',text:'Azure AI Services overview — Cognitive Services, Azure OpenAI, AI Search, Document Intelligence'},
+      {icon:'🤖',text:'Azure OpenAI — GPT-4o, embedding models, fine-tuning, content filters, quotas'},
+      {icon:'🔌',text:'AI integration patterns — sidecar, API gateway with AI enrichment, event-driven pipelines'},
+      {icon:'📐',text:'AI-ready API design — prompt versioning, response caching, graceful fallback'},
+    ],
+    code:`// Azure AI Services landscape
+// ┌─────────────────────────────────────────────────┐
+// │  Azure OpenAI Service                           │
+// │   ├─ GPT-4o     (chat, completion)              │
+// │   ├─ Embeddings (text-embedding-ada-002)        │
+// │   └─ DALL-E     (image generation)             │
+// │                                                  │
+// │  Azure AI Services                              │
+// │   ├─ Language   (sentiment, NER, translation)  │
+// │   ├─ Vision     (OCR, object detection)        │
+// │   ├─ Speech     (STT, TTS)                     │
+// │   └─ Document Intelligence (forms, invoices)   │
+// └─────────────────────────────────────────────────┘
+
+// Integration pattern — API gateway with AI enrichment
+// GET /api/reports/summary → ERP data → GPT-4o → formatted report`
+  },
+  m27:{
+    day:'DAY 11 · MODULE 27',color:'var(--d11)',
+    title:'AI Integration in .NET Applications',
+    overview:'Calling Azure OpenAI from .NET is straightforward via the Azure.AI.OpenAI SDK. The real engineering challenge is managing prompts at scale, securing API keys, building a proper abstraction layer so models can be swapped, and monitoring token usage and costs.',
+    topics:[
+      {icon:'📡',text:'Calling Azure OpenAI — Azure.AI.OpenAI SDK, ChatClient, ChatCompletion, streaming'},
+      {icon:'📝',text:'Prompt management — system prompts, few-shot examples, prompt templates with Handlebars'},
+      {icon:'🔐',text:'Secure key handling — Azure Key Vault, Managed Identity, never hardcode in source'},
+      {icon:'🏗️',text:'AI service abstraction layer — IAiService interface, mock for testing'},
+      {icon:'📊',text:'Logging AI usage — request/response logging, token counts, latency tracking'},
+      {icon:'💰',text:'Cost monitoring — Azure Cost Management, alert budgets, token optimization strategies'},
+    ],
+    code:`// Azure OpenAI from .NET 8
+using Azure.AI.OpenAI;
+
+var client = new AzureOpenAIClient(
+    new Uri(config["AzureOpenAI:Endpoint"]!),
+    new DefaultAzureCredential());  // Managed Identity
+
+var chat = client.GetChatClient("gpt-4o");
+
+var response = await chat.CompleteChatAsync([
+    new SystemChatMessage(
+        "You are an ERP assistant. Be concise and factual."),
+    new UserChatMessage(
+        $"Summarize the following enrollment data: {json}")
+]);
+
+string summary = response.Value.Content[0].Text;
+_logger.LogInformation("Tokens used: {Tokens}",
+    response.Value.Usage.TotalTokenCount);`
+  },
+  m28:{
+    day:'DAY 11 · MODULE 28',color:'var(--d11)',
+    title:'AI-Powered ERP Features',
+    overview:'The capstone of the course: embedding AI into every layer of the ERP — from backend analysis pipelines to Blazor UI chat assistants. Each feature follows the same pattern: gather structured ERP data → format as a context-rich prompt → call GPT-4o → parse and display the result.',
+    topics:[
+      {icon:'📊',text:'AI-based summary reports — auto-generate monthly enrollment and grade summaries from DB data'},
+      {icon:'📈',text:'Automated grade analysis — detect at-risk students, pattern recognition, recommended actions'},
+      {icon:'📦',text:'Intelligent inventory recommendation — predict restocking needs from usage patterns'},
+      {icon:'💬',text:'AI assistant inside ERP — Blazor chat UI, streaming responses, conversation history'},
+    ],
+    code:`// AI-powered grade analysis endpoint
+[HttpGet("students/{id}/ai-analysis")]
+[Authorize(Roles = "Manager,Admin")]
+public async Task<IActionResult> AiAnalysis(string id) {
+    var grades = await _db.Grades
+        .Where(g => g.StudentId == id)
+        .OrderByDescending(g => g.Date)
+        .Take(20).ToListAsync();
+
+    var prompt = $"""
+        Analyze these recent grades for student {id}:
+        {JsonSerializer.Serialize(grades)}
+
+        Provide: risk level (Low/Medium/High),
+        trend (Improving/Declining/Stable),
+        and 2-3 specific actionable recommendations.
+        Respond in JSON only.
+        """;
+
+    var result = await _ai.CompleteAsync(prompt);
+    return Ok(JsonDocument.Parse(result));
+}`
+  },
+};
+
+// Default content for modules without full data
+const defaultModule = (id) => ({
+  day:`MODULE ${id.toUpperCase()}`,color:'var(--accent)',
+  title:'Module Details',
+  overview:'Detailed notes for this module are available during the live training session. The trainer will walk through all concepts with live coding examples and real-world analogies.',
+  topics:[
+    {icon:'📖',text:'Full topic coverage as listed on the course card'},
+    {icon:'💻',text:'Live coding demonstrations with real ERP scenarios'},
+    {icon:'🧪',text:'Hands-on exercises connecting to the lab for this day'},
+  ],
+  code:`// Sample code will be demonstrated live during the session`
+});
+
+function openPanel(id){
+  const data = modules[id] || defaultModule(id);
+  document.getElementById('panel-day-badge').textContent = data.day;
+  document.getElementById('panel-day-badge').style.setProperty('--panel-color', data.color);
+  document.getElementById('panel').style.setProperty('--panel-color', data.color);
+  document.getElementById('panel-title').textContent = data.title;
+
+  document.getElementById('panel-body').innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Overview</div>
+      <div class="panel-callout">${data.overview}</div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Topics Covered</div>
+      <div class="panel-topic-list">
+        ${data.topics.map(t=>`
+          <div class="panel-topic">
+            <span class="panel-topic-icon">${t.icon}</span>
+            <span>${t.text}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Code Reference</div>
+      <div class="code-block">${escHtml(data.code)}</div>
+    </div>
+  `;
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePanel(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  document.body.style.overflow='';
+}
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+</script>
+</body>
+</html>
