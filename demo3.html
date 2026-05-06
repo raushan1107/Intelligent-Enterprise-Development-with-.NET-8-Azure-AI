@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Demo 03 · C# Language Constructs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09090e;--surface:#111118;--surface2:#18181f;--surface3:#22222c;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f5;--muted:#8888a0;--faint:#44445a;
+  --C:#22d3ee;--C-dim:rgba(34,211,238,0.09);--C-border:rgba(34,211,238,0.22);--C-glow:rgba(34,211,238,0.3);
+  --blue:#3b9eff;--blue-dim:rgba(59,158,255,0.1);--blue-border:rgba(59,158,255,0.22);
+  --green:#2dd4a0;--green-dim:rgba(45,212,160,0.1);--green-border:rgba(45,212,160,0.22);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--amber-border:rgba(245,166,35,0.22);
+  --rose:#f0456a;--rose-dim:rgba(240,69,106,0.1);--rose-border:rgba(240,69,106,0.22);
+  --font-display:'Instrument Serif',serif;
+  --font-ui:'DM Sans',sans-serif;
+  --font-code:'JetBrains Mono',monospace;
+  --r:8px;--r-lg:14px;--r-xl:20px;--nav-h:58px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.65;font-size:15px;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+
+nav{position:fixed;inset:0 0 auto;height:var(--nav-h);background:rgba(9,9,14,0.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 32px;z-index:200}
+.nav-back{font-size:12px;font-weight:600;color:var(--muted);padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);transition:all .2s;font-family:var(--font-code)}.nav-back:hover{color:var(--C);border-color:var(--C-border)}
+.nav-title{font-size:13px;color:var(--muted)}.nav-title strong{color:var(--text)}
+.nav-badge{margin-left:auto;background:var(--C-dim);color:var(--C);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--C-border);font-family:var(--font-code)}
+.nav-prev{font-size:12px;font-weight:600;padding:6px 14px;border-radius:var(--r);color:var(--muted);border:1px solid var(--border);transition:all .2s;font-family:var(--font-code)}.nav-prev:hover{color:var(--C);border-color:var(--C-border)}
+.nav-next{font-size:12px;font-weight:700;padding:6px 16px;border-radius:var(--r);color:#000;background:var(--C);transition:all .2s;font-family:var(--font-code)}.nav-next:hover{opacity:.85;transform:translateY(-1px)}
+
+/* HERO */
+.hero{padding:calc(var(--nav-h)+60px) 48px 56px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 3% 55%,rgba(34,211,238,0.1),transparent 65%),radial-gradient(ellipse 40% 50% at 98% 25%,rgba(45,212,160,0.06),transparent 60%)}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{font-family:var(--font-code);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--C);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:24px;height:2px;background:var(--C)}
+h1{font-family:var(--font-display);font-size:clamp(34px,4.8vw,56px);font-weight:400;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px}
+h1 em{font-style:italic;color:var(--C)}
+.hero-desc{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:28px;max-width:480px}
+.hero-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:32px}
+.pill{font-family:var(--font-code);font-size:10px;font-weight:600;padding:4px 11px;border-radius:4px;border:1px solid var(--border2);color:var(--muted)}
+.hero-progress{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px}
+.hp-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.hp-bar{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:8px}
+.hp-fill{height:100%;width:50%;background:linear-gradient(90deg,var(--blue),var(--C));border-radius:2px}
+.hp-text{font-size:11px;color:var(--muted);font-family:var(--font-code)}
+
+/* LIVE SWITCH CARD (hero right) */
+.switch-live{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.sl-head{background:var(--surface2);padding:12px 16px;border-bottom:1px solid var(--border)}
+.sl-title{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--C);letter-spacing:.08em;text-transform:uppercase}
+.sl-sub{font-size:11px;color:var(--faint);margin-top:2px}
+.sl-body{padding:18px}
+.sl-score-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sl-score-label{font-family:var(--font-code);font-size:11px;color:var(--muted)}
+.sl-score-val{font-family:var(--font-display);font-size:42px;font-weight:400;color:var(--text);line-height:1}
+.sl-slider{width:100%;appearance:none;height:5px;border-radius:3px;background:var(--surface3);outline:none;margin-bottom:14px;cursor:pointer}
+.sl-slider::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--C);cursor:pointer;box-shadow:0 0 12px var(--C-glow)}
+.sl-grade{text-align:center;margin-bottom:10px}
+.sl-grade-letter{font-family:var(--font-display);font-size:52px;font-weight:400;line-height:1;transition:all .25s}
+.sl-arm-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-family:var(--font-code);font-size:10px;color:var(--faint)}
+.sl-arm-box span{color:var(--C)}
+.sl-arms{margin-top:12px;display:flex;flex-direction:column;gap:3px}
+.arm-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;font-family:var(--font-code);font-size:10px;color:var(--faint);transition:all .2s;border:1px solid transparent}
+.arm-row.hit{background:var(--C-dim);border-color:var(--C-border);color:var(--C)}
+.arm-pattern{flex:1}.arm-result{color:var(--amber)}
+
+/* CONTENT */
+.content{max-width:1100px;margin:0 auto;padding:56px 48px 88px}
+.sec-label{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.sl-tag{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--C);background:var(--C-dim);border:1px solid var(--C-border);padding:3px 10px;border-radius:4px}
+.sl-title2{font-family:var(--font-display);font-size:26px;font-weight:400}
+.sl-line{flex:1;height:1px;background:var(--border)}
+
+/* CONCEPT CARDS */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all .22s;border-top:2px solid transparent}
+.cc:hover{border-color:var(--border2);transform:translateY(-2px)}
+.cc.teal{border-top-color:var(--C)}.cc.blue{border-top-color:var(--blue)}.cc.green{border-top-color:var(--green)}.cc.amber{border-top-color:var(--amber)}.cc.rose{border-top-color:var(--rose)}
+.cc-icon{font-size:22px;margin-bottom:10px}
+.cc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.cc-body{font-size:12px;color:var(--muted);line-height:1.65}
+.cc-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--C);padding:8px 10px;border-radius:var(--r);margin-top:10px;color:#abb2bf;white-space:pre-wrap}
+.cc.blue .cc-code{border-left-color:var(--blue)}.cc.green .cc-code{border-left-color:var(--green)}.cc.amber .cc-code{border-left-color:var(--amber)}.cc.rose .cc-code{border-left-color:var(--rose)}
+
+/* LOOP TRACER */
+.loop-tracer{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.lt-header{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.lt-title{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--text)}
+.lt-sub{font-size:12px;color:var(--muted)}
+.lt-type-btns{display:flex;gap:7px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.lt-btn{font-family:var(--font-code);font-size:11px;font-weight:600;padding:5px 13px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .2s}
+.lt-btn:hover{border-color:var(--C-border);color:var(--C)}
+.lt-btn.active{background:var(--C-dim);border-color:var(--C);color:var(--C)}
+.lt-body{display:grid;grid-template-columns:1fr 1fr}
+.lt-code-panel{background:#0d1117;border-right:1px solid var(--border)}
+.lt-code-bar{background:#161b22;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.05);font-family:var(--font-code);font-size:10px;color:rgba(255,255,255,.3);display:flex;align-items:center;gap:8px}
+.lt-dots{display:flex;gap:4px}.lt-dot{width:9px;height:9px;border-radius:50%}
+.lt-dot.r{background:#ff5f57}.lt-dot.y{background:#febc2e}.lt-dot.g{background:#28c840}
+.lt-code{padding:16px 18px;font-family:var(--font-code);font-size:12px;line-height:1.85;color:#abb2bf;overflow-x:auto;white-space:pre}
+.lt-trace-panel{padding:16px 18px}
+.lt-trace-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--C);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.lt-trace{display:flex;flex-direction:column;gap:4px}
+.trace-row{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:var(--r);font-family:var(--font-code);font-size:11px;background:var(--surface2);border:1px solid var(--border);transition:all .4s}
+.trace-row.active-trace{background:var(--C-dim);border-color:var(--C-border)}
+.tr-iter{color:var(--faint);width:48px;flex-shrink:0;font-size:10px}
+.tr-action{color:var(--muted);flex:1}
+.tr-result{font-weight:700}
+.tr-out{color:var(--green)}.tr-skip{color:var(--amber)}.tr-break{color:var(--rose)}.tr-done{color:var(--C)}
+.lt-play-btn{margin:12px 16px;font-family:var(--font-code);font-size:11px;font-weight:700;padding:8px 18px;border-radius:var(--r);border:1px solid var(--C-border);background:var(--C-dim);color:var(--C);cursor:pointer;transition:all .2s;display:inline-block}
+.lt-play-btn:hover{background:var(--C);color:#000}
+
+/* EXCEPTION FLOW */
+.exc-flow{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.ef-header{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ef-title{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--text)}
+.ef-sub{font-size:12px;color:var(--muted)}
+.ef-body{display:grid;grid-template-columns:260px 1fr}
+.ef-steps-panel{border-right:1px solid var(--border);padding:16px 0}
+.ef-step{display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;transition:all .22s;border-left:3px solid transparent;position:relative}
+.ef-step:hover{background:var(--surface2)}
+.ef-step.active{background:var(--C-dim);border-left-color:var(--C)}
+.ef-step.danger.active{background:var(--rose-dim);border-left-color:var(--rose)}
+.ef-step.success.active{background:var(--green-dim);border-left-color:var(--green)}
+.ef-step-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.ef-step-name{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--text)}
+.ef-step-sub{font-size:10px;color:var(--faint);margin-top:1px}
+.ef-connector{height:10px;width:2px;background:var(--border);margin-left:30px}
+.ef-detail-panel{padding:24px}
+.ef-d-eyebrow{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--C);margin-bottom:10px}
+.ef-d-title{font-family:var(--font-display);font-size:22px;font-weight:400;margin-bottom:10px}
+.ef-d-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px}
+.ef-d-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-left:3px solid var(--C);border-radius:var(--r);padding:14px 16px;color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
+.ef-d-code.danger{border-left-color:var(--rose)}
+.ef-d-code.success{border-left-color:var(--green)}
+.ef-d-tip{background:var(--C-dim);border:1px solid var(--C-border);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--C);margin-top:12px;line-height:1.6}
+
+/* CODE TABS */
+.code-demo{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.cd-tabs{display:flex;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto}
+.cd-tab{font-family:var(--font-code);font-size:11px;font-weight:600;padding:11px 18px;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s}
+.cd-tab:hover{color:var(--muted)}.cd-tab.active{color:var(--C);border-bottom-color:var(--C);background:var(--surface)}
+.cd-panel{display:none}.cd-panel.active{display:grid;grid-template-columns:1fr 340px}
+.code-side{background:#0d1117}
+.code-bar{background:#161b22;display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.cb-dots{display:flex;gap:5px}.cb-dot{width:10px;height:10px;border-radius:50%}
+.cb-dot.r{background:#ff5f57}.cb-dot.y{background:#febc2e}.cb-dot.g{background:#28c840}
+.cb-file{font-family:var(--font-code);font-size:11px;color:rgba(255,255,255,.3);margin-left:6px}
+.code-block{padding:20px 22px;font-family:var(--font-code);font-size:12px;line-height:1.85;color:#abb2bf;overflow-x:auto;white-space:pre}
+.kw{color:#ff79c6}.str{color:#f1fa8c}.cm{color:#6272a4;font-style:italic}
+.num{color:#bd93f9}.cls{color:#8be9fd}.fn{color:#50fa7b}.prop{color:#ffb86c}
+.ann-side{padding:22px;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto}
+.ann-title{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--C);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ann-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.ann-item:last-child{border-bottom:none;margin-bottom:0}
+.ai-line{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.ai-num{width:20px;height:20px;border-radius:50%;background:var(--C);color:#000;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-code);margin-top:1px}
+.ai-label{font-size:12.5px;font-weight:700;color:var(--text)}
+.ai-body{font-size:12px;color:var(--muted);line-height:1.6;margin-left:30px}
+.ai-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);padding:3px 8px;border-radius:4px;color:var(--C);display:inline-block;margin-top:4px}
+
+/* VS SETUP */
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.sb-header{background:linear-gradient(135deg,rgba(34,211,238,0.08),transparent);padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.sb-icon{font-size:28px}
+.sb-h-title{font-family:var(--font-display);font-size:20px}
+.sb-h-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.sb-steps{padding:20px 24px;display:flex;flex-direction:column;gap:0}
+.sb-step{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.sb-step:last-child{border-bottom:none}
+.ss-num{width:26px;height:26px;border-radius:50%;background:var(--C-dim);border:1px solid var(--C-border);color:var(--C);font-family:var(--font-code);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.ss-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px}
+.ss-desc{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:8px}
+.ss-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--C);padding:10px 14px;border-radius:var(--r);color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
+.ss-note{font-size:11.5px;color:var(--faint);margin-top:6px;font-style:italic}
+.ss-menu{font-family:var(--font-code);font-size:11px;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:4px}
+
+/* TRY IT */
+.try-box{background:var(--surface);border:1px solid var(--green-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.try-header{background:var(--green-dim);padding:14px 22px;border-bottom:1px solid var(--green-border);display:flex;align-items:center;gap:12px}
+.try-icon{font-size:22px}.try-h-title{font-size:15px;font-weight:700;color:var(--green)}.try-h-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.try-body{padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+.try-task{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px}
+.tt-num{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--green);text-transform:uppercase;margin-bottom:7px}
+.tt-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:7px}
+.tt-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.tt-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);padding:14px 16px;color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
+.tt-expected{background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r);padding:10px 14px;margin-top:10px}
+.te-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.te-out{font-family:var(--font-code);font-size:11.5px;color:var(--text);line-height:1.8;white-space:pre}
+
+/* MISTAKES */
+.mistakes-box{background:var(--surface);border:1px solid var(--amber-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.mb-header{background:var(--amber-dim);padding:14px 22px;border-bottom:1px solid var(--amber-border);display:flex;align-items:center;gap:10px}
+.mb-title{font-size:14px;font-weight:700;color:var(--amber)}
+.mistakes-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.mistake{display:grid;grid-template-columns:22px 1fr;gap:12px}
+.mk-body{font-size:13px;color:var(--muted);line-height:1.65}.mk-body strong{color:var(--text)}
+.mk-fix{font-family:var(--font-code);font-size:11px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--green);padding:6px 10px;border-radius:var(--r);color:var(--green);margin-top:6px;display:block}
+
+/* NEXT */
+.next-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nn-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.nn-title{font-family:var(--font-display);font-size:24px;font-weight:400;margin-bottom:6px}
+.nn-desc{font-size:13px;color:var(--muted)}
+.nn-btn{background:var(--C);color:#000;font-weight:700;font-size:13px;padding:12px 24px;border-radius:var(--r);transition:all .2s;white-space:nowrap;font-family:var(--font-code)}
+.nn-btn:hover{opacity:.85;transform:translateY(-2px)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s,transform .55s}.reveal.in{opacity:1;transform:none}
+@media(max-width:960px){.hero-inner,.cd-panel,.concept-grid,.lt-body,.ef-body{grid-template-columns:1fr}.content{padding:40px 24px 60px}.hero{padding:calc(var(--nav-h)+40px) 24px 40px}}
+::-webkit-scrollbar{width:5px;height:4px}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="demos.html" class="nav-back">← Demos</a>
+  <div class="nav-title">Demo <strong>03 / 06</strong> · M03</div>
+  <div class="nav-badge">Language Constructs</div>
+  <a href="demo2.html" class="nav-prev">← Demo 02</a>
+  <a href="demo4.html" class="nav-next">Demo 04 →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Demo 03 · Module 03</div>
+      <h1>C# Language<br/><em>Constructs</em></h1>
+      <p class="hero-desc">Switch expressions, loop patterns, and exception handling — the control-flow vocabulary that governs every business rule, iteration, and error recovery path in the ERP enrollment system.</p>
+      <div class="hero-pills">
+        <span class="pill">switch expression</span><span class="pill">foreach / for / while</span>
+        <span class="pill">do-while</span><span class="pill">break / continue</span>
+        <span class="pill">try / catch / finally</span><span class="pill">when filter</span><span class="pill">throw vs throw ex</span>
+      </div>
+      <div class="hero-progress">
+        <div class="hp-label">Course Progress</div>
+        <div class="hp-bar"><div class="hp-fill"></div></div>
+        <div class="hp-text">Demo 3 of 6 · ~55 min · Beginner → Intermediate</div>
+      </div>
+    </div>
+    <!-- Live Switch Card -->
+    <div class="switch-live">
+      <div class="sl-head">
+        <div class="sl-title">⚡ Live Switch Expression</div>
+        <div class="sl-sub">Drag the slider — watch which arm fires</div>
+      </div>
+      <div class="sl-body">
+        <div class="sl-score-row">
+          <div class="sl-score-label">Score</div>
+          <div class="sl-score-val" id="scoreVal">75</div>
+        </div>
+        <input class="sl-slider" type="range" min="0" max="100" value="75" id="scoreSlider" oninput="updateSwitch()"/>
+        <div class="sl-grade">
+          <div class="sl-grade-letter" id="gradeLetter">B</div>
+        </div>
+        <div class="sl-arm-box">Matching arm: <span id="armText">score >= 70 => "B"</span></div>
+        <div class="sl-arms" id="armRows"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="content">
+
+<!-- S1: CONCEPTS -->
+<div class="sec-label reveal">
+  <div class="sl-tag">01 · Concepts</div>
+  <div class="sl-title2">Control Flow — What You Must Know</div>
+  <div class="sl-line"></div>
+</div>
+<div class="concept-grid reveal">
+  <div class="cc teal">
+    <div class="cc-icon">🔀</div>
+    <div class="cc-title">Switch Expression (C# 8+)</div>
+    <div class="cc-body">Returns a value — it's an expression, not a statement. Each arm is <code>pattern => result</code>. The <code>_</code> discard is the mandatory catch-all. Compiler checks exhaustiveness — miss a case and you get a warning at build time.</div>
+    <div class="cc-code">string grade = score switch {
+    >= 90           => "A+",
+    >= 80 and < 90  => "A",
+    >= 60           => "B/C",
+    _               => "F"
+};</div>
+  </div>
+  <div class="cc blue">
+    <div class="cc-icon">🔁</div>
+    <div class="cc-title">foreach — Most Common Loop</div>
+    <div class="cc-body">Use <code>foreach</code> for 90% of iterations — collections, arrays, LINQ results. Use <code>for</code> only when you need the index for something beyond element access. Prefer <code>continue</code> to skip over bad data instead of wrapping in an <code>if</code>.</div>
+    <div class="cc-code">foreach (var s in students) {
+    if (string.IsNullOrEmpty(s.Name))
+        continue;    // skip, next iteration
+    Process(s);
+}</div>
+  </div>
+  <div class="cc blue">
+    <div class="cc-icon">🔄</div>
+    <div class="cc-title">while &amp; do-while</div>
+    <div class="cc-body"><code>while</code> — check condition first, may never run. <code>do-while</code> — always runs once, check after. Use <code>do-while</code> for input loops where you must read before checking. Use <code>while</code> for retry loops with an attempt counter.</div>
+    <div class="cc-code">// do-while: perfect for input menus
+do {
+    Console.Write("Enter ID: ");
+    input = Console.ReadLine();
+    Process(input);
+} while (input != "quit");</div>
+  </div>
+  <div class="cc green">
+    <div class="cc-icon">💥</div>
+    <div class="cc-title">try / catch / finally</div>
+    <div class="cc-body">Surround risky code in <code>try</code>. Catch blocks are checked top-down — most specific first. <code>finally</code> always runs — perfect for cleanup. Never catch <code>Exception</code> and swallow it silently. Always log or rethrow.</div>
+    <div class="cc-code">try { var n = int.Parse(input); }
+catch (FormatException fe) {  // specific
+    Log(fe.Message);
+} catch (Exception ex) {      // catch-all last
+    Log(ex); throw;           // rethrow!
+} finally {
+    conn.Close();             // always runs
+}</div>
+  </div>
+  <div class="cc amber">
+    <div class="cc-icon">🎯</div>
+    <div class="cc-title">when — Exception Filters</div>
+    <div class="cc-body">The <code>when</code> clause runs BEFORE the catch block. If it returns false, the catch is skipped entirely — and crucially, the stack is NOT unwound yet, so the debugger sees the original call site. Ideal for SQL error codes, HTTP status codes.</div>
+    <div class="cc-code">catch (SqlException ex)
+    when (ex.Number == 1205) {
+    // Only catches deadlock (1205)
+    // Stack NOT unwound if filter = false
+    RetryOperation();
+}</div>
+  </div>
+  <div class="cc rose">
+    <div class="cc-icon">🔄</div>
+    <div class="cc-title">throw vs throw ex</div>
+    <div class="cc-body">Always use bare <code>throw</code> to re-throw — it preserves the full original stack trace. <code>throw ex</code> resets the stack trace to the catch block, hiding where the exception actually originated. This makes production debugging much harder.</div>
+    <div class="cc-code">catch (Exception ex) {
+    Log(ex);
+    throw;     // ✓ preserves stack trace
+    // throw ex; ❌ resets to HERE — hides origin
+}</div>
+  </div>
+</div>
+
+<!-- S2: LOOP TRACER -->
+<div class="sec-label reveal">
+  <div class="sl-tag">02 · Visualiser</div>
+  <div class="sl-title2">Loop Execution Tracer</div>
+  <div class="sl-line"></div>
+</div>
+<div class="loop-tracer reveal">
+  <div class="lt-header">
+    <div class="lt-title">🔁 Loop Tracer — Step Through Iterations</div>
+    <div class="lt-sub">Select a loop type to see code + execution trace</div>
+  </div>
+  <div class="lt-type-btns">
+    <div class="lt-btn active" onclick="setLoop(this,'foreach')">foreach</div>
+    <div class="lt-btn" onclick="setLoop(this,'for')">for (index)</div>
+    <div class="lt-btn" onclick="setLoop(this,'while')">while (retry)</div>
+    <div class="lt-btn" onclick="setLoop(this,'dowhile')">do-while (menu)</div>
+    <div class="lt-btn" onclick="setLoop(this,'break')">break + continue</div>
+    <div class="lt-btn" onclick="setLoop(this,'linq')">Loop vs LINQ</div>
+  </div>
+  <div class="lt-body">
+    <div class="lt-code-panel">
+      <div class="lt-code-bar"><div class="lt-dots"><div class="lt-dot r"></div><div class="lt-dot y"></div><div class="lt-dot g"></div></div><span id="ltFileName">LoopDemo.cs</span></div>
+      <div class="lt-code" id="ltCode"></div>
+    </div>
+    <div class="lt-trace-panel">
+      <div class="lt-trace-label">Execution Trace</div>
+      <div class="lt-trace" id="ltTrace"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S3: EXCEPTION FLOW -->
+<div class="sec-label reveal">
+  <div class="sl-tag">03 · Interactive</div>
+  <div class="sl-title2">Exception Handling — Step-by-Step Flow</div>
+  <div class="sl-line"></div>
+</div>
+<div class="exc-flow reveal">
+  <div class="ef-header">
+    <div class="ef-title">💥 Exception Flow Explorer</div>
+    <div class="ef-sub">Click each stage to understand what the CLR does</div>
+  </div>
+  <div class="ef-body">
+    <div class="ef-steps-panel">
+      <div class="ef-step active" onclick="setExc(this,0)"><div class="ef-step-icon">🟦</div><div><div class="ef-step-name">try { }</div><div class="ef-step-sub">Protected block</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step danger" onclick="setExc(this,1)"><div class="ef-step-icon">💥</div><div><div class="ef-step-name">throw</div><div class="ef-step-sub">Exception created</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step" onclick="setExc(this,2)"><div class="ef-step-icon">🔍</div><div><div class="ef-step-name">Stack Unwind</div><div class="ef-step-sub">CLR searches for catch</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step" onclick="setExc(this,3)"><div class="ef-step-icon">🎯</div><div><div class="ef-step-name">when (filter)</div><div class="ef-step-sub">Optional filter check</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step" onclick="setExc(this,4)"><div class="ef-step-icon">🟨</div><div><div class="ef-step-name">catch (Type ex)</div><div class="ef-step-sub">Handler runs</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step success" onclick="setExc(this,5)"><div class="ef-step-icon">🟩</div><div><div class="ef-step-name">finally { }</div><div class="ef-step-sub">Always runs — cleanup</div></div></div>
+      <div class="ef-connector"></div>
+      <div class="ef-step" onclick="setExc(this,6)"><div class="ef-step-icon">🔄</div><div><div class="ef-step-name">throw vs throw ex</div><div class="ef-step-sub">Re-throw strategies</div></div></div>
+    </div>
+    <div class="ef-detail-panel">
+      <div class="ef-d-eyebrow" id="efEyebrow">try block</div>
+      <div class="ef-d-title" id="efTitle">The Protected Region</div>
+      <div class="ef-d-body" id="efBody"></div>
+      <div class="ef-d-code" id="efCode"></div>
+      <div class="ef-d-tip" id="efTip"></div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: CODE TABS -->
+<div class="sec-label reveal">
+  <div class="sl-tag">04 · Code</div>
+  <div class="sl-title2">Annotated Code Walkthroughs</div>
+  <div class="sl-line"></div>
+</div>
+<div class="code-demo reveal">
+  <div class="cd-tabs">
+    <div class="cd-tab active" onclick="showTab(this,'ct1')">Switch Expression</div>
+    <div class="cd-tab" onclick="showTab(this,'ct2')">Loops &amp; Iteration</div>
+    <div class="cd-tab" onclick="showTab(this,'ct3')">Exception Handling</div>
+    <div class="cd-tab" onclick="showTab(this,'ct4')">ERP Enrollment Session</div>
+  </div>
+
+  <!-- Tab 1: Switch -->
+  <div class="cd-panel active" id="ct1">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">SwitchExpressions.cs</div></div>
+      <div class="code-block"><span class="cm">// ── BASIC SWITCH EXPRESSION ──</span>
+<span class="kw">string</span> <span class="fn">GetGrade</span>(<span class="kw">int</span> score) => score <span class="kw">switch</span>
+{
+    >= <span class="num">90</span>           => <span class="str">"A+"</span>,
+    >= <span class="num">80</span> <span class="kw">and</span> < <span class="num">90</span> => <span class="str">"A"</span>,
+    >= <span class="num">70</span>           => <span class="str">"B"</span>,
+    >= <span class="num">60</span>           => <span class="str">"C"</span>,
+    >= <span class="num">40</span>           => <span class="str">"D"</span>,
+    _               => <span class="str">"F"</span>   <span class="cm">// _ = discard (default)</span>
+};
+
+<span class="cm">// ── TYPE PATTERN ──</span>
+<span class="kw">string</span> <span class="fn">Describe</span>(<span class="kw">object</span> obj) => obj <span class="kw">switch</span>
+{
+    <span class="cls">Student</span> s  => <span class="str">$"Student: {s.Name}"</span>,
+    <span class="cls">Course</span>  c  => <span class="str">$"Course: {c.Code}"</span>,
+    <span class="kw">null</span>       => <span class="str">"(null)"</span>,
+    _           => <span class="str">$"Other: {obj.GetType().Name}"</span>
+};
+
+<span class="cm">// ── PROPERTY PATTERN ──</span>
+<span class="kw">decimal</span> <span class="fn">GetFeeRate</span>(<span class="cls">Student</span> s) => s <span class="kw">switch</span>
+{
+    { GPA: > <span class="num">3.8m</span>, HasScholarship: <span class="kw">true</span> } => <span class="num">0.50m</span>,
+    { GPA: > <span class="num">3.0m</span> }                        => <span class="num">0.80m</span>,
+    { IsActive: <span class="kw">false</span> }                     => <span class="num">0.00m</span>,
+    _                                          => <span class="num">1.00m</span>
+};
+
+<span class="cm">// ── TUPLE PATTERN ──</span>
+<span class="kw">string</span> <span class="fn">GetAction</span>(<span class="cls">EligStatus</span> s, <span class="kw">bool</span> paid) =>
+    (s, paid) <span class="kw">switch</span>
+    {
+        (<span class="cls">EligStatus</span>.Approved, <span class="kw">true</span>)  => <span class="str">"Enroll"</span>,
+        (<span class="cls">EligStatus</span>.Approved, <span class="kw">false</span>) => <span class="str">"Collect fee"</span>,
+        (<span class="cls">EligStatus</span>.Blocked,  _)     => <span class="str">"Contact admin"</span>,
+        _                              => <span class="str">"Review"</span>
+    };</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Switch Patterns</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">Expression, not statement</div></div>
+        <div class="ai-body">Switch expression returns a value — assign it to a variable, pass it as an argument, or return it directly. Every arm must return the same type. Compiler checks all cases are covered.</div>
+        <div class="ai-code">var g = score switch { ... };</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">Top-down, first match wins</div></div>
+        <div class="ai-body">Arms are evaluated top-to-bottom. Put most-specific patterns first. <code>>= 90</code> must come before <code>>= 80</code>. The <code>_</code> discard at the bottom catches everything that didn't match.</div>
+        <div class="ai-code">Most specific → least specific → _</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">Property pattern</div></div>
+        <div class="ai-body">Test object properties inline. Combine with <code>and</code>: <code>{ GPA: &gt; 3.8m, HasScholarship: true }</code>. Both conditions must be true. No temporary variables needed.</div>
+        <div class="ai-code">{ GPA: > 3.8m, Active: true }</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">4</div><div class="ai-label">Tuple pattern</div></div>
+        <div class="ai-body">Match multiple values at once with a tuple. Each arm tests a combination. Perfect for state machines: (currentState, event) → nextState.</div>
+        <div class="ai-code">(status, paid) switch { ... }</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Loops -->
+  <div class="cd-panel" id="ct2">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">Loops.cs</div></div>
+      <div class="code-block"><span class="cm">// ── foreach — most idiomatic ──</span>
+<span class="kw">var</span> roster = <span class="kw">new</span>[] { <span class="str">"Alice"</span>, <span class="str">""</span>, <span class="str">"Bob"</span>, <span class="kw">null</span>, <span class="str">"Riya"</span> };
+<span class="kw">foreach</span> (<span class="kw">var</span> name <span class="kw">in</span> roster)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(name)) <span class="kw">continue</span>;
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Enrolling: {name}"</span>);
+}
+<span class="cm">// Output: Alice, Bob, Riya (skipped "", null)</span>
+
+<span class="cm">// ── for — when you need the index ──</span>
+<span class="kw">int</span>[] scores = { <span class="num">85</span>, <span class="num">72</span>, <span class="num">91</span>, <span class="num">63</span> };
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < scores.Length; i++)
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Student {i+1}: {scores[i]}"</span>);
+
+<span class="cm">// ── while — retry loop ──</span>
+<span class="kw">int</span> attempts = <span class="num">0</span>;
+<span class="kw">bool</span> ok = <span class="kw">false</span>;
+<span class="kw">while</span> (attempts < <span class="num">3</span> && !ok)
+{
+    ok = <span class="fn">TryRegister</span>(studentId);
+    attempts++;
+}
+
+<span class="cm">// ── do-while — input validation ──</span>
+<span class="kw">string</span>? input;
+<span class="kw">do</span>
+{
+    <span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"Enter ID (or 'quit'): "</span>);
+    input = <span class="cls">Console</span>.<span class="fn">ReadLine</span>();
+    <span class="kw">if</span> (input != <span class="str">"quit"</span>) <span class="fn">ProcessStudent</span>(input!);
+} <span class="kw">while</span> (input != <span class="str">"quit"</span>);
+
+<span class="cm">// ── break exits the whole loop ──</span>
+<span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> students)
+{
+    <span class="kw">if</span> (enrollCount >= MAX) <span class="kw">break</span>;   <span class="cm">// done</span>
+    <span class="kw">if</span> (!s.IsEligible)     <span class="kw">continue</span>; <span class="cm">// skip this one</span>
+    <span class="fn">Enroll</span>(s);
+    enrollCount++;
+}</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Loop Guide</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">continue skips, break stops</div></div>
+        <div class="ai-body"><code>continue</code> — skip the rest of THIS iteration, jump to the next one. <code>break</code> — exit the entire loop immediately. <code>return</code> — exit the whole method (strongest). Use the weakest one that solves the problem.</div>
+        <div class="ai-code">continue = skip one
+break    = exit loop
+return   = exit method</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">do-while runs at least once</div></div>
+        <div class="ai-body">The body ALWAYS executes at least once — the condition is checked AFTER. Perfect for menus and input loops where you must read before you can validate. Cleaner than <code>while(true) + break</code>.</div>
+        <div class="ai-code">do { read; } while (!valid);</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">for vs foreach</div></div>
+        <div class="ai-body">Use <code>for</code> only when you need the numeric index for something beyond just accessing the element. Otherwise <code>foreach</code> is cleaner and avoids off-by-one errors (starting at 0, stopping at Length-1).</div>
+        <div class="ai-code">for when index matters
+foreach otherwise</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Exception -->
+  <div class="cd-panel" id="ct3">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">ExceptionHandling.cs</div></div>
+      <div class="code-block"><span class="cm">// ── try / catch / finally ──</span>
+<span class="kw">try</span>
+{
+    <span class="kw">var</span> batchSize = <span class="kw">int</span>.<span class="fn">Parse</span>(<span class="cls">Console</span>.<span class="fn">ReadLine</span>()!);
+    <span class="fn">ProcessBatch</span>(batchSize);
+}
+<span class="kw">catch</span> (<span class="cls">FormatException</span> fe)           <span class="cm">// most specific first</span>
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Not a number: {fe.Message}"</span>);
+}
+<span class="kw">catch</span> (<span class="cls">ArgumentOutOfRangeException</span> aoore)
+    <span class="kw">when</span> (aoore.ParamName == <span class="str">"batchSize"</span>)  <span class="cm">// filter</span>
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Batch must be 1–30"</span>);
+}
+<span class="kw">catch</span> (<span class="cls">Exception</span> ex)                   <span class="cm">// catch-all LAST</span>
+{
+    <span class="fn">LogError</span>(<span class="str">"FATAL"</span>, ex);
+    <span class="kw">throw</span>;                              <span class="cm">// preserve stack ✓</span>
+}
+<span class="kw">finally</span>
+{
+    <span class="fn">CloseResources</span>();                   <span class="cm">// ALWAYS runs</span>
+}
+
+<span class="cm">// ── using = auto-dispose (like finally) ──</span>
+<span class="kw">await using var</span> conn = <span class="kw">new</span> <span class="cls">SqlConnection</span>(cs);
+<span class="kw">await</span> conn.<span class="fn">OpenAsync</span>();
+<span class="cm">// DisposeAsync() called automatically — even on exception</span>
+
+<span class="cm">// ── Guard clauses — throw early ──</span>
+<span class="kw">public void</span> <span class="fn">Enroll</span>(<span class="cls">Student</span>? s, <span class="cls">Course</span>? c)
+{
+    <span class="cls">ArgumentNullException</span>.<span class="fn">ThrowIfNull</span>(s);  <span class="cm">// .NET 7+</span>
+    <span class="cls">ArgumentNullException</span>.<span class="fn">ThrowIfNull</span>(c);
+    <span class="kw">if</span> (s.Age < <span class="num">15</span>)
+        <span class="kw">throw new</span> <span class="cls">ArgumentException</span>(
+            <span class="str">"Min age 15"</span>, <span class="kw">nameof</span>(s.Age));
+    <span class="cm">// ... happy path below</span>
+}</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Exception Rules</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">Most-specific catch first</div></div>
+        <div class="ai-body">Catch blocks are checked top-to-bottom. <code>FormatException</code> must come before <code>Exception</code>. If <code>Exception</code> were first, it would catch EVERYTHING — specific blocks would never run. Compiler won't warn you; it's a logic bug.</div>
+        <div class="ai-code">FormatException first
+Exception last</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">when filter — no stack unwind</div></div>
+        <div class="ai-body">The <code>when</code> clause runs before the catch block starts. If it's false, the exception continues searching for another handler. The stack is still intact — the debugger can still see the original throw location.</div>
+        <div class="ai-code">catch (Ex) when (condition)</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">finally always runs</div></div>
+        <div class="ai-body">Even if no catch matches, even if there's a <code>return</code> inside the try, finally still runs. The CLR guarantees this. Use for closing connections, releasing locks, logging completion. <code>using</code> is syntactic sugar over try/finally.</div>
+        <div class="ai-code">finally = guaranteed cleanup</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">4</div><div class="ai-label">Guard clauses — fail fast</div></div>
+        <div class="ai-body">Validate inputs at the top of the method and throw immediately if invalid. This is the "fail fast" pattern — better to crash clearly at the entry point than silently produce wrong results 10 lines later.</div>
+        <div class="ai-code">ArgumentNullException.ThrowIfNull(s)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: ERP -->
+  <div class="cd-panel" id="ct4">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">EnrollmentSession.cs — ERP Context</div></div>
+      <div class="code-block"><span class="cm">// Full enrollment session using all M03 concepts</span>
+<span class="kw">public static void</span> <span class="fn">RunSession</span>()
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"=== ERP Enrollment Session ==="</span>);
+    <span class="kw">string</span>? input;
+
+    <span class="kw">do</span>  <span class="cm">// do-while: run at least once</span>
+    {
+        <span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"\nStudent ID (or 'done'): "</span>);
+        input = <span class="cls">Console</span>.<span class="fn">ReadLine</span>()?.Trim();
+
+        <span class="kw">if</span> (input == <span class="str">"done"</span>) <span class="kw">break</span>;
+        <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrEmpty</span>(input)) <span class="kw">continue</span>;
+
+        <span class="kw">try</span>
+        {
+            <span class="kw">var</span> student = <span class="fn">FindStudent</span>(input);
+            <span class="kw">var</span> action  = <span class="fn">CheckEligibility</span>(student) <span class="kw">switch</span>
+            {
+                <span class="cls">EligStatus</span>.Approved   => <span class="str">"✓ Enrolling"</span>,
+                <span class="cls">EligStatus</span>.FeePending => <span class="str">"⚠ Fee pending"</span>,
+                <span class="cls">EligStatus</span>.Blocked    => <span class="str">"✕ Blocked — see admin"</span>,
+                _ => <span class="kw">throw new</span> <span class="cls">InvalidOperationException</span>(
+                        <span class="str">"Unknown status"</span>)
+            };
+            <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  {action}: {student.Name}"</span>);
+        }
+        <span class="kw">catch</span> (<span class="cls">StudentNotFoundException</span> ex)
+        {
+            <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  ⚠ {ex.Message}"</span>);
+            <span class="cm">// Recoverable — loop continues</span>
+        }
+        <span class="kw">catch</span> (<span class="cls">Exception</span> ex)
+        {
+            <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"  ✕ Unexpected error"</span>);
+            <span class="fn">LogFatal</span>(ex);
+            <span class="kw">throw</span>; <span class="cm">// fatal — rethrow, preserve trace</span>
+        }
+
+    } <span class="kw">while</span> (<span class="kw">true</span>);
+
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"\nSession complete."</span>);
+}</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">ERP Patterns</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">do-while(true) + break</div></div>
+        <div class="ai-body">The REPL (Read-Eval-Print Loop) pattern. Runs forever until the user types "done". Using <code>do-while(true)</code> is clearer than <code>while(true)</code> because it shows intent: this always executes once before any exit check.</div>
+        <div class="ai-code">do { } while (true) + break on "done"</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">continue skips empty input</div></div>
+        <div class="ai-body">User pressed Enter without typing. <code>continue</code> skips the rest of this iteration and goes back to the top of the loop — prompting again. Much cleaner than wrapping the entire loop body in <code>if (!empty)</code>.</div>
+        <div class="ai-code">if (empty) continue; // re-prompt</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">Business vs fatal exceptions</div></div>
+        <div class="ai-body"><code>StudentNotFoundException</code> is expected — show message and continue. Unknown <code>Exception</code> is fatal — log and rethrow. Two-tier error handling: recover from domain errors, crash-fast on unexpected ones.</div>
+        <div class="ai-code">domain error → recover
+unexpected  → rethrow</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">4</div><div class="ai-label">throw in switch default arm</div></div>
+        <div class="ai-body">The <code>_ => throw new InvalidOperationException()</code> ensures that if an unknown EligStatus value appears, it fails immediately with a clear message — rather than silently doing nothing. Fail loudly on programmer errors.</div>
+        <div class="ai-code">_ => throw new InvalidOp(...)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S5: VS SETUP -->
+<div class="sec-label reveal">
+  <div class="sl-tag">05 · Setup</div>
+  <div class="sl-title2">VS 2022 — Practicing Constructs</div>
+  <div class="sl-line"></div>
+</div>
+<div class="setup-box reveal">
+  <div class="sb-header">
+    <div class="sb-icon">⚙️</div>
+    <div>
+      <div class="sb-h-title">Add Control Flow to Your ERP Project</div>
+      <div class="sb-h-sub">Continue from Demo 02 — ERP.Enrollment project with Student model</div>
+    </div>
+  </div>
+  <div class="sb-steps">
+    <div class="sb-step">
+      <div class="ss-num">1</div>
+      <div class="ss-body">
+        <div class="ss-title">Add an EligibilityStatus enum</div>
+        <div class="ss-desc">Right-click <code>Models</code> → <strong>Add → Class</strong> → name it <code>EligibilityStatus.cs</code>:</div>
+        <div class="ss-code"><span class="kw">namespace</span> ERP.Enrollment.Models;
+
+<span class="kw">public enum</span> <span class="cls">EligibilityStatus</span>
+{
+    Approved    = <span class="num">0</span>,
+    FeePending  = <span class="num">1</span>,
+    Blocked     = <span class="num">2</span>,
+    Waitlisted  = <span class="num">3</span>
+}</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">2</div>
+      <div class="ss-body">
+        <div class="ss-title">Add a helper method to Student</div>
+        <div class="ss-desc">Open <code>Student.cs</code> and add a method that returns eligibility based on student data:</div>
+        <div class="ss-code"><span class="kw">public</span> <span class="cls">EligibilityStatus</span> <span class="fn">CheckEligibility</span>() => <span class="kw">this switch</span>
+{
+    { IsActive: <span class="kw">false</span> }                     => <span class="cls">EligibilityStatus</span>.Blocked,
+    { FeeBalance: > <span class="num">0m</span> }                    => <span class="cls">EligibilityStatus</span>.FeePending,
+    { EnrolledCourses.Count: >= MAX_COURSES } => <span class="cls">EligibilityStatus</span>.Waitlisted,
+    _                                          => <span class="cls">EligibilityStatus</span>.Approved
+};</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">3</div>
+      <div class="ss-body">
+        <div class="ss-title">Replace Program.cs with the REPL session</div>
+        <div class="ss-desc">Test the full loop + switch + exception pattern:</div>
+        <div class="ss-code"><span class="kw">using</span> ERP.Enrollment.Models;
+
+<span class="kw">var</span> students = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="cls">Student</span>&gt;
+{
+    <span class="kw">new</span>() { Id=<span class="num">1</span>, Name=<span class="str">"Alice"</span>, IsActive=<span class="kw">true</span>,  FeeBalance=<span class="num">0m</span>    },
+    <span class="kw">new</span>() { Id=<span class="num">2</span>, Name=<span class="str">"Bob"</span>,   IsActive=<span class="kw">true</span>,  FeeBalance=<span class="num">5000m</span> },
+    <span class="kw">new</span>() { Id=<span class="num">3</span>, Name=<span class="str">"Riya"</span>,  IsActive=<span class="kw">false</span>, FeeBalance=<span class="num">0m</span>    },
+};
+
+<span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> students)
+{
+    <span class="kw">var</span> status = s.<span class="fn">CheckEligibility</span>();
+    <span class="kw">var</span> msg = status <span class="kw">switch</span>
+    {
+        <span class="cls">EligibilityStatus</span>.Approved   => <span class="str">"✓ Approved"</span>,
+        <span class="cls">EligibilityStatus</span>.FeePending => <span class="str">"⚠ Pay fee first"</span>,
+        <span class="cls">EligibilityStatus</span>.Blocked    => <span class="str">"✕ Blocked"</span>,
+        _ => <span class="str">"? Unknown"</span>
+    };
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"{s.Name,-10} → {msg}"</span>);
+}</div>
+        <div class="ss-note">Run with Ctrl+F5. Expected: Alice → ✓ Approved | Bob → ⚠ Pay fee first | Riya → ✕ Blocked</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">4</div>
+      <div class="ss-body">
+        <div class="ss-title">Add a try/catch around input parsing</div>
+        <div class="ss-desc">Extend the loop to read an ID from the console with safe parsing:</div>
+        <div class="ss-code"><span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"Enter student ID: "</span>);
+<span class="kw">try</span>
+{
+    <span class="kw">var</span> id      = <span class="kw">int</span>.<span class="fn">Parse</span>(<span class="cls">Console</span>.<span class="fn">ReadLine</span>()!);
+    <span class="kw">var</span> student = students.<span class="fn">FirstOrDefault</span>(s => s.Id == id)
+        ?? <span class="kw">throw new</span> <span class="cls">KeyNotFoundException</span>(<span class="str">$"ID {id} not found"</span>);
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Found: {student.Name}"</span>);
+}
+<span class="kw">catch</span> (<span class="cls">FormatException</span>)
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"⚠ Please enter a number"</span>);
+}
+<span class="kw">catch</span> (<span class="cls">KeyNotFoundException</span> ex)
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"⚠ {ex.Message}"</span>);
+}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: TRY IT -->
+<div class="sec-label reveal">
+  <div class="sl-tag">06 · Practice</div>
+  <div class="sl-title2">Try It Yourself — 3 Exercises</div>
+  <div class="sl-line"></div>
+</div>
+<div class="try-box reveal">
+  <div class="try-header">
+    <div class="try-icon">🧪</div>
+    <div><div class="try-h-title">Hands-on Exercises</div><div class="try-h-sub">Type and run in VS 2022. Expected output shown.</div></div>
+  </div>
+  <div class="try-body">
+    <div class="try-task">
+      <div class="tt-num">Exercise 1 of 3</div>
+      <div class="tt-title">Grade Calculator with Switch Expression</div>
+      <div class="tt-desc">Build a grade evaluator using switch expression and test with various scores.</div>
+      <div class="tt-code"><span class="kw">int</span>[] testScores = { <span class="num">95</span>, <span class="num">83</span>, <span class="num">71</span>, <span class="num">62</span>, <span class="num">45</span>, <span class="num">30</span> };
+
+<span class="kw">foreach</span> (<span class="kw">var</span> score <span class="kw">in</span> testScores)
+{
+    <span class="kw">string</span> grade = score <span class="kw">switch</span>
+    {
+        >= <span class="num">90</span>           => <span class="str">"A+"</span>,
+        >= <span class="num">80</span> <span class="kw">and</span> < <span class="num">90</span> => <span class="str">"A"</span>,
+        >= <span class="num">70</span>           => <span class="str">"B"</span>,
+        >= <span class="num">60</span>           => <span class="str">"C"</span>,
+        >= <span class="num">40</span>           => <span class="str">"D"</span>,
+        _               => <span class="str">"F"</span>
+    };
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Score {score,3} → Grade {grade}"</span>);
+}</div>
+      <div class="tt-expected">
+        <div class="te-label">Expected Output</div>
+        <div class="te-out">Score  95 → Grade A+
+Score  83 → Grade A
+Score  71 → Grade B
+Score  62 → Grade C
+Score  45 → Grade D
+Score  30 → Grade F</div>
+      </div>
+    </div>
+    <div class="try-task">
+      <div class="tt-num">Exercise 2 of 3</div>
+      <div class="tt-title">Loop with continue and break</div>
+      <div class="tt-desc">Process a student list — skip blank names, stop when capacity is reached.</div>
+      <div class="tt-code"><span class="kw">var</span> names = <span class="kw">new</span>[] { <span class="str">"Alice"</span>, <span class="str">""</span>, <span class="str">"Bob"</span>, <span class="str">"Riya"</span>, <span class="str">"Priya"</span>, <span class="str">"Sam"</span> };
+<span class="kw">const int</span> MAX = <span class="num">3</span>;
+<span class="kw">int</span> count = <span class="num">0</span>;
+
+<span class="kw">foreach</span> (<span class="kw">var</span> name <span class="kw">in</span> names)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(name))
+    {
+        <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"  (skipping blank name)"</span>);
+        <span class="kw">continue</span>;
+    }
+    <span class="kw">if</span> (count >= MAX)
+    {
+        <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  Batch full at {MAX}. Stopping."</span>);
+        <span class="kw">break</span>;
+    }
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  ✓ Enrolled: {name}"</span>);
+    count++;
+}
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"\nTotal enrolled: {count}"</span>);</div>
+      <div class="tt-expected">
+        <div class="te-label">Expected Output</div>
+        <div class="te-out">  ✓ Enrolled: Alice
+  (skipping blank name)
+  ✓ Enrolled: Bob
+  ✓ Enrolled: Riya
+  Batch full at 3. Stopping.
+
+Total enrolled: 3</div>
+      </div>
+    </div>
+    <div class="try-task">
+      <div class="tt-num">Exercise 3 of 3</div>
+      <div class="tt-title">Safe Age Input with try/catch + do-while</div>
+      <div class="tt-desc">Combine a do-while loop with exception handling for robust input validation.</div>
+      <div class="tt-code"><span class="kw">int</span> age = <span class="num">0</span>;
+<span class="kw">bool</span> valid = <span class="kw">false</span>;
+
+<span class="kw">do</span>
+{
+    <span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"Enter student age (15–60): "</span>);
+    <span class="kw">try</span>
+    {
+        age = <span class="kw">int</span>.<span class="fn">Parse</span>(<span class="cls">Console</span>.<span class="fn">ReadLine</span>()!);
+        <span class="kw">if</span> (age < <span class="num">15</span> || age > <span class="num">60</span>)
+            <span class="kw">throw new</span> <span class="cls">ArgumentOutOfRangeException</span>(<span class="str">"Age must be 15–60"</span>);
+        valid = <span class="kw">true</span>;
+    }
+    <span class="kw">catch</span> (<span class="cls">FormatException</span>)
+    {
+        <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"  ⚠ Not a number. Try again."</span>);
+    }
+    <span class="kw">catch</span> (<span class="cls">ArgumentOutOfRangeException</span> ex)
+    {
+        <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  ⚠ {ex.Message}"</span>);
+    }
+} <span class="kw">while</span> (!valid);
+
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"\n✓ Age {age} accepted."</span>);</div>
+      <div class="tt-expected">
+        <div class="te-label">Try: "abc" then "5" then "25"</div>
+        <div class="te-out">Enter student age (15–60): abc
+  ⚠ Not a number. Try again.
+Enter student age (15–60): 5
+  ⚠ Age must be 15–60
+Enter student age (15–60): 25
+
+✓ Age 25 accepted.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S7: MISTAKES -->
+<div class="sec-label reveal">
+  <div class="sl-tag">07 · Watch Out</div>
+  <div class="sl-title2">Common Mistakes in M03</div>
+  <div class="sl-line"></div>
+</div>
+<div class="mistakes-box reveal">
+  <div class="mb-header"><div>⚠️</div><div class="mb-title">Control Flow Mistakes That Cause Real Bugs</div></div>
+  <div class="mistakes-body">
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Catch blocks in wrong order</strong>: Putting <code>catch (Exception ex)</code> before <code>catch (FormatException fe)</code>. The general Exception swallows everything — FormatException never runs.
+        <span class="mk-fix">Fix: Always put most-specific exceptions FIRST. Exception should always be last.</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Using throw ex instead of throw</strong>: <code>catch (Exception ex) { throw ex; }</code> — resets the stack trace to the catch block. The original call site is hidden, making production debugging very hard.
+        <span class="mk-fix">Fix: catch (Exception ex) { Log(ex); throw; }  // bare throw preserves full trace</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Swallowing exceptions silently</strong>: <code>catch (Exception) { }</code> — empty catch block. The error disappears. Your app continues with corrupted state. This is one of the worst patterns in professional code.
+        <span class="mk-fix">Fix: Always at minimum: catch (Exception ex) { Log(ex); throw; }</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Missing the _ discard in switch</strong>: If you add a new enum value later and forget to add it to the switch, the switch silently falls through with no warning.
+        <span class="mk-fix">Fix: Always end with: _ => throw new InvalidOperationException($"Unhandled: {value}")</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Using int.Parse() on user input</strong>: If the user types letters, <code>int.Parse(Console.ReadLine()!)</code> throws an unhandled FormatException and crashes.
+        <span class="mk-fix">Fix: if (int.TryParse(Console.ReadLine(), out int n)) { ... } else { show error }</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEXT -->
+<div class="next-nav reveal">
+  <div>
+    <div class="nn-label">Next up · Demo 04</div>
+    <div class="nn-title">Methods &amp; Overloading</div>
+    <div class="nn-desc">Live overload resolver — enter values and watch the compiler pick the right method. ref/out/params. DRY composition for the ERP fee calculator.</div>
+  </div>
+  <a href="demo4.html" class="nn-btn">Demo 04 →</a>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// SWITCH LIVE
+const arms = [
+  { pattern: 'score >= 90',           result: '"A+"',  min:90, max:100, grade:'A+', color:'#56d364' },
+  { pattern: 'score >= 80 and < 90',  result: '"A"',   min:80, max:89,  grade:'A',  color:'#79c0ff' },
+  { pattern: 'score >= 70',           result: '"B"',   min:70, max:79,  grade:'B',  color:'#22d3ee' },
+  { pattern: 'score >= 60',           result: '"C"',   min:60, max:69,  grade:'C',  color:'#f5a623' },
+  { pattern: 'score >= 40',           result: '"D"',   min:40, max:59,  grade:'D',  color:'#f97316' },
+  { pattern: '_ (default)',           result: '"F"',   min:0,  max:39,  grade:'F',  color:'#f0456a' }
+];
+function updateSwitch() {
+  const v = parseInt(document.getElementById('scoreSlider').value);
+  document.getElementById('scoreVal').textContent = v;
+  const hit = arms.find(a => v >= a.min && v <= a.max);
+  document.getElementById('gradeLetter').textContent = hit.grade;
+  document.getElementById('gradeLetter').style.color = hit.color;
+  document.getElementById('armText').textContent = `${hit.pattern} => ${hit.result}`;
+  document.getElementById('armRows').innerHTML = arms.map(a =>
+    `<div class="arm-row${a===hit?' hit':''}">
+      <span class="arm-pattern">${a.pattern}</span>
+      <span class="arm-result">=> ${a.result}</span>
+    </div>`).join('');
+}
+updateSwitch();
+
+// LOOP TRACER
+const loops = {
+  foreach: {
+    file: 'ForEachLoop.cs',
+    code: `<span class="kw">var</span> roster = <span class="kw">new</span>[] { <span class="str">"Alice"</span>, <span class="str">""</span>, <span class="str">"Bob"</span>, <span class="kw">null</span>, <span class="str">"Riya"</span> };
+
+<span class="kw">foreach</span> (<span class="kw">var</span> name <span class="kw">in</span> roster)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrWhiteSpace</span>(name))
+        <span class="kw">continue</span>;    <span class="cm">// skip this one</span>
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"✓ {name}"</span>);
+}`,
+    trace: [
+      { iter:'[0]', action:'name = "Alice" → not blank', result:'out', text:'✓ Alice' },
+      { iter:'[1]', action:'name = "" → IsNullOrWhiteSpace = true', result:'skip', text:'continue →' },
+      { iter:'[2]', action:'name = "Bob" → not blank', result:'out', text:'✓ Bob' },
+      { iter:'[3]', action:'name = null → IsNullOrWhiteSpace = true', result:'skip', text:'continue →' },
+      { iter:'[4]', action:'name = "Riya" → not blank', result:'out', text:'✓ Riya' },
+      { iter:'end', action:'All elements processed', result:'done', text:'Loop exits' }
+    ]
+  },
+  for: {
+    file: 'ForLoop.cs',
+    code: `<span class="kw">int</span>[] scores = { <span class="num">85</span>, <span class="num">72</span>, <span class="num">91</span>, <span class="num">63</span> };
+
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i < scores.Length; i++)
+{
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(
+        <span class="str">$"Student {i+1}: {scores[i]}"</span>);
+}
+<span class="cm">// scores.Length = 4
+// Loop: i=0,1,2,3 → check i&lt;4 → true
+//       i=4       → check i&lt;4 → false → exit</span>`,
+    trace: [
+      { iter:'init', action:'i = 0', result:'done', text:'initialise' },
+      { iter:'i=0', action:'0 < 4 → true → scores[0]=85', result:'out', text:'Student 1: 85 → i++→1' },
+      { iter:'i=1', action:'1 < 4 → true → scores[1]=72', result:'out', text:'Student 2: 72 → i++→2' },
+      { iter:'i=2', action:'2 < 4 → true → scores[2]=91', result:'out', text:'Student 3: 91 → i++→3' },
+      { iter:'i=3', action:'3 < 4 → true → scores[3]=63', result:'out', text:'Student 4: 63 → i++→4' },
+      { iter:'i=4', action:'4 < 4 → false', result:'break', text:'Exit loop' }
+    ]
+  },
+  while: {
+    file: 'WhileLoop.cs',
+    code: `<span class="kw">int</span> attempts = <span class="num">0</span>;
+<span class="kw">bool</span> ok = <span class="kw">false</span>;
+
+<span class="kw">while</span> (attempts < <span class="num">3</span> && !ok)
+{
+    ok = <span class="fn">TryRegister</span>(studentId);
+    attempts++;
+}
+
+<span class="cm">// Check condition BEFORE running.
+// If ok=true from the start, body never runs.
+// Useful for retry loops with a limit.</span>`,
+    trace: [
+      { iter:'check', action:'0 < 3 && !false → true', result:'out', text:'TryRegister → false, attempts=1' },
+      { iter:'check', action:'1 < 3 && !false → true', result:'out', text:'TryRegister → false, attempts=2' },
+      { iter:'check', action:'2 < 3 && !false → true', result:'out', text:'TryRegister → true,  attempts=3' },
+      { iter:'check', action:'3 < 3 = false', result:'break', text:'Exit (or: ok=true → !ok=false)' }
+    ]
+  },
+  dowhile: {
+    file: 'DoWhileLoop.cs',
+    code: `<span class="kw">string</span>? input;
+
+<span class="kw">do</span>
+{
+    <span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"ID (or 'quit'): "</span>);
+    input = <span class="cls">Console</span>.<span class="fn">ReadLine</span>();
+    <span class="kw">if</span> (input != <span class="str">"quit"</span>)
+        <span class="fn">ProcessStudent</span>(input!);
+} <span class="kw">while</span> (input != <span class="str">"quit"</span>);
+
+<span class="cm">// Body runs FIRST, check after.
+// Always executes at least once.
+// Perfect for menus and input sessions.</span>`,
+    trace: [
+      { iter:'run 1', action:'Body runs — input="STU001"', result:'out', text:'Process("STU001") → check: != quit → true → loop' },
+      { iter:'run 2', action:'Body runs — input="STU002"', result:'out', text:'Process("STU002") → check: != quit → true → loop' },
+      { iter:'run 3', action:'Body runs — input="quit"', result:'skip', text:'(skip process) → check: "quit"!="quit" = false' },
+      { iter:'exit', action:'Condition false → loop exits', result:'break', text:'Done — ran 3 times' }
+    ]
+  },
+  break: {
+    file: 'BreakContinue.cs',
+    code: `<span class="kw">const int</span> MAX = <span class="num">2</span>;
+<span class="kw">int</span> count = <span class="num">0</span>;
+<span class="kw">var</span> names = <span class="kw">new</span>[] { <span class="str">"Alice"</span>, <span class="str">""</span>, <span class="str">"Bob"</span>, <span class="str">"Riya"</span> };
+
+<span class="kw">foreach</span> (<span class="kw">var</span> name <span class="kw">in</span> names)
+{
+    <span class="kw">if</span> (<span class="kw">string</span>.<span class="fn">IsNullOrEmpty</span>(name)) <span class="kw">continue</span>;
+    <span class="kw">if</span> (count >= MAX) <span class="kw">break</span>;
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"✓ {name}"</span>);
+    count++;
+}`,
+    trace: [
+      { iter:'"Alice"', action:'not empty, count=0 < 2', result:'out', text:'✓ Alice → count=1' },
+      { iter:'""', action:'IsNullOrEmpty = true', result:'skip', text:'continue → next' },
+      { iter:'"Bob"', action:'not empty, count=1 < 2', result:'out', text:'✓ Bob → count=2' },
+      { iter:'"Riya"', action:'count=2 >= MAX=2', result:'break', text:'break → exit loop' }
+    ]
+  },
+  linq: {
+    file: 'LinqVsLoop.cs',
+    code: `<span class="cm">// MANUAL LOOP — imperative style</span>
+<span class="kw">var</span> atRisk = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt;();
+<span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> students)
+    <span class="kw">if</span> (s.GPA < <span class="num">2.0m</span>) atRisk.<span class="fn">Add</span>(s.Name);
+
+<span class="cm">// LINQ — declarative style (preferred for reads)</span>
+<span class="kw">var</span> atRisk = students
+    .<span class="fn">Where</span>(s => s.GPA < <span class="num">2.0m</span>)
+    .<span class="fn">Select</span>(s => s.Name)
+    .<span class="fn">ToList</span>();
+
+<span class="cm">// Use loops for: mutations, complex flow, early exit.
+// Use LINQ for: filtering, transforming, projecting.
+// Both produce identical results here.</span>`,
+    trace: [
+      { iter:'s=Alice', action:'GPA=3.8 → 3.8 < 2.0 = false', result:'skip', text:'Not at risk' },
+      { iter:'s=Bob', action:'GPA=1.5 → 1.5 < 2.0 = true', result:'out', text:'Added: "Bob"' },
+      { iter:'s=Riya', action:'GPA=2.8 → 2.8 < 2.0 = false', result:'skip', text:'Not at risk' },
+      { iter:'s=Sam', action:'GPA=1.8 → 1.8 < 2.0 = true', result:'out', text:'Added: "Sam"' },
+      { iter:'done', action:'ToList() materialises', result:'done', text:'Result: ["Bob", "Sam"]' }
+    ]
+  }
+};
+
+function setLoop(btn, key) {
+  document.querySelectorAll('.lt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const l = loops[key];
+  document.getElementById('ltFileName').textContent = l.file;
+  document.getElementById('ltCode').innerHTML = l.code;
+  const colorMap = { out:'tr-out', skip:'tr-skip', break:'tr-break', done:'tr-done' };
+  document.getElementById('ltTrace').innerHTML = l.trace.map(r =>
+    `<div class="trace-row">
+      <span class="tr-iter">${r.iter}</span>
+      <span class="tr-action">${r.action}</span>
+      <span class="tr-result ${colorMap[r.result]||''}">${r.text}</span>
+    </div>`).join('');
+}
+setLoop(document.querySelector('.lt-btn'), 'foreach');
+
+// EXCEPTION FLOW
+const excSteps = [
+  {
+    eyebrow:'Stage 1 — try block',
+    title:'The Protected Region',
+    body:'Code inside try { } runs normally. If no exception is thrown, execution jumps to after the try/catch/finally block — catch blocks are completely skipped. The finally block always runs regardless.',
+    code:`try\n{\n    var n = int.Parse(Console.ReadLine()!);\n    ProcessBatch(n);\n    // If no exception → execution continues here\n    // Catch blocks are SKIPPED\n}\n// finally { } still runs`,
+    tip:'💡 Keep try blocks small — only wrap the line(s) that can throw. Wrapping too much code makes it hard to know which line caused the exception.',
+    cls:''
+  },
+  {
+    eyebrow:'Stage 2 — throw',
+    title:'Exception Created &amp; Thrown',
+    body:'When throw executes, an exception object is created on the heap with a message, stack trace, and optionally an inner exception. Execution of the current method stops immediately — no further lines in the try block run.',
+    code:`// int.Parse("abc") internally does:
+throw new FormatException(
+    "Input string was not in a correct format.");
+// Stack trace captured at THIS point
+// Execution of the try block stops immediately`,
+    tip:'💡 Use the existing exception types where they fit (FormatException, ArgumentNullException, KeyNotFoundException). Only create custom exceptions when the built-in types don\'t carry enough domain information.',
+    cls:'danger'
+  },
+  {
+    eyebrow:'Stage 3 — stack unwind',
+    title:'CLR Searches for a Handler',
+    body:'The CLR walks up the call stack looking for a matching catch block. It checks each try/catch in the call chain — from the innermost to the outermost. If no catch is found anywhere, the process terminates with an unhandled exception.',
+    code:`// Call stack at the moment of exception:
+//   int.Parse()           ← throw site
+//   ProcessEnrollment()   ← no catch here
+//   RunSession()          ← has try/catch ← CLR finds it
+//   Main()
+//
+// CLR unwinds back to RunSession's catch block`,
+    tip:'💡 If you don\'t catch an exception, it propagates up automatically. You don\'t need to catch-and-rethrow just to let it bubble up — just don\'t catch it.',
+    cls:''
+  },
+  {
+    eyebrow:'Stage 4 — when filter',
+    title:'Exception Filter (Optional)',
+    body:'If a catch block has a when clause, the CLR evaluates it BEFORE entering the catch block. If when returns false, this catch is skipped and the search continues. Crucially — the stack is NOT unwound yet, so debuggers still see the original throw context.',
+    code:`catch (SqlException ex)
+    when (ex.Number == 1205)     // deadlock
+{
+    // Only runs if Number == 1205
+    // Stack still intact at int.Parse() call site
+    RetryOperation();
+}
+catch (SqlException ex)
+    when (ex.Number == 1222)     // lock timeout
+{
+    await Task.Delay(100);
+}`,
+    tip:'💡 Exception filters are powerful for logging without handling: catch (Exception ex) when (LogException(ex) == false) { } — logs every exception but never actually catches any.',
+    cls:''
+  },
+  {
+    eyebrow:'Stage 5 — catch block',
+    title:'Handler Executes',
+    body:'Once a matching catch block is found, the stack unwinds to that frame and the catch body executes. The variable ex holds the exception object. After the catch body completes, execution continues after the entire try/catch/finally construct — unless you throw or return.',
+    code:`catch (FormatException fe)
+{
+    // fe.Message → "Input string was not in correct format"
+    // fe.StackTrace → full call stack from throw site
+    // fe.InnerException → null (or nested exception)
+    Console.WriteLine($"Error: {fe.Message}");
+    // After this block → execution continues normally
+}`,
+    tip:'💡 catch (FormatException fe) — the variable name fe is optional. catch (FormatException) works if you don\'t need the exception object. But always name it if you\'re logging.',
+    cls:''
+  },
+  {
+    eyebrow:'Stage 6 — finally block',
+    title:'Guaranteed Cleanup',
+    body:'The finally block runs regardless: whether the try completed normally, whether an exception was caught, whether an exception was NOT caught, even if there\'s a return inside the try. The CLR guarantees this. Use it for releasing resources.',
+    code:`try
+{
+    var conn = new SqlConnection(cs);
+    conn.Open();
+    // ... do work ...
+    return result;          // finally still runs!
+}
+catch (SqlException ex)
+{
+    Log(ex);
+    throw;                  // finally still runs!
+}
+finally
+{
+    conn?.Close();          // ALWAYS executed
+    Log("Session ended");
+}`,
+    tip:'💡 The using statement is syntactic sugar over try/finally. await using var conn = new SqlConnection(cs); is equivalent to a try { } finally { conn.DisposeAsync(); } block.',
+    cls:'success'
+  },
+  {
+    eyebrow:'Stage 7 — re-throw strategies',
+    title:'throw vs throw ex',
+    body:'When you re-throw inside a catch, HOW you throw matters. Bare throw preserves the full original stack trace — the exception looks like it was thrown from the original line. throw ex resets the stack trace to the current catch block, hiding the origin.',
+    code:`catch (Exception ex)
+{
+    Log(ex.StackTrace);  // log original trace
+
+    throw;       // ✓ stack trace: at int.Parse() line 42
+                 //   at ProcessBatch() line 18
+                 //   at RunSession() line 7
+
+    // throw ex; ✗ stack trace: at RunSession() line 9
+                 //   (original origin HIDDEN)
+}`,
+    tip:'💡 Rule: always use bare throw. The only exception (pun intended) is when you intentionally want to wrap and rethrow: throw new ApplicationException("msg", ex); — this creates a new exception with the original as InnerException.',
+    cls:''
+  }
+];
+
+function setExc(el, i) {
+  document.querySelectorAll('.ef-step').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const s = excSteps[i];
+  document.getElementById('efEyebrow').textContent = s.eyebrow;
+  document.getElementById('efTitle').innerHTML = s.title;
+  document.getElementById('efBody').textContent = s.body;
+  document.getElementById('efCode').textContent = s.code;
+  document.getElementById('efCode').className = `ef-d-code${s.cls?' '+s.cls:''}`;
+  document.getElementById('efTip').textContent = s.tip;
+}
+setExc(document.querySelector('.ef-step'), 0);
+
+// TABS
+function showTab(el, id) {
+  document.querySelectorAll('.cd-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cd-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// REVEAL
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, { threshold: 0.07 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
