@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Demo 02 · Types of Data &amp; Expressions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#09090e;--surface:#111118;--surface2:#18181f;--surface3:#22222c;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f5;--muted:#8888a0;--faint:#44445a;
+  --C:#3b9eff;--C-dim:rgba(59,158,255,0.1);--C-border:rgba(59,158,255,0.22);--C-glow:rgba(59,158,255,0.3);
+  --green:#2dd4a0;--green-dim:rgba(45,212,160,0.1);--green-border:rgba(45,212,160,0.22);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--amber-border:rgba(245,166,35,0.22);
+  --rose:#f0456a;--rose-dim:rgba(240,69,106,0.1);--rose-border:rgba(240,69,106,0.22);
+  --font-display:'Instrument Serif',serif;
+  --font-ui:'DM Sans',sans-serif;
+  --font-code:'JetBrains Mono',monospace;
+  --r:8px;--r-lg:14px;--r-xl:20px;--nav-h:58px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.65;font-size:15px;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{position:fixed;inset:0 0 auto;height:var(--nav-h);background:rgba(9,9,14,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 32px;z-index:200}
+.nav-back{font-size:12px;font-weight:600;color:var(--muted);padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);transition:all .2s;font-family:var(--font-code)}.nav-back:hover{color:var(--C);border-color:var(--C-border)}
+.nav-title{font-size:13px;color:var(--muted)}.nav-title strong{color:var(--text)}
+.nav-badge{margin-left:auto;background:var(--C-dim);color:var(--C);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--C-border);font-family:var(--font-code)}
+.nav-prev{font-size:12px;font-weight:600;padding:6px 14px;border-radius:var(--r);color:var(--muted);border:1px solid var(--border);transition:all .2s;font-family:var(--font-code)}.nav-prev:hover{color:var(--C);border-color:var(--C-border)}
+.nav-next{font-size:12px;font-weight:700;padding:6px 16px;border-radius:var(--r);color:#fff;background:var(--C);transition:all .2s;font-family:var(--font-code)}.nav-next:hover{background:#2988e8;transform:translateY(-1px)}
+
+/* HERO */
+.hero{padding:calc(var(--nav-h)+60px) 48px 56px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 5% 60%,rgba(59,158,255,0.09),transparent 65%),radial-gradient(ellipse 50% 60% at 95% 30%,rgba(45,212,160,0.07),transparent 60%)}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:60px;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{font-family:var(--font-code);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--C);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before{content:'';width:24px;height:2px;background:var(--C)}
+h1{font-family:var(--font-display);font-size:clamp(34px,4.8vw,58px);font-weight:400;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px}
+h1 em{font-style:italic;color:var(--green)}
+.hero-desc{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:28px;max-width:480px}
+.hero-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:32px}
+.pill{font-family:var(--font-code);font-size:10px;font-weight:600;padding:4px 11px;border-radius:4px;border:1px solid var(--border2);color:var(--muted)}
+.hero-progress{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px}
+.hp-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.hp-bar{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:8px}
+.hp-fill{height:100%;width:33.3%;background:linear-gradient(90deg,var(--C),var(--green));border-radius:2px}
+.hp-text{font-size:11px;color:var(--muted);font-family:var(--font-code)}
+
+/* TYPE COMPARISON TABLE (hero right) */
+.type-table{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+.tt-head{display:grid;grid-template-columns:1fr 1fr;background:var(--surface2);border-bottom:1px solid var(--border)}
+.tt-col{padding:12px 16px;font-family:var(--font-code);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tt-col.v{color:var(--C)}.tt-col.r{color:var(--green)}
+.tt-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);transition:background .18s;cursor:default}
+.tt-row:last-child{border-bottom:none}
+.tt-row:hover{background:var(--surface2)}
+.tt-cell{padding:9px 16px;font-family:var(--font-code);font-size:11px;color:var(--muted)}
+.tt-cell.v{color:#79c0ff}.tt-cell.r{color:#56d364}
+.tt-section{padding:8px 16px;font-family:var(--font-code);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);background:var(--surface2);border-bottom:1px solid var(--border)}
+
+/* MAIN CONTENT */
+.content{max-width:1100px;margin:0 auto;padding:56px 48px 88px}
+.sec-label{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.sl-tag{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--C);background:var(--C-dim);border:1px solid var(--C-border);padding:3px 10px;border-radius:4px}
+.sl-title{font-family:var(--font-display);font-size:26px;font-weight:400}
+.sl-line{flex:1;height:1px;background:var(--border)}
+
+/* CONCEPT CARDS */
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all .22s;border-top:2px solid transparent}
+.cc:hover{border-color:var(--border2);transform:translateY(-2px)}
+.cc.blue{border-top-color:var(--C)}.cc.green{border-top-color:var(--green)}.cc.amber{border-top-color:var(--amber)}.cc.rose{border-top-color:var(--rose)}
+.cc-icon{font-size:22px;margin-bottom:10px}
+.cc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.cc-body{font-size:12px;color:var(--muted);line-height:1.65}
+.cc-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--C);padding:8px 10px;border-radius:var(--r);margin-top:10px;color:#abb2bf;white-space:pre-wrap}
+.cc.green .cc-code{border-left-color:var(--green)}
+.cc.amber .cc-code{border-left-color:var(--amber)}
+.cc.rose .cc-code{border-left-color:var(--rose)}
+
+/* STACK / HEAP VISUALISER */
+.mem-vis{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.mv-header{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mv-title{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.mv-sub{font-size:12px;color:var(--muted)}
+.mv-scenario-btns{display:flex;gap:6px;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.sc-btn{font-family:var(--font-code);font-size:11px;font-weight:600;padding:6px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .2s}
+.sc-btn:hover{border-color:var(--C-border);color:var(--C)}
+.sc-btn.active{background:var(--C-dim);border-color:var(--C);color:var(--C)}
+.mv-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.mem-panel{padding:18px;border-right:1px solid var(--border)}
+.mem-panel:last-child{border-right:none}
+.mp-label{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.mp-label.stack{color:var(--C)}.mp-label.heap{color:var(--green)}
+.mem-cell{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);margin-bottom:5px;border:1px solid transparent;transition:all .4s;font-family:var(--font-code);font-size:11px}
+.mc-stack{background:rgba(59,158,255,0.07);border-color:rgba(59,158,255,0.15);color:var(--muted)}
+.mc-heap{background:rgba(45,212,160,0.07);border-color:rgba(45,212,160,0.15);color:var(--muted)}
+.mc-highlight{transform:scale(1.02);box-shadow:0 0 16px rgba(59,158,255,0.2)}
+.mc-highlight.mc-heap{box-shadow:0 0 16px rgba(45,212,160,0.2);border-color:var(--green)!important}
+.mc-addr{font-size:9px;color:var(--faint);width:56px;flex-shrink:0}
+.mc-name{font-weight:700;color:var(--text);min-width:54px}
+.mc-val{color:var(--amber);margin-left:auto}
+.mc-ptr{color:var(--rose);font-size:9px}
+.mc-empty{padding:16px;text-align:center;font-family:var(--font-code);font-size:11px;color:var(--faint)}
+.mv-code-row{padding:14px 18px;border-top:1px solid var(--border);font-family:var(--font-code);font-size:12px;line-height:1.8;color:#abb2bf;background:#0d1117}
+.mv-insight{padding:12px 18px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);background:var(--surface2);line-height:1.6}
+.mv-insight strong{color:var(--text)}
+
+/* CODE TABS */
+.code-demo{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.cd-tabs{display:flex;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto}
+.cd-tab{font-family:var(--font-code);font-size:11px;font-weight:600;padding:11px 18px;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s}
+.cd-tab:hover{color:var(--muted)}.cd-tab.active{color:var(--C);border-bottom-color:var(--C);background:var(--surface)}
+.cd-panel{display:none}.cd-panel.active{display:grid;grid-template-columns:1fr 340px}
+.code-side{background:#0d1117}
+.code-bar{background:#161b22;display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.cb-dots{display:flex;gap:5px}.cb-dot{width:10px;height:10px;border-radius:50%}
+.cb-dot.r{background:#ff5f57}.cb-dot.y{background:#febc2e}.cb-dot.g{background:#28c840}
+.cb-file{font-family:var(--font-code);font-size:11px;color:rgba(255,255,255,.3);margin-left:6px}
+.code-block{padding:20px 22px;font-family:var(--font-code);font-size:12px;line-height:1.85;color:#abb2bf;overflow-x:auto;white-space:pre}
+.kw{color:#ff79c6}.str{color:#f1fa8c}.cm{color:#6272a4;font-style:italic}
+.num{color:#bd93f9}.cls{color:#8be9fd}.fn{color:#50fa7b}.prop{color:#ffb86c}
+.ann-side{padding:22px;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto}
+.ann-title{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--C);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ann-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.ann-item:last-child{border-bottom:none;margin-bottom:0}
+.ai-line{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.ai-num{width:20px;height:20px;border-radius:50%;background:var(--C);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-code);margin-top:1px}
+.ai-label{font-size:12.5px;font-weight:700;color:var(--text)}
+.ai-body{font-size:12px;color:var(--muted);line-height:1.6;margin-left:30px}
+.ai-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);padding:3px 8px;border-radius:4px;color:var(--C);display:inline-block;margin-top:4px}
+
+/* TYPE CONVERTER */
+.converter{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.conv-header{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border)}
+.conv-title{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--text)}
+.conv-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.conv-type-btns{display:flex;flex-wrap:wrap;gap:7px;padding:16px 18px;border-bottom:1px solid var(--border)}
+.ct-btn{font-family:var(--font-code);font-size:11px;font-weight:600;padding:6px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .2s}
+.ct-btn:hover{border-color:var(--C-border);color:var(--C)}
+.ct-btn.active{background:var(--C-dim);border-color:var(--C);color:var(--C)}
+.conv-body{padding:20px 18px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.conv-field{background:var(--surface2);border:2px solid var(--border2);border-radius:var(--r-lg);padding:14px 16px;transition:border-color .2s}
+.conv-field:focus-within{border-color:var(--C)}
+.cf-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.cf-input{width:100%;background:transparent;border:none;outline:none;font-family:var(--font-code);font-size:16px;font-weight:700;color:var(--text)}
+.cf-type{font-family:var(--font-code);font-size:10px;color:var(--C);margin-top:6px}
+.conv-arrow-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.conv-arrow{font-size:22px;color:var(--faint)}
+.conv-cast{font-family:var(--font-code);font-size:10px;color:var(--amber);text-align:center}
+.conv-result-field{background:var(--surface3);border:2px solid var(--border);border-radius:var(--r-lg);padding:14px 16px}
+.cr-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.cr-value{font-family:var(--font-code);font-size:16px;font-weight:700;color:var(--green);min-height:24px}
+.cr-type{font-family:var(--font-code);font-size:10px;color:var(--muted);margin-top:6px}
+.conv-msg{padding:12px 18px;border-top:1px solid var(--border);font-size:13px;line-height:1.6;min-height:48px}
+.msg-warn{color:var(--amber)}.msg-ok{color:var(--green)}.msg-err{color:var(--rose)}
+
+/* VS SETUP */
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.sb-header{background:linear-gradient(135deg,rgba(59,158,255,0.1),transparent);padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.sb-icon{font-size:28px}
+.sb-h-title{font-family:var(--font-display);font-size:20px}
+.sb-h-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.sb-steps{padding:20px 24px;display:flex;flex-direction:column;gap:0}
+.sb-step{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.sb-step:last-child{border-bottom:none}
+.ss-num{width:26px;height:26px;border-radius:50%;background:var(--C-dim);border:1px solid var(--C-border);color:var(--C);font-family:var(--font-code);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.ss-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px}
+.ss-desc{font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:8px}
+.ss-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid var(--border);border-left:3px solid var(--C);padding:10px 14px;border-radius:var(--r);color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
+.ss-note{font-size:11.5px;color:var(--faint);margin-top:6px;font-style:italic}
+.ss-menu{font-family:var(--font-code);font-size:11px;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:4px}
+
+/* TRY IT */
+.try-box{background:var(--surface);border:1px solid var(--green-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.try-header{background:var(--green-dim);padding:14px 22px;border-bottom:1px solid var(--green-border);display:flex;align-items:center;gap:12px}
+.try-icon{font-size:22px}.try-h-title{font-size:15px;font-weight:700;color:var(--green)}.try-h-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.try-body{padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+.try-task{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px}
+.tt-num{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--green);text-transform:uppercase;margin-bottom:7px}
+.tt-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:7px}
+.tt-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.tt-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);padding:14px 16px;color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
+.tt-expected{background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r);padding:10px 14px;margin-top:10px}
+.te-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.te-out{font-family:var(--font-code);font-size:11.5px;color:var(--text);line-height:1.8;white-space:pre}
+
+/* MISTAKES */
+.mistakes-box{background:var(--surface);border:1px solid var(--amber-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
+.mb-header{background:var(--amber-dim);padding:14px 22px;border-bottom:1px solid var(--amber-border);display:flex;align-items:center;gap:10px}
+.mb-title{font-size:14px;font-weight:700;color:var(--amber)}
+.mistakes-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.mistake{display:grid;grid-template-columns:22px 1fr;gap:12px}
+.mk-body{font-size:13px;color:var(--muted);line-height:1.65}
+.mk-body strong{color:var(--text)}
+.mk-fix{font-family:var(--font-code);font-size:11px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--green);padding:6px 10px;border-radius:var(--r);color:var(--green);margin-top:6px;display:block}
+
+/* NEXT */
+.next-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nn-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.nn-title{font-family:var(--font-display);font-size:24px;font-weight:400;margin-bottom:6px}
+.nn-desc{font-size:13px;color:var(--muted)}
+.nn-btn{background:var(--C);color:#fff;font-weight:700;font-size:13px;padding:12px 24px;border-radius:var(--r);transition:all .2s;white-space:nowrap;box-shadow:0 4px 16px -4px var(--C-glow);font-family:var(--font-code)}
+.nn-btn:hover{background:#2988e8;transform:translateY(-2px)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s,transform .55s}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:960px){.hero-inner,.cd-panel,.concept-grid,.conv-body,.mv-body{grid-template-columns:1fr}.content{padding:40px 24px 60px}.hero{padding:calc(var(--nav-h)+40px) 24px 40px}}
+::-webkit-scrollbar{width:5px;height:4px}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="demos.html" class="nav-back">← Demos</a>
+  <div class="nav-title">Demo <strong>02 / 06</strong> · M02</div>
+  <div class="nav-badge">Types &amp; Expressions</div>
+  <a href="demo1.html" class="nav-prev">← Demo 01</a>
+  <a href="demo3.html" class="nav-next">Demo 03 →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Demo 02 · Module 02</div>
+      <h1>Types of Data<br/>&amp; <em>Expressions</em></h1>
+      <p class="hero-desc">The single most important mental model in C# — value types live on the stack and copy on assignment, reference types live on the heap and share on assignment. Get this wrong and you'll introduce subtle ERP bugs that take hours to find.</p>
+      <div class="hero-pills">
+        <span class="pill">int / decimal / string</span><span class="pill">struct / class</span>
+        <span class="pill">Stack vs Heap</span><span class="pill">Nullable&lt;T&gt;</span>
+        <span class="pill">?? / ?.</span><span class="pill">TryParse</span><span class="pill">Casting</span>
+      </div>
+      <div class="hero-progress">
+        <div class="hp-label">Course Progress</div>
+        <div class="hp-bar"><div class="hp-fill"></div></div>
+        <div class="hp-text">Demo 2 of 6 · ~50 min · Beginner</div>
+      </div>
+    </div>
+    <!-- Type Table -->
+    <div class="type-table">
+      <div class="tt-head">
+        <div class="tt-col v">📦 Value Types</div>
+        <div class="tt-col r">🔗 Reference Types</div>
+      </div>
+      <div class="tt-section">Examples</div>
+      <div class="tt-row"><div class="tt-cell v">int, long, decimal</div><div class="tt-cell r">string, class</div></div>
+      <div class="tt-row"><div class="tt-cell v">bool, char, double</div><div class="tt-cell r">array, interface</div></div>
+      <div class="tt-row"><div class="tt-cell v">struct, enum</div><div class="tt-cell r">List&lt;T&gt;, Dictionary</div></div>
+      <div class="tt-section">Memory &amp; Behaviour</div>
+      <div class="tt-row"><div class="tt-cell v">Stored on Stack</div><div class="tt-cell r">Object on Heap</div></div>
+      <div class="tt-row"><div class="tt-cell v">b = a → copy</div><div class="tt-cell r">s2 = s1 → same obj</div></div>
+      <div class="tt-row"><div class="tt-cell v">== compares value</div><div class="tt-cell r">== compares address</div></div>
+      <div class="tt-section">Default (unassigned)</div>
+      <div class="tt-row"><div class="tt-cell v">0, false, '\0'</div><div class="tt-cell r">null</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="content">
+
+<!-- SECTION 1: CONCEPTS -->
+<div class="sec-label reveal">
+  <div class="sl-tag">01 · Concepts</div>
+  <div class="sl-title">The C# Type System — What You Must Know</div>
+  <div class="sl-line"></div>
+</div>
+<div class="concept-grid reveal">
+  <div class="cc blue">
+    <div class="cc-icon">📦</div>
+    <div class="cc-title">Value Types — Copy on Assign</div>
+    <div class="cc-body">Value types store data <strong>directly</strong> on the stack. When you write <code>b = a</code>, b gets an independent copy. Changing b never affects a. Built-ins: <code>int</code>, <code>long</code>, <code>decimal</code>, <code>bool</code>, <code>char</code>, <code>double</code>, <code>DateTime</code>, any <code>struct</code>.</div>
+    <div class="cc-code">int a = 10;
+int b = a;   // independent copy
+b = 20;
+Console.WriteLine(a); // 10 — unchanged ✓</div>
+  </div>
+  <div class="cc green">
+    <div class="cc-icon">🔗</div>
+    <div class="cc-title">Reference Types — Share on Assign</div>
+    <div class="cc-body">Reference types store a <strong>pointer</strong> to a heap object. When you write <code>s2 = s1</code>, both variables point to the <strong>same object</strong>. Mutating through s2 changes what s1 sees too. This is the most common source of ERP data bugs.</div>
+    <div class="cc-code">var s1 = new Student { Name = "Alice" };
+var s2 = s1;        // copies the POINTER
+s2.Name = "Bob";
+Console.WriteLine(s1.Name); // "Bob" 🐛</div>
+  </div>
+  <div class="cc amber">
+    <div class="cc-icon">💰</div>
+    <div class="cc-title">decimal — Always for Money</div>
+    <div class="cc-body">ALWAYS use <code>decimal</code> for fees, salaries, tax. <code>double</code> uses binary floating-point — <strong>0.1 + 0.2 ≠ 0.3</strong> exactly. This isn't a bug; it's how binary fractions work. <code>decimal</code> uses base-10 with 28–29 significant digits — exact for currency.</div>
+    <div class="cc-code">double d = 0.1 + 0.2;
+Console.WriteLine(d); // 0.30000000000000004 ❌
+
+decimal m = 0.1m + 0.2m;
+Console.WriteLine(m); // 0.3 ✓ (m = decimal)</div>
+  </div>
+  <div class="cc rose">
+    <div class="cc-icon">❓</div>
+    <div class="cc-title">Nullable Types — Explicit Null</div>
+    <div class="cc-body">With <code>Nullable=enable</code>, <code>string</code> cannot be null. Use <code>string?</code> to explicitly allow it. Works for value types too: <code>int?</code> is <code>Nullable&lt;int&gt;</code>. Use <code>??</code> for fallback, <code>?.</code> to safely navigate null chains without throwing.</div>
+    <div class="cc-code">string? alias = null;
+int?    score = null;
+
+string display = alias ?? "Unknown"; // fallback
+int?   len = alias?.Length;          // null, no throw
+int    final = score ?? 0;           // 0 if null</div>
+  </div>
+  <div class="cc blue">
+    <div class="cc-icon">🔄</div>
+    <div class="cc-title">Type Conversion — Safe vs Unsafe</div>
+    <div class="cc-body"><strong>Implicit</strong> (widening): always safe, no data loss (<code>int → long</code>). <strong>Explicit cast</strong>: truncates, may lose data (<code>(int)3.9 = 3</code>, not 4). <strong>TryParse</strong>: safe parsing of strings — never use <code>Parse()</code> on user input (it throws).</div>
+    <div class="cc-code">int    i = 42;
+long   l = i;          // implicit — safe
+double d = 3.9;
+int    n = (int)d;     // explicit → 3 (truncated!)
+
+// Always TryParse on user input:
+if (int.TryParse(input, out int age)) { ... }</div>
+  </div>
+  <div class="cc green">
+    <div class="cc-icon">🎯</div>
+    <div class="cc-title">string — Immutable Reference Type</div>
+    <div class="cc-body"><code>string</code> is a reference type but <strong>behaves like a value</strong> because strings are immutable — they can never be changed after creation. Every "change" creates a new string. Use <code>StringBuilder</code> for repeated concatenation inside loops.</div>
+    <div class="cc-code">string x = "Hello";
+string y = x;        // both point to "Hello"
+x = "World";         // NEW string — y unchanged
+Console.WriteLine(y); // "Hello" ✓
+
+// Loop concatenation: use StringBuilder
+var sb = new StringBuilder();
+foreach (var n in names) sb.Append(n);</div>
+  </div>
+</div>
+
+<!-- SECTION 2: STACK / HEAP VISUALISER -->
+<div class="sec-label reveal">
+  <div class="sl-tag">02 · Visualiser</div>
+  <div class="sl-title">Stack vs Heap — Live Memory View</div>
+  <div class="sl-line"></div>
+</div>
+<div class="mem-vis reveal">
+  <div class="mv-header">
+    <div class="mv-title">🧠 Memory Visualiser</div>
+    <div class="mv-sub">Click a scenario to see exactly what happens in memory</div>
+  </div>
+  <div class="mv-scenario-btns">
+    <div class="sc-btn active" onclick="setScenario(this,0)">① Value Copy</div>
+    <div class="sc-btn" onclick="setScenario(this,1)">② Reference Alias Bug</div>
+    <div class="sc-btn" onclick="setScenario(this,2)">③ with-expression Fix</div>
+    <div class="sc-btn" onclick="setScenario(this,3)">④ Nullable String</div>
+    <div class="sc-btn" onclick="setScenario(this,4)">⑤ struct vs class</div>
+    <div class="sc-btn" onclick="setScenario(this,5)">⑥ String Immutability</div>
+  </div>
+  <div class="mv-body">
+    <div class="mem-panel">
+      <div class="mp-label stack">📦 STACK — value types &amp; pointers</div>
+      <div id="stackPanel"></div>
+    </div>
+    <div class="mem-panel">
+      <div class="mp-label heap">🔗 HEAP — reference type objects</div>
+      <div id="heapPanel"></div>
+    </div>
+  </div>
+  <div class="mv-code-row" id="mvCode"></div>
+  <div class="mv-insight" id="mvInsight"></div>
+</div>
+
+<!-- SECTION 3: CODE TABS -->
+<div class="sec-label reveal">
+  <div class="sl-tag">03 · Code</div>
+  <div class="sl-title">Annotated Code Walkthroughs</div>
+  <div class="sl-line"></div>
+</div>
+<div class="code-demo reveal">
+  <div class="cd-tabs">
+    <div class="cd-tab active" onclick="showTab(this,'ct1')">Value vs Reference</div>
+    <div class="cd-tab" onclick="showTab(this,'ct2')">Nullable &amp; Null-Safety</div>
+    <div class="cd-tab" onclick="showTab(this,'ct3')">Type Conversion</div>
+    <div class="cd-tab" onclick="showTab(this,'ct4')">ERP: Fees &amp; decimal</div>
+    <div class="cd-tab" onclick="showTab(this,'ct5')">Pattern Matching</div>
+  </div>
+
+  <!-- Tab 1 -->
+  <div class="cd-panel active" id="ct1">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">ValueVsReference.cs</div></div>
+      <div class="code-block"><span class="cm">// ── VALUE TYPE: independent copy ──</span>
+<span class="kw">int</span> a = <span class="num">10</span>;
+<span class="kw">int</span> b = a;       <span class="cm">// stack: new slot, value=10</span>
+b = <span class="num">20</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(a); <span class="cm">// 10 — not affected ✓</span>
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(b); <span class="cm">// 20</span>
+
+<span class="cm">// ── REFERENCE TYPE: shared pointer ──</span>
+<span class="kw">var</span> s1 = <span class="kw">new</span> <span class="cls">Student</span> { Name = <span class="str">"Alice"</span> };
+<span class="kw">var</span> s2 = s1;    <span class="cm">// copies POINTER, not object</span>
+s2.Name = <span class="str">"Bob"</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(s1.Name); <span class="cm">// "Bob" ← bug! 🐛</span>
+
+<span class="cm">// ── FIX A: new object ──</span>
+<span class="kw">var</span> s3 = <span class="kw">new</span> <span class="cls">Student</span> { Name = s1.Name, Id = s1.Id };
+s3.Name = <span class="str">"Charlie"</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(s1.Name); <span class="cm">// "Bob" — s1 untouched ✓</span>
+
+<span class="cm">// ── FIX B: record with-expression ──</span>
+<span class="kw">public record</span> <span class="cls">StudentRecord</span>(<span class="kw">int</span> Id, <span class="kw">string</span> Name);
+<span class="kw">var</span> r1 = <span class="kw">new</span> <span class="cls">StudentRecord</span>(<span class="num">1</span>, <span class="str">"Alice"</span>);
+<span class="kw">var</span> r2 = r1 <span class="kw">with</span> { Name = <span class="str">"Charlie"</span> }; <span class="cm">// new copy</span>
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(r1.Name); <span class="cm">// "Alice" ✓</span></div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Key Points</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">int b = a → two slots</div></div>
+        <div class="ai-body">Two independent stack slots. After <code>b = 20</code>, stack looks like: <code>[a=10][b=20]</code>. They will never share state again.</div>
+        <div class="ai-code">Stack: [a=10] [b=20] (independent)</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">var s2 = s1 → same address</div></div>
+        <div class="ai-body">Stack has two pointer slots — both holding address <code>0x5800</code>. There is only ONE Student object on the heap. <code>s2.Name = "Bob"</code> modifies the shared object.</div>
+        <div class="ai-code">Stack: [s1→0x5800] [s2→0x5800]</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">record with { } → new object</div></div>
+        <div class="ai-body"><code>with</code> is a <em>non-destructive copy</em> — it creates a new object with all the same values, then applies your overrides. The original is never touched. Requires the type to be a <code>record</code>.</div>
+        <div class="ai-code">r1 with { Name = "X" } → new record</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2 -->
+  <div class="cd-panel" id="ct2">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">NullSafety.cs</div></div>
+      <div class="code-block"><span class="cm">// Nullable=enable in .csproj</span>
+
+<span class="kw">string</span>  name  = <span class="str">"Alice"</span>; <span class="cm">// cannot be null</span>
+<span class="kw">string</span>? alias = <span class="kw">null</span>;  <span class="cm">// ? = explicitly nullable</span>
+<span class="kw">int</span>?    score = <span class="kw">null</span>;  <span class="cm">// Nullable&lt;int&gt;</span>
+
+<span class="cm">// ── ?. NULL-CONDITIONAL ──</span>
+<span class="cm">// Safe chain: if ANY part is null → result is null</span>
+<span class="kw">string</span>? city = student?.Address?.City;
+<span class="cm">// student=null → city=null (no NullReferenceException)
+// student.Address=null → city=null
+// both set → city = "Mumbai"</span>
+
+<span class="cm">// ── ?? NULL-COALESCING ──</span>
+<span class="kw">string</span> display = alias ?? <span class="str">"Unknown"</span>;
+<span class="kw">int</span>    final   = score ?? <span class="num">0</span>;
+
+<span class="cm">// ── ??= NULL-COALESCING ASSIGNMENT ──</span>
+alias ??= <span class="str">"Default"</span>; <span class="cm">// assigns ONLY if currently null</span>
+
+<span class="cm">// ── ! NULL-FORGIVING (use sparingly) ──</span>
+<span class="kw">string</span> forced = alias!; <span class="cm">// "trust me, not null"</span>
+<span class="cm">// ⚠ Only use when YOU are certain</span>
+
+<span class="cm">// ── TryParse — never Parse() on user input ──</span>
+<span class="kw">string</span>? raw = <span class="cls">Console</span>.<span class="fn">ReadLine</span>();
+<span class="kw">if</span> (<span class="kw">int</span>.<span class="fn">TryParse</span>(raw, <span class="kw">out int</span> age))
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Valid age: {age}"</span>);
+<span class="kw">else</span>
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"Not a valid number"</span>);
+<span class="cm">// No FormatException — ever.</span></div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Null Safety Patterns</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">?. short-circuits the chain</div></div>
+        <div class="ai-body">If any operand is null, the whole expression returns null immediately. No exception. The result type is always nullable. Common in EF Core navigation: <code>order?.Customer?.Email</code>.</div>
+        <div class="ai-code">a?.b?.c → null if a or b is null</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">?? chains infinitely</div></div>
+        <div class="ai-body">The right side evaluates lazily — only when the left is null. Chain multiple: <code>a ?? b ?? c ?? "default"</code>. Use <code>??=</code> for lazy initialisation patterns.</div>
+        <div class="ai-code">config ?? env ?? "default"</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">TryParse vs Parse</div></div>
+        <div class="ai-body"><code>int.Parse("abc")</code> throws <code>FormatException</code>. <code>int.TryParse("abc", out int n)</code> returns <code>false</code> and sets <code>n = 0</code>. Always use TryParse on any data you don't fully control.</div>
+        <div class="ai-code">TryParse → false (safe)
+Parse    → throws (dangerous)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3 -->
+  <div class="cd-panel" id="ct3">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">TypeConversion.cs</div></div>
+      <div class="code-block"><span class="cm">// ── IMPLICIT (widening — zero data loss) ──</span>
+<span class="kw">int</span>    i = <span class="num">100</span>;
+<span class="kw">long</span>   l = i;       <span class="cm">// int fits in long ✓</span>
+<span class="kw">double</span> d = i;       <span class="cm">// int fits in double ✓</span>
+
+<span class="cm">// ── EXPLICIT (narrowing — may lose data) ──</span>
+<span class="kw">double</span> pi    = <span class="num">3.14159</span>;
+<span class="kw">int</span>    piInt = (<span class="kw">int</span>)pi;  <span class="cm">// 3 — TRUNCATED, not rounded</span>
+<span class="cm">// Use Math.Round() first if you need rounding:</span>
+<span class="kw">int</span>    piRound = (<span class="kw">int</span>)<span class="cls">Math</span>.<span class="fn">Round</span>(pi); <span class="cm">// 3</span>
+<span class="kw">int</span>    piConv  = <span class="cls">Convert</span>.<span class="fn">ToInt32</span>(pi); <span class="cm">// 3 (banker's round)</span>
+
+<span class="cm">// ── CHECKED — throw on overflow ──</span>
+<span class="kw">int</span> max     = <span class="kw">int</span>.MaxValue;     <span class="cm">// 2,147,483,647</span>
+<span class="kw">int</span> wrapped = max + <span class="num">1</span>;          <span class="cm">// -2147483648 (silent!)</span>
+<span class="kw">int</span> safe    = <span class="kw">checked</span>(max + <span class="num">1</span>); <span class="cm">// throws OverflowException</span>
+
+<span class="cm">// ── NUMBER LITERALS ──</span>
+<span class="kw">int</span>     million = <span class="num">1_000_000</span>;       <span class="cm">// underscores for readability</span>
+<span class="kw">int</span>     flags   = <span class="num">0b1010_1100</span>;     <span class="cm">// binary literal</span>
+<span class="kw">int</span>     hex     = <span class="num">0xFF_AA</span>;         <span class="cm">// hex literal</span>
+<span class="kw">decimal</span> fee     = <span class="num">85_000.00m</span>;      <span class="cm">// m suffix = decimal</span>
+<span class="kw">float</span>   ratio   = <span class="num">0.5f</span>;            <span class="cm">// f suffix = float</span>
+<span class="kw">long</span>    bigId   = <span class="num">9_000_000_000L</span>;  <span class="cm">// L suffix = long</span></div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Conversion Rules</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">Cast truncates, not rounds</div></div>
+        <div class="ai-body"><code>(int)3.9</code> = 3. The <code>.9</code> is simply dropped. This catches many people off-guard. If you need rounding: use <code>Math.Round()</code> first. <code>Convert.ToInt32()</code> uses banker's rounding (round half to even).</div>
+        <div class="ai-code">(int)3.9  = 3  (truncate)
+(int)3.5  = 3  (truncate)
+Convert.ToInt32(3.5) = 4 (round)</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">checked catches overflow</div></div>
+        <div class="ai-body">By default, integer arithmetic wraps silently on overflow. <code>int.MaxValue + 1</code> = <code>-2,147,483,648</code>. The <code>checked</code> keyword makes this throw instead. Critical for financial code where overflow = data corruption.</div>
+        <div class="ai-code">checked(int.MaxValue + 1) → throws</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">Suffixes lock the type</div></div>
+        <div class="ai-body">Without suffix, literals default to <code>int</code> or <code>double</code>. Use <code>m</code> for decimal, <code>f</code> for float, <code>L</code> for long. Missing the <code>m</code> on a decimal literal creates a double — then an implicit narrowing conversion happens.</div>
+        <div class="ai-code">15000   → int
+15000.0 → double
+15000m  → decimal ← correct for fees</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4 -->
+  <div class="cd-panel" id="ct4">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">ErpFees.cs — Real ERP Context</div></div>
+      <div class="code-block"><span class="cm">// ── ERP FEE MODEL — correct types ──</span>
+<span class="kw">public class</span> <span class="cls">StudentFee</span>
+{
+    <span class="kw">public int</span>      <span class="prop">StudentId</span>   { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>   <span class="prop">CourseName</span>  { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public decimal</span>  <span class="prop">BaseFee</span>     { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// ← decimal</span>
+    <span class="kw">public decimal</span>? <span class="prop">Scholarship</span> { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// ← nullable</span>
+    <span class="kw">public DateTime</span> <span class="prop">DueDate</span>     { <span class="kw">get</span>; <span class="kw">init</span>; }  <span class="cm">// ← init-only</span>
+
+    <span class="kw">public decimal</span> <span class="prop">EffectiveFee</span>
+        => BaseFee - (Scholarship ?? <span class="num">0m</span>);       <span class="cm">// computed</span>
+
+    <span class="kw">public decimal</span> <span class="prop">TotalWithGST</span>
+        => EffectiveFee * <span class="num">1.18m</span>;               <span class="cm">// 18% GST</span>
+}
+
+<span class="cm">// ── USAGE ──</span>
+<span class="kw">var</span> fee = <span class="kw">new</span> <span class="cls">StudentFee</span> {
+    StudentId  = <span class="num">101</span>,
+    CourseName = <span class="str">"Full Stack .NET 8"</span>,
+    BaseFee    = <span class="num">85_000m</span>,
+    Scholarship= <span class="num">10_000m</span>,          <span class="cm">// optional</span>
+    DueDate    = <span class="kw">new</span> <span class="cls">DateTime</span>(<span class="num">2025</span>, <span class="num">6</span>, <span class="num">1</span>)
+};
+
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Base fee   : {fee.BaseFee:C0}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Scholarship: {fee.Scholarship:C0}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Effective  : {fee.EffectiveFee:C0}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Total+GST  : {fee.TotalWithGST:C0}"</span>);</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">ERP Type Decisions</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">decimal for every fee</div></div>
+        <div class="ai-body">BaseFee, Scholarship, GST — all <code>decimal</code>. Never mix with <code>double</code> in calculations. If a <code>double</code> sneaks in, C# will implicitly convert decimal → double and you'll get rounding errors silently.</div>
+        <div class="ai-code">decimal fee = 85_000m; // always</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">decimal? for optional amounts</div></div>
+        <div class="ai-body"><code>Scholarship</code> is <code>decimal?</code> because not every student has one. Using 0 as "no scholarship" is ambiguous. Null is unambiguous: it means the field simply doesn't apply. The <code>?? 0m</code> in the computed property handles it cleanly.</div>
+        <div class="ai-code">Scholarship ?? 0m // fallback to zero</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">init-only for immutable dates</div></div>
+        <div class="ai-body"><code>init</code> means the property can only be set during object construction (in the object initialiser or a constructor). After that, it's read-only. DueDate should never change once a fee record is created.</div>
+        <div class="ai-code">DueDate { get; init; } // set once</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 5 -->
+  <div class="cd-panel" id="ct5">
+    <div class="code-side">
+      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">PatternMatching.cs</div></div>
+      <div class="code-block"><span class="cm">// ── TYPE PATTERN ──</span>
+<span class="kw">object</span> item = <span class="fn">GetEnrollmentItem</span>();
+<span class="kw">if</span> (item <span class="kw">is</span> <span class="cls">Student</span> s)
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Student: {s.Name}"</span>);
+<span class="kw">else if</span> (item <span class="kw">is</span> <span class="cls">Course</span> c)
+    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Course: {c.Code}"</span>);
+
+<span class="cm">// ── RELATIONAL PATTERN ──</span>
+<span class="kw">string</span> category = score <span class="kw">switch</span> {
+    >= <span class="num">90</span>           => <span class="str">"Distinction"</span>,
+    >= <span class="num">75</span> <span class="kw">and</span> < <span class="num">90</span> => <span class="str">"First Class"</span>,
+    >= <span class="num">60</span>           => <span class="str">"Second Class"</span>,
+    >= <span class="num">40</span>           => <span class="str">"Pass"</span>,
+    _               => <span class="str">"Fail"</span>
+};
+
+<span class="cm">// ── PROPERTY PATTERN ──</span>
+<span class="kw">bool</span> atRisk = student <span class="kw">is</span>
+    { GPA: < <span class="num">2.0m</span>, IsActive: <span class="kw">true</span> };
+
+<span class="cm">// ── NULL CHECK PATTERN ──</span>
+<span class="kw">if</span> (student <span class="kw">is not null</span>)
+    <span class="fn">Process</span>(student);
+
+<span class="cm">// ── RANGE VALIDATION ──</span>
+<span class="kw">if</span> (age <span class="kw">is</span> >= <span class="num">15</span> <span class="kw">and</span> <= <span class="num">60</span>)
+    <span class="fn">Enroll</span>(student);
+<span class="kw">else</span>
+    <span class="kw">throw new</span> <span class="cls">ArgumentException</span>(<span class="str">"Age must be 15–60"</span>);</div>
+    </div>
+    <div class="ann-side">
+      <div class="ann-title">Pattern Matching</div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">Type pattern is and cast</div></div>
+        <div class="ai-body"><code>if (item is Student s)</code> checks the type AND gives you a typed variable <code>s</code> in one step. No separate cast. If item is null or a different type, the block is skipped entirely — no exception.</div>
+        <div class="ai-code">is Student s → typed + null safe</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">Switch expression → value</div></div>
+        <div class="ai-body">Switch expressions return a value — they're expressions, not statements. Every arm must return the same type. The compiler verifies exhaustiveness — if you miss a case you get a warning. The <code>_</code> discard covers everything else.</div>
+        <div class="ai-code">score switch { ... _ => "Fail" }</div>
+      </div>
+      <div class="ann-item">
+        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">Property pattern — no if-else chains</div></div>
+        <div class="ai-body">Test multiple properties inline without nesting. <code>{ GPA: &lt; 2.0m, IsActive: true }</code> replaces an if-chain. Can be nested: <code>{ Address: {{ City: "Mumbai" }} }</code>.</div>
+        <div class="ai-code">{ GPA: &lt; 2.0m, IsActive: true }</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: LIVE TYPE CONVERTER -->
+<div class="sec-label reveal">
+  <div class="sl-tag">04 · Simulator</div>
+  <div class="sl-title">Type Conversion — Live Calculator</div>
+  <div class="sl-line"></div>
+</div>
+<div class="converter reveal">
+  <div class="conv-header">
+    <div class="conv-title">🔄 Type Conversion Playground</div>
+    <div class="conv-sub">Select a conversion type, enter a value, see the result and any warnings instantly</div>
+  </div>
+  <div class="conv-type-btns">
+    <div class="ct-btn active" onclick="setConv(this,'int-long')">int → long</div>
+    <div class="ct-btn" onclick="setConv(this,'double-int')">double → int (truncate)</div>
+    <div class="ct-btn" onclick="setConv(this,'string-int')">string → int (TryParse)</div>
+    <div class="ct-btn" onclick="setConv(this,'decimal-double')">decimal → double (precision loss)</div>
+    <div class="ct-btn" onclick="setConv(this,'int-string')">int → string (ToString)</div>
+    <div class="ct-btn" onclick="setConv(this,'int-nullable')">int? unwrap (??)</div>
+  </div>
+  <div class="conv-body">
+    <div class="conv-field">
+      <div class="cf-label" id="convFromLabel">Input (int)</div>
+      <input class="cf-input" id="convInput" value="42" oninput="calcConv()"/>
+      <div class="cf-type" id="convFromType">System.Int32</div>
+    </div>
+    <div class="conv-arrow-wrap">
+      <div class="conv-arrow">→</div>
+      <div class="conv-cast" id="convCastLabel">implicit</div>
+    </div>
+    <div class="conv-result-field">
+      <div class="cr-label" id="convToLabel">Output (long)</div>
+      <div class="cr-value" id="convResult">42</div>
+      <div class="cr-type" id="convToType">System.Int64</div>
+    </div>
+  </div>
+  <div class="conv-msg" id="convMsg"></div>
+</div>
+
+<!-- SECTION 5: VS 2022 SETUP -->
+<div class="sec-label reveal">
+  <div class="sl-tag">05 · Setup</div>
+  <div class="sl-title">VS 2022 — Practicing Types</div>
+  <div class="sl-line"></div>
+</div>
+<div class="setup-box reveal">
+  <div class="sb-header">
+    <div class="sb-icon">⚙️</div>
+    <div>
+      <div class="sb-h-title">Add Models to Your ERP Project</div>
+      <div class="sb-h-sub">Continue from Demo 01 — same ERP.Enrollment project</div>
+    </div>
+  </div>
+  <div class="sb-steps">
+    <div class="sb-step">
+      <div class="ss-num">1</div>
+      <div class="ss-body">
+        <div class="ss-title">Create a Models Folder</div>
+        <div class="ss-desc">In Solution Explorer, right-click <strong>ERP.Enrollment</strong> project → <strong>Add → New Folder</strong>. Name it <code>Models</code>.</div>
+        <div class="ss-menu">Right-click project → Add → New Folder → "Models"</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">2</div>
+      <div class="ss-body">
+        <div class="ss-title">Add Student.cs</div>
+        <div class="ss-desc">Right-click <code>Models</code> folder → <strong>Add → Class</strong> → name it <code>Student.cs</code>. Enter this code:</div>
+        <div class="ss-code"><span class="kw">namespace</span> ERP.Enrollment.Models;
+
+<span class="kw">public class</span> <span class="cls">Student</span>
+{
+    <span class="kw">public int</span>      <span class="prop">Id</span>     { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>   <span class="prop">Name</span>   { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public string</span>   <span class="prop">Email</span>  { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
+    <span class="kw">public decimal</span>  <span class="prop">Fee</span>    { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public decimal</span>? <span class="prop">Scholarship</span> { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public decimal</span>  <span class="prop">NetFee</span> => Fee - (Scholarship ?? <span class="num">0m</span>);
+}</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">3</div>
+      <div class="ss-body">
+        <div class="ss-title">Test in Program.cs</div>
+        <div class="ss-desc">Replace Program.cs with this to test value vs reference types:</div>
+        <div class="ss-code"><span class="kw">using</span> ERP.Enrollment.Models;
+
+<span class="cm">// VALUE TYPE test</span>
+<span class="kw">int</span> a = <span class="num">10</span>, b = a;
+b = <span class="num">20</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"a={a}, b={b}"</span>); <span class="cm">// a=10, b=20</span>
+
+<span class="cm">// REFERENCE TYPE test</span>
+<span class="kw">var</span> s1 = <span class="kw">new</span> <span class="cls">Student</span> { Name = <span class="str">"Alice"</span>, Fee = <span class="num">85000m</span> };
+<span class="kw">var</span> s2 = s1;
+s2.Name = <span class="str">"Bob"</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"s1={s1.Name}"</span>); <span class="cm">// Bob! Shared</span>
+
+<span class="cm">// DECIMAL vs DOUBLE</span>
+<span class="kw">double</span>  wrong = <span class="num">0.1</span> + <span class="num">0.2</span>;
+<span class="kw">decimal</span> right = <span class="num">0.1m</span> + <span class="num">0.2m</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(wrong); <span class="cm">// 0.30000000000000004</span>
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(right); <span class="cm">// 0.3</span></div>
+        <div class="ss-note">Run with Ctrl+F5 and observe the difference in decimal vs double output.</div>
+      </div>
+    </div>
+    <div class="sb-step">
+      <div class="ss-num">4</div>
+      <div class="ss-body">
+        <div class="ss-title">Enable Nullable Warnings</div>
+        <div class="ss-desc">Double-click <code>ERP.Enrollment.csproj</code> and verify these properties are set:</div>
+        <div class="ss-code">&lt;<span class="cls">Nullable</span>&gt;enable&lt;/<span class="cls">Nullable</span>&gt;</div>
+        <div class="ss-note">Now try: public string Name { get; set; } — you'll see a green squiggle warning CS8618. Fix it by adding = "";</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: TRY IT -->
+<div class="sec-label reveal">
+  <div class="sl-tag">06 · Practice</div>
+  <div class="sl-title">Try It Yourself — 3 Exercises</div>
+  <div class="sl-line"></div>
+</div>
+<div class="try-box reveal">
+  <div class="try-header">
+    <div class="try-icon">🧪</div>
+    <div>
+      <div class="try-h-title">Hands-on Exercises</div>
+      <div class="try-h-sub">Type and run each exercise in VS 2022. Expected output shown.</div>
+    </div>
+  </div>
+  <div class="try-body">
+    <div class="try-task">
+      <div class="tt-num">Exercise 1 of 3</div>
+      <div class="tt-title">Prove Value Copy vs Reference Sharing</div>
+      <div class="tt-desc">Run this code and observe the difference. Notice how the int copy is independent but the Student reference is shared.</div>
+      <div class="tt-code"><span class="cm">// In Program.cs</span>
+<span class="kw">using</span> ERP.Enrollment.Models;
+
+<span class="kw">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"=== VALUE TYPE ==="</span>);
+<span class="kw">int</span> x = <span class="num">100</span>, y = x;
+y = <span class="num">999</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"x = {x}"</span>);  <span class="cm">// 100</span>
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"y = {y}"</span>);  <span class="cm">// 999</span>
+
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"\n=== REFERENCE TYPE ==="</span>);
+<span class="kw">var</span> orig = <span class="kw">new</span> <span class="cls">Student</span> { Name = <span class="str">"Alice"</span>, Fee = <span class="num">50000m</span> };
+<span class="kw">var</span> copy = orig;
+copy.Name = <span class="str">"Bob"</span>;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"orig.Name = {orig.Name}"</span>); <span class="cm">// Bob!</span>
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"copy.Name = {copy.Name}"</span>); <span class="cm">// Bob</span></div>
+      <div class="tt-expected">
+        <div class="te-label">Expected Output</div>
+        <div class="te-out">=== VALUE TYPE ===
+x = 100
+y = 999
+
+=== REFERENCE TYPE ===
+orig.Name = Bob
+copy.Name = Bob</div>
+      </div>
+    </div>
+    <div class="try-task">
+      <div class="tt-num">Exercise 2 of 3</div>
+      <div class="tt-title">decimal vs double — See the Difference</div>
+      <div class="tt-desc">This exercise proves why decimal is mandatory for financial calculations.</div>
+      <div class="tt-code"><span class="kw">double</span>  dFee  = <span class="num">50000.10</span> + <span class="num">25000.20</span>;
+<span class="kw">decimal</span> mFee  = <span class="num">50000.10m</span> + <span class="num">25000.20m</span>;
+
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"double  result : {dFee}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"decimal result : {mFee}"</span>);
+
+<span class="cm">// GST calculation</span>
+<span class="kw">decimal</span> baseFee = <span class="num">85_000m</span>;
+<span class="kw">decimal</span> gst     = baseFee * <span class="num">0.18m</span>;
+<span class="kw">decimal</span> total   = baseFee + gst;
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"\nBase  : {baseFee:C0}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"GST   : {gst:C0}"</span>);
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Total : {total:C0}"</span>);</div>
+      <div class="tt-expected">
+        <div class="te-label">Expected Output</div>
+        <div class="te-out">double  result : 75000.29999999999
+decimal result : 75000.30
+
+Base  : ₹85,000
+GST   : ₹15,300
+Total : ₹1,00,300</div>
+      </div>
+    </div>
+    <div class="try-task">
+      <div class="tt-num">Exercise 3 of 3</div>
+      <div class="tt-title">Safe User Input with TryParse and Nullable</div>
+      <div class="tt-desc">Practice safe input parsing and nullable null-coalescing. Run and try entering both valid numbers and invalid text.</div>
+      <div class="tt-code"><span class="cls">Console</span>.<span class="fn">Write</span>(<span class="str">"Enter student age: "</span>);
+<span class="kw">string</span>? input = <span class="cls">Console</span>.<span class="fn">ReadLine</span>();
+
+<span class="kw">int</span>? age = <span class="kw">int</span>.<span class="fn">TryParse</span>(input, <span class="kw">out int</span> parsed)
+    ? parsed
+    : (<span class="kw">int</span>?)<span class="kw">null</span>;
+
+<span class="kw">string</span> result = age <span class="kw">switch</span> {
+    <span class="kw">null</span>           => <span class="str">"⚠ Invalid input — not a number"</span>,
+    < <span class="num">15</span>            => <span class="str">"⚠ Too young (minimum age: 15)"</span>,
+    > <span class="num">60</span>            => <span class="str">"⚠ Too old (maximum age: 60)"</span>,
+    <span class="kw">var</span> a           => <span class="str">$"✓ Age {a} is valid for enrollment"</span>
+};
+
+<span class="cls">Console</span>.<span class="fn">WriteLine</span>(result);</div>
+      <div class="tt-expected">
+        <div class="te-label">Try these inputs</div>
+        <div class="te-out">Enter "25"   → ✓ Age 25 is valid for enrollment
+Enter "abc"  → ⚠ Invalid input — not a number
+Enter "10"   → ⚠ Too young (minimum age: 15)
+Enter "70"   → ⚠ Too old (maximum age: 60)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 7: MISTAKES -->
+<div class="sec-label reveal">
+  <div class="sl-tag">07 · Watch Out</div>
+  <div class="sl-title">Common Mistakes in M02</div>
+  <div class="sl-line"></div>
+</div>
+<div class="mistakes-box reveal">
+  <div class="mb-header"><div>⚠️</div><div class="mb-title">Mistakes with Types That Bite Later</div></div>
+  <div class="mistakes-body">
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Using double for money</strong>: <code>double fee = 15000.50 + 500.30;</code> gives <code>15500.799999999998</code> — a tiny error that compounds over hundreds of transactions.
+        <span class="mk-fix">Fix: Always decimal. decimal fee = 15000.50m + 500.30m; // exact: 15500.80</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Expecting var s2 = s1 to clone the object</strong>: Beginners assume assignment copies the object. It doesn't — it copies the reference. Both variables point to the same Student.
+        <span class="mk-fix">Fix: var s2 = new Student { Name = s1.Name, Id = s1.Id }; // truly independent</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Using int.Parse() on Console input</strong>: If the user types letters, <code>int.Parse(Console.ReadLine()!)</code> throws an unhandled <code>FormatException</code> and crashes the app.
+        <span class="mk-fix">Fix: if (int.TryParse(Console.ReadLine(), out int n)) { use n } else { show error }</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Forgetting the 'm' suffix on decimal literals</strong>: <code>decimal fee = 15000.5;</code> — the literal <code>15000.5</code> is a <code>double</code>. C# implicitly converts but gives a precision warning.
+        <span class="mk-fix">Fix: decimal fee = 15000.5m;  // 'm' suffix = decimal literal</span>
+      </div>
+    </div>
+    <div class="mistake">
+      <div>❌</div>
+      <div class="mk-body">
+        <strong>Accessing a nullable without checking first</strong>: <code>int? score = null; Console.WriteLine(score.Value);</code> throws <code>InvalidOperationException</code>.
+        <span class="mk-fix">Fix: Console.WriteLine(score ?? 0);  // or: if (score.HasValue) { ... }</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEXT -->
+<div class="next-nav reveal">
+  <div>
+    <div class="nn-label">Next up · Demo 03</div>
+    <div class="nn-title">C# Language Constructs</div>
+    <div class="nn-desc">Switch expressions with a live grade calculator. Loop tracer. Exception flow step-by-step. try/catch/finally/when explained.</div>
+  </div>
+  <a href="demo3.html" class="nn-btn">Demo 03 →</a>
+</div>
+
+</div>
+
+<script>
+// STACK/HEAP SCENARIOS
+const scenarios = [
+  {
+    stack:[{a:'0x1000',n:'a',v:'10'},{a:'0x1004',n:'b',v:'20'}],
+    heap:[],
+    code:`<span class="kw">int</span> a = <span class="num">10</span>;\n<span class="kw">int</span> b = a;   <span class="cm">// stack: new slot, value copied</span>\nb = <span class="num">20</span>;\n<span class="cls">Console</span>.<span class="fn">WriteLine</span>(a); <span class="cm">// 10 — a unchanged ✓</span>`,
+    insight:`<strong>Value Copy:</strong> b gets its own slot on the stack. After b = 20, the stack has [a=10] and [b=20] — completely independent. Changing b never touches a.`
+  },
+  {
+    stack:[{a:'0x1010',n:'s1',v:'→ 0x5800',ptr:true},{a:'0x1018',n:'s2',v:'→ 0x5800',ptr:true}],
+    heap:[{a:'0x5800',n:'Student',v:'Name="Bob"',hi:true}],
+    code:`<span class="kw">var</span> s1 = <span class="kw">new</span> <span class="cls">Student</span> { Name=<span class="str">"Alice"</span> };\n<span class="kw">var</span> s2 = s1;   <span class="cm">// copies POINTER 0x5800</span>\ns2.Name = <span class="str">"Bob"</span>;  <span class="cm">// mutates the shared object</span>\n<span class="cls">Console</span>.<span class="fn">WriteLine</span>(s1.Name); <span class="cm">// "Bob" 🐛</span>`,
+    insight:`<strong>Reference Alias Bug:</strong> Both s1 and s2 hold address 0x5800. There is ONE Student object on the heap. s2.Name = "Bob" mutates that object — and s1 sees the change too.`
+  },
+  {
+    stack:[{a:'0x1010',n:'r1',v:'→ 0x5800',ptr:true},{a:'0x1018',n:'r2',v:'→ 0x5900',ptr:true}],
+    heap:[{a:'0x5800',n:'Record (r1)',v:'Name="Alice"'},{a:'0x5900',n:'Record (r2)',v:'Name="Charlie"',hi:true}],
+    code:`<span class="kw">public record</span> <span class="cls">StudentRecord</span>(<span class="kw">string</span> Name);\n<span class="kw">var</span> r1 = <span class="kw">new</span> <span class="cls">StudentRecord</span>(<span class="str">"Alice"</span>);\n<span class="kw">var</span> r2 = r1 <span class="kw">with</span> { Name = <span class="str">"Charlie"</span> };\n<span class="cm">// r1 → 0x5800 (Alice) — unchanged ✓</span>\n<span class="cm">// r2 → 0x5900 (Charlie) — new object</span>`,
+    insight:`<strong>with-expression Fix:</strong> The 'with' expression creates a NEW object (0x5900) with all values copied, then applies overrides. r1 still points to 0x5800 (Alice). Two independent objects.`
+  },
+  {
+    stack:[{a:'0x1020',n:'name',v:'→ 0x6000',ptr:true},{a:'0x1028',n:'alias',v:'null'}],
+    heap:[{a:'0x6000',n:'String',v:'"Alice"'}],
+    code:`<span class="kw">string</span>  name  = <span class="str">"Alice"</span>;  <span class="cm">// → heap 0x6000</span>\n<span class="kw">string</span>? alias = <span class="kw">null</span>;    <span class="cm">// stack: null (no heap obj)</span>\n\n<span class="kw">string</span> display = alias ?? <span class="str">"Unknown"</span>; <span class="cm">// "Unknown"</span>\n<span class="kw">int</span>?   len     = alias?.Length;        <span class="cm">// null (no throw)</span>`,
+    insight:`<strong>Nullable String:</strong> 'name' holds heap address 0x6000. 'alias' is null — no heap object at all. The ?? operator returns "Unknown" as fallback. The ?. operator returns null safely — no NullReferenceException.`
+  },
+  {
+    stack:[{a:'0x1030',n:'pt.X',v:'3'},{a:'0x1034',n:'pt.Y',v:'4'},{a:'0x1040',n:'student',v:'→ 0x7000',ptr:true}],
+    heap:[{a:'0x7000',n:'Student (class)',v:'Name="Riya"'}],
+    code:`<span class="kw">struct</span> <span class="cls">Point</span> { <span class="kw">public int</span> X, Y; }\n<span class="kw">var</span> pt = <span class="kw">new</span> <span class="cls">Point</span> { X=<span class="num">3</span>, Y=<span class="num">4</span> };\n<span class="cm">// pt.X and pt.Y live on the stack — no heap alloc!</span>\n\n<span class="kw">var</span> student = <span class="kw">new</span> <span class="cls">Student</span> { Name=<span class="str">"Riya"</span> };\n<span class="cm">// pointer on stack, object on heap</span>`,
+    insight:`<strong>struct vs class:</strong> The Point struct lives entirely on the stack — no heap allocation, no GC pressure. Perfect for small, short-lived data like coordinates, Money, DateRange. The Student class has a pointer on the stack pointing to the heap object.`
+  },
+  {
+    stack:[{a:'0x1050',n:'x',v:'→ 0x8000',ptr:true},{a:'0x1058',n:'y',v:'→ 0x8000',ptr:true}],
+    heap:[{a:'0x8000',n:'String "Hello"',v:'(immutable)'},{a:'0x8010',n:'String "World"',v:'← x reassigned',hi:true}],
+    code:`<span class="kw">string</span> x = <span class="str">"Hello"</span>;  <span class="cm">// x → heap 0x8000</span>\n<span class="kw">string</span> y = x;       <span class="cm">// y → heap 0x8000 (same)</span>\nx = <span class="str">"World"</span>;         <span class="cm">// NEW string at 0x8010, x repoints</span>\n<span class="cls">Console</span>.<span class="fn">WriteLine</span>(y); <span class="cm">// "Hello" — y still → 0x8000 ✓</span>`,
+    insight:`<strong>String Immutability:</strong> Strings can never be modified. x = "World" creates a NEW string object (0x8010) and makes x point there. y still points to 0x8000 ("Hello"). This is why string behaves like a value type even though it's a class.`
+  }
+];
+
+function setScenario(btn, i) {
+  document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const s = scenarios[i];
+  document.getElementById('stackPanel').innerHTML = s.stack.map(c =>
+    `<div class="mem-cell mc-stack${c.hi?' mc-highlight':''}">
+      <span class="mc-addr">${c.a}</span>
+      <span class="mc-name">${c.n}</span>
+      <span class="mc-val">${c.v}${c.ptr?` <span class="mc-ptr">📌</span>`:''}</span>
+    </div>`).join('');
+  document.getElementById('heapPanel').innerHTML = s.heap.length
+    ? s.heap.map(c =>
+        `<div class="mem-cell mc-heap${c.hi?' mc-highlight':''}">
+          <span class="mc-addr">${c.a}</span>
+          <span class="mc-name">${c.n}</span>
+          <span class="mc-val">${c.v}</span>
+        </div>`).join('')
+    : `<div class="mc-empty">(empty — value types only, no heap allocation)</div>`;
+  document.getElementById('mvCode').innerHTML = s.code;
+  document.getElementById('mvInsight').innerHTML = s.insight;
+}
+setScenario(document.querySelector('.sc-btn'), 0);
+
+// TABS
+function showTab(el, id) {
+  document.querySelectorAll('.cd-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.cd-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// CONVERTER
+const convDefs = {
+  'int-long':     { from:'int',    to:'long',    fromT:'System.Int32',  toT:'System.Int64',   cast:'implicit (widening)',  calc: v => { const n=parseInt(v); if(isNaN(n)) return {err:'Not a valid int'}; return {val:n,ok:`Widening conversion — always safe. long holds all int values (up to ${Number.MAX_SAFE_INTEGER.toLocaleString()}).`}; }, ph:'42' },
+  'double-int':   { from:'double', to:'int',     fromT:'System.Double', toT:'System.Int32',   cast:'explicit (int)d',      calc: v => { const n=parseFloat(v); if(isNaN(n)) return {err:'Not a valid double'}; const r=Math.trunc(n); return {val:r,warn:`Truncated — fractional part .${v.includes('.')?v.split('.')[1]:'0'} is discarded. (int)${n} = ${r}. NOT rounded. Use Math.Round() first if needed.`}; }, ph:'3.14159' },
+  'string-int':   { from:'string', to:'int',     fromT:'System.String', toT:'System.Int32',   cast:'int.TryParse()',        calc: v => { const clean=v.replace(/^"|"$/g,''); const n=parseInt(clean); if(isNaN(n)||String(parseInt(clean))!==clean.trim()) return {err:`int.TryParse("${clean}") → false. Returns 0 and does NOT throw. Handle the false return in your code.`}; return {val:n,ok:`int.TryParse succeeded → ${n}. The 'out' parameter holds the result.`}; }, ph:'42' },
+  'decimal-double':{ from:'decimal',to:'double', fromT:'System.Decimal',toT:'System.Double',  cast:'explicit (double)m',   calc: v => { const clean=v.replace('m',''); const n=parseFloat(clean); if(isNaN(n)) return {err:'Not a valid decimal (try: 75000.1234567890)'}; return {val:n.toPrecision(15).replace(/\.?0+$/,''),warn:`Precision LOST. decimal has 28-29 significant digits; double only 15-17. NEVER convert financial values to double.`}; }, ph:'75000.1234567890m' },
+  'int-string':   { from:'int',    to:'string',  fromT:'System.Int32',  toT:'System.String',  cast:'.ToString()',           calc: v => { const n=parseInt(v); if(isNaN(n)) return {err:'Not a valid int'}; return {val:`"${n}"`,ok:`ToString() never loses data for integers. No information is lost — all integers can be represented exactly as strings.`}; }, ph:'12345' },
+  'int-nullable': { from:'int?',   to:'int',     fromT:'Nullable<Int32>',toT:'System.Int32',  cast:'?? operator',          calc: v => { if(v.toLowerCase()==='null'||v==='') return {val:'0',warn:`int? was null → ?? 0 returned the fallback value 0. Accessing .Value on a null int? would throw InvalidOperationException.`}; const n=parseInt(v); if(isNaN(n)) return {err:'Enter a number or "null"'}; return {val:n,ok:`Non-null int? ${n} → unwrapped via ??. No exception. .HasValue = true.`}; }, ph:'null' }
+};
+
+let curConv = 'int-long';
+function setConv(btn, key) {
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  curConv = key;
+  const d = convDefs[key];
+  document.getElementById('convInput').value = d.ph;
+  document.getElementById('convFromLabel').textContent = `Input (${d.from})`;
+  document.getElementById('convFromType').textContent = d.fromT;
+  document.getElementById('convToLabel').textContent = `Output (${d.to})`;
+  document.getElementById('convToType').textContent = d.toT;
+  document.getElementById('convCastLabel').textContent = d.cast;
+  calcConv();
+}
+function calcConv() {
+  const d = convDefs[curConv];
+  const v = document.getElementById('convInput').value;
+  const r = d.calc(v);
+  const res = document.getElementById('convResult');
+  const msg = document.getElementById('convMsg');
+  if (r.err) {
+    res.textContent = '—';
+    res.style.color = 'var(--rose)';
+    msg.innerHTML = `<span class="msg-err">⚠ ${r.err}</span>`;
+  } else {
+    res.textContent = r.val;
+    res.style.color = 'var(--green)';
+    if (r.warn) msg.innerHTML = `<span class="msg-warn">⚠ ${r.warn}</span>`;
+    else if (r.ok) msg.innerHTML = `<span class="msg-ok">✓ ${r.ok}</span>`;
+  }
+}
+calcConv();
+
+// REVEAL
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }});
+}, { threshold: 0.07 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
