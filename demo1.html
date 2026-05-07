@@ -1,1048 +1,1001 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Demo 01 · Writing Apps in C# &amp; .NET 8</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Demo 1 — Building Your First .NET 8 App | Module 1</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --bg:#09090e;--surface:#111118;--surface2:#18181f;--surface3:#22222c;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#f0f0f5;--muted:#8888a0;--faint:#44445a;
-  --C:#3b9eff;--C-dim:rgba(59,158,255,0.1);--C-border:rgba(59,158,255,0.22);--C-glow:rgba(59,158,255,0.3);
-  --green:#2dd4a0;--green-dim:rgba(45,212,160,0.1);--green-border:rgba(45,212,160,0.22);
-  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);--amber-border:rgba(245,166,35,0.22);
-  --rose:#f0456a;--rose-dim:rgba(240,69,106,0.1);
-  --font-display:'Instrument Serif',serif;
-  --font-ui:'DM Sans',sans-serif;
-  --font-code:'JetBrains Mono',monospace;
-  --r:8px;--r-lg:14px;--r-xl:20px;
-  --nav-h:58px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.65;font-size:15px;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
+  :root {
+    --bg:        #0b0e14;
+    --surface:   #111520;
+    --card:      #161b27;
+    --border:    #1f2840;
+    --accent:    #5c6ef8;
+    --accent2:   #00d4aa;
+    --accent3:   #f7c948;
+    --text:      #dde3f5;
+    --muted:     #6b7a99;
+    --code-bg:   #0d1017;
+    --green:     #3ecf8e;
+    --red:       #f06a6a;
+    --purple:    #b87fff;
+    --step-h:    52px;
+  }
 
-/* NAV */
-nav{position:fixed;inset:0 0 auto;height:var(--nav-h);background:rgba(9,9,14,0.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 32px;z-index:200}
-.nav-back{font-size:12px;font-weight:600;color:var(--muted);padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);transition:all .2s;font-family:var(--font-code)}
-.nav-back:hover{color:var(--C);border-color:var(--C-border)}
-.nav-title{font-size:13px;color:var(--muted)}.nav-title strong{color:var(--text)}
-.nav-badge{margin-left:auto;background:var(--C-dim);color:var(--C);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid var(--C-border);font-family:var(--font-code)}
-.nav-next{font-size:12px;font-weight:700;padding:6px 16px;border-radius:var(--r);color:#fff;background:var(--C);transition:all .2s;font-family:var(--font-code)}
-.nav-next:hover{background:#2988e8;transform:translateY(-1px)}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* HERO */
-.hero{padding:calc(var(--nav-h)+60px) 48px 56px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 0% 50%,rgba(59,158,255,0.1),transparent 70%)}
-.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;position:relative;z-index:1}
-.hero-eyebrow{font-family:var(--font-code);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--C);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.hero-eyebrow::before{content:'';width:24px;height:2px;background:var(--C)}
-h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.06;letter-spacing:-.02em;margin-bottom:18px}
-h1 em{font-style:italic;color:var(--C)}
-.hero-desc{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:28px;max-width:500px}
-.hero-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:32px}
-.pill{font-family:var(--font-code);font-size:10px;font-weight:600;padding:4px 11px;border-radius:4px;border:1px solid var(--border2);color:var(--muted)}
-.hero-progress{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px}
-.hp-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
-.hp-bar{height:4px;background:var(--surface3);border-radius:2px;margin-bottom:8px}
-.hp-fill{height:100%;width:16.6%;background:linear-gradient(90deg,var(--C),#60b0f4);border-radius:2px}
-.hp-text{font-size:11px;color:var(--muted);font-family:var(--font-code)}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* CLR PIPELINE CARD */
-.pipeline-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
-.pc-header{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border)}
-.pc-title{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--C)}
-.pc-sub{font-size:11px;color:var(--faint);margin-top:2px}
-.pipe-stages{padding:16px;display:flex;flex-direction:column;gap:4px}
-.ps{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;transition:all .22s}
-.ps:hover,.ps.active{background:var(--C-dim);border-color:var(--C-border)}
-.ps-icon{font-size:18px;flex-shrink:0;width:32px;text-align:center}
-.ps-info{flex:1}
-.ps-name{font-family:var(--font-code);font-size:12px;font-weight:700;color:var(--text)}
-.ps-sub{font-size:10px;color:var(--faint);margin-top:1px}
-.ps-arrow{font-size:10px;color:var(--faint);transition:color .2s}
-.ps:hover .ps-arrow,.ps.active .ps-arrow{color:var(--C)}
-.pc-detail{padding:14px 18px;border-top:1px solid var(--border);min-height:80px}
-.pcd-title{font-family:var(--font-code);font-size:11px;font-weight:700;color:var(--C);margin-bottom:6px}
-.pcd-body{font-size:12.5px;color:var(--muted);line-height:1.65}
-.pc-connector{display:flex;align-items:center;justify-content:center;height:14px;color:var(--faint);font-size:11px}
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(92,110,248,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,110,248,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* CONTENT AREA */
-.content{max-width:1100px;margin:0 auto;padding:56px 48px 88px}
+  /* ── TOP BAR (VS 2022 style) ── */
+  .vs-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: #0d1117;
+    border-bottom: 1px solid #1a2035;
+    display: flex; align-items: center; gap: 0;
+    height: 36px;
+    padding: 0 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .vs-bar .logo {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--accent);
+    font-weight: 700; font-size: 12px; margin-right: 24px;
+  }
+  .vs-bar .logo svg { width: 18px; height: 18px; }
+  .vs-menu { display: flex; gap: 2px; }
+  .vs-menu span {
+    padding: 6px 10px; cursor: default;
+    border-radius: 3px; transition: background .15s;
+  }
+  .vs-menu span:hover { background: #1f2840; color: var(--text); }
+  .vs-spacer { flex: 1; }
+  .vs-badge {
+    background: var(--accent); color: #fff;
+    padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;
+    margin-left: 12px;
+  }
 
-/* SECTION HEADERS */
-.sec-label{display:flex;align-items:center;gap:14px;margin-bottom:28px}
-.sl-tag{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--C);background:var(--C-dim);border:1px solid var(--C-border);padding:3px 10px;border-radius:4px}
-.sl-title{font-family:var(--font-display);font-size:26px;font-weight:400}
-.sl-line{flex:1;height:1px;background:var(--border)}
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    padding: 64px 48px 48px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .module-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(92,110,248,.12);
+    border: 1px solid rgba(92,110,248,.3);
+    color: var(--accent);
+    padding: 4px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800; line-height: 1.1;
+    color: #fff; margin-bottom: 16px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    font-size: 1.05rem; color: var(--muted); max-width: 600px; line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .meta-chip {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px; color: var(--muted);
+  }
+  .meta-chip .dot { width: 7px; height: 7px; border-radius: 50%; }
 
-/* CONCEPT CARDS */
-.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:48px}
-.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all .22s;border-top:2px solid transparent}
-.cc:hover{border-color:var(--border2);transform:translateY(-2px)}
-.cc.blue{border-top-color:var(--C)}.cc.green{border-top-color:var(--green)}.cc.amber{border-top-color:var(--amber)}
-.cc-icon{font-size:22px;margin-bottom:10px}
-.cc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
-.cc-body{font-size:12px;color:var(--muted);line-height:1.65}
-.cc-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--C);padding:8px 10px;border-radius:var(--r);margin-top:10px;color:#abb2bf;white-space:pre-wrap}
+  /* ── MAIN LAYOUT ── */
+  .main {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto; padding: 0 48px 80px;
+    display: flex; flex-direction: column; gap: 40px;
+  }
 
-/* VS 2022 SETUP BOX */
-.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
-.sb-header{background:linear-gradient(135deg,rgba(59,158,255,0.12),rgba(59,158,255,0.04));padding:20px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
-.sb-vs-logo{width:44px;height:44px;background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.sb-h-title{font-family:var(--font-display);font-size:20px;font-weight:400}
-.sb-h-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.sb-steps{padding:24px 26px;display:flex;flex-direction:column;gap:0}
-.sb-step{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
-.sb-step:last-child{border-bottom:none}
-.ss-num{width:28px;height:28px;border-radius:50%;background:var(--C-dim);border:1px solid var(--C-border);color:var(--C);font-family:var(--font-code);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.ss-body{}
-.ss-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px}
-.ss-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:10px}
-.ss-cmd{font-family:var(--font-code);font-size:12px;background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--C);padding:10px 14px;border-radius:var(--r);color:#79c0ff;display:flex;align-items:center;gap:10px}
-.ss-cmd::before{content:'$';color:var(--faint);flex-shrink:0}
-.ss-path{font-family:var(--font-code);font-size:11px;background:var(--surface3);border:1px solid var(--border);padding:6px 12px;border-radius:var(--r);color:var(--amber);margin-top:6px;display:inline-block}
-.ss-note{font-size:12px;color:var(--faint);margin-top:6px;font-style:italic}
-.ss-menu{font-family:var(--font-code);font-size:11px;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:4px 10px;border-radius:4px;display:inline-block;margin-top:4px}
+  /* ── SECTION LABEL ── */
+  .section-label {
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
 
-/* CODE DEMO PANEL */
-.code-demo{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
-.cd-tabs{display:flex;background:var(--surface2);border-bottom:1px solid var(--border);overflow-x:auto}
-.cd-tab{font-family:var(--font-code);font-size:11px;font-weight:600;padding:11px 18px;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .18s}
-.cd-tab:hover{color:var(--muted)}
-.cd-tab.active{color:var(--C);border-bottom-color:var(--C);background:var(--surface)}
-.cd-panel{display:none}.cd-panel.active{display:grid;grid-template-columns:1fr 340px}
-.code-side{background:#0d1117}
-.code-bar{background:#161b22;display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05)}
-.cb-dots{display:flex;gap:5px}
-.cb-dot{width:10px;height:10px;border-radius:50%}
-.cb-dot.r{background:#ff5f57}.cb-dot.y{background:#febc2e}.cb-dot.g{background:#28c840}
-.cb-file{font-family:var(--font-code);font-size:11px;color:rgba(255,255,255,.3);margin-left:6px}
-.code-block{padding:20px 22px;font-family:var(--font-code);font-size:12px;line-height:1.85;color:#abb2bf;overflow-x:auto;white-space:pre}
-.kw{color:#ff79c6}.str{color:#f1fa8c}.cm{color:#6272a4;font-style:italic}
-.num{color:#bd93f9}.cls{color:#8be9fd}.fn{color:#50fa7b}.prop{color:#ffb86c}.punc{color:#ff5555}
-.ann-side{padding:22px;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto}
-.ann-title{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--C);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.ann-item{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.ann-item:last-child{border-bottom:none;margin-bottom:0}
-.ai-line{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
-.ai-num{width:20px;height:20px;border-radius:50%;background:var(--C);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-code);margin-top:1px}
-.ai-label{font-size:12.5px;font-weight:700;color:var(--text)}
-.ai-body{font-size:12px;color:var(--muted);line-height:1.6;margin-left:30px}
-.ai-code{font-family:var(--font-code);font-size:10.5px;background:var(--surface2);border:1px solid var(--border);padding:3px 8px;border-radius:4px;color:var(--C);display:inline-block;margin-top:4px}
+  /* ── OBJECTIVE CARD ── */
+  .objective-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 10px;
+    padding: 24px 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .obj-item { display: flex; gap: 12px; align-items: flex-start; }
+  .obj-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: rgba(0,212,170,.1); border: 1px solid rgba(0,212,170,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .obj-text strong { font-size: .9rem; color: var(--text); display: block; margin-bottom: 3px; }
+  .obj-text span { font-size: .8rem; color: var(--muted); }
 
-/* TERMINAL SIMULATOR */
-.terminal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
-.term-header{background:var(--surface2);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.term-dots{display:flex;gap:6px}
-.term-dot{width:11px;height:11px;border-radius:50%}
-.term-dot.r{background:#ff5f57}.term-dot.y{background:#febc2e}.term-dot.g{background:#28c840}
-.term-label{font-family:var(--font-code);font-size:11px;color:var(--faint);margin-left:4px}
-.term-body{background:#0d1117;padding:18px 20px;min-height:160px;font-family:var(--font-code);font-size:12.5px;line-height:2;overflow-x:auto}
-.t-prompt{color:#484f58}
-.t-cmd{color:#79c0ff}
-.t-out{color:#56d364}
-.t-warn{color:#d29922}
-.t-err{color:#f85149}
-.t-dim{color:#30363d}
-.t-cursor{animation:blink 1s infinite;color:#79c0ff}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.term-btns{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;background:var(--surface2);border-top:1px solid var(--border)}
-.tbtn{font-family:var(--font-code);font-size:11px;font-weight:600;padding:6px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface3);color:var(--muted);cursor:pointer;transition:all .18s}
-.tbtn:hover{background:var(--C-dim);border-color:var(--C-border);color:var(--C)}
-.tbtn.active{background:var(--C-dim);border-color:var(--C);color:var(--C)}
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 28px; }
 
-/* TRY IT YOURSELF */
-.try-box{background:var(--surface);border:1px solid var(--green-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
-.try-header{background:var(--green-dim);padding:16px 22px;border-bottom:1px solid var(--green-border);display:flex;align-items:center;gap:12px}
-.try-icon{font-size:22px}
-.try-h-title{font-size:15px;font-weight:700;color:var(--green)}
-.try-h-sub{font-size:12px;color:var(--muted);margin-top:1px}
-.try-body{padding:24px 26px;display:flex;flex-direction:column;gap:20px}
-.try-task{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px}
-.tt-num{font-family:var(--font-code);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--green);text-transform:uppercase;margin-bottom:8px}
-.tt-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
-.tt-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
-.tt-code{font-family:var(--font-code);font-size:11.5px;background:#0d1117;border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);padding:14px 16px;color:#abb2bf;white-space:pre;overflow-x:auto;line-height:1.75}
-.tt-expected{background:var(--green-dim);border:1px solid var(--green-border);border-radius:var(--r);padding:10px 14px;margin-top:10px}
-.te-label{font-family:var(--font-code);font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
-.te-out{font-family:var(--font-code);font-size:11.5px;color:var(--text);line-height:1.75;white-space:pre}
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .step-card:hover { border-color: rgba(92,110,248,.4); }
 
-/* MISTAKES BOX */
-.mistakes-box{background:var(--surface);border:1px solid var(--amber-border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:48px}
-.mb-header{background:var(--amber-dim);padding:14px 22px;border-bottom:1px solid var(--amber-border);display:flex;align-items:center;gap:10px}
-.mb-title{font-size:14px;font-weight:700;color:var(--amber)}
-.mistakes-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
-.mistake{display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:flex-start}
-.mk-icon{font-size:16px;margin-top:2px}
-.mk-body{font-size:13px;color:var(--muted);line-height:1.65}
-.mk-body strong{color:var(--text)}
-.mk-fix{font-family:var(--font-code);font-size:11px;background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--green);padding:6px 10px;border-radius:var(--r);color:var(--green);margin-top:6px;display:block}
+  .step-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(92,110,248,.15);
+    border: 1.5px solid rgba(92,110,248,.4);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 13px; color: var(--accent);
+    flex-shrink: 0;
+  }
+  .step-title { font-size: 1rem; font-weight: 700; color: #fff; }
+  .step-subtitle { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .step-chevron {
+    margin-left: auto; color: var(--muted);
+    transition: transform .25s; font-size: 16px;
+  }
+  .step-card.open .step-chevron { transform: rotate(180deg); }
 
-/* NEXT NAV */
-.next-nav{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.nn-left{}
-.nn-label{font-family:var(--font-code);font-size:10px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
-.nn-title{font-family:var(--font-display);font-size:24px;font-weight:400;margin-bottom:6px}
-.nn-desc{font-size:13px;color:var(--muted)}
-.nn-btn{background:var(--C);color:#fff;font-weight:700;font-size:13px;padding:12px 24px;border-radius:var(--r);transition:all .2s;white-space:nowrap;box-shadow:0 4px 16px -4px var(--C-glow)}
-.nn-btn:hover{background:#2988e8;transform:translateY(-2px)}
+  .step-body {
+    display: none; padding: 24px;
+    flex-direction: column; gap: 20px;
+  }
+  .step-card.open .step-body { display: flex; }
 
-/* REVEAL */
-.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s,transform .55s}
-.reveal.in{opacity:1;transform:none}
+  /* ── INSTRUCTION LIST ── */
+  .instruction-list { display: flex; flex-direction: column; gap: 14px; }
+  .instruction {
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .ins-bullet {
+    width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+    background: rgba(92,110,248,.1);
+    border: 1px solid rgba(92,110,248,.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 700; color: var(--accent);
+    margin-top: 2px;
+  }
+  .ins-text { font-size: .88rem; line-height: 1.7; color: var(--text); }
+  .ins-text strong { color: var(--accent2); }
+  .ins-text kbd {
+    display: inline-block;
+    background: #0d1117;
+    border: 1px solid #2a334d;
+    border-bottom: 2px solid #1a2035;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem; color: var(--accent3);
+    margin: 0 2px;
+  }
 
-@media(max-width:960px){.hero-inner,.cd-panel,.concept-grid{grid-template-columns:1fr}.hero-inner{gap:32px}.content{padding:40px 24px 60px}.hero{padding:calc(var(--nav-h)+40px) 24px 40px}}
-::-webkit-scrollbar{width:5px;height:4px}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+  /* ── SCREENSHOT HINT ── */
+  .screenshot-hint {
+    background: rgba(247,201,72,.05);
+    border: 1px dashed rgba(247,201,72,.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: .8rem; color: var(--accent3);
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .code-topbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: #0b0e14;
+  }
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .code-filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--muted); margin-left: 6px;
+  }
+  .code-copy {
+    margin-left: auto;
+    background: rgba(92,110,248,.1);
+    border: 1px solid rgba(92,110,248,.2);
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    color: var(--accent); cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    transition: background .15s;
+  }
+  .code-copy:hover { background: rgba(92,110,248,.25); }
+  .code-copy.copied { color: var(--green); border-color: var(--green); }
+  pre {
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+    line-height: 1.8;
+    tab-size: 4;
+  }
+  /* Syntax tokens */
+  .k  { color: #7c8ff5; }   /* keyword */
+  .kw { color: #c792ea; }   /* keyword2 */
+  .cl { color: #82aaff; }   /* class */
+  .m  { color: var(--green); }/* method */
+  .s  { color: #f78c6c; }   /* string */
+  .c  { color: #546e7a; font-style: italic; }  /* comment */
+  .n  { color: var(--text); }/* normal */
+  .p  { color: var(--muted); }/* punctuation */
+  .num{ color: var(--accent3); }/* number */
+  .a  { color: var(--accent2); }/* attribute */
+
+  /* ── OUTPUT TERMINAL ── */
+  .terminal {
+    background: #060b10;
+    border: 1px solid #1a2a1a;
+    border-radius: 10px; overflow: hidden;
+  }
+  .terminal-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    background: #0a1008;
+    border-bottom: 1px solid #1a2a1a;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: #3d7a3d;
+  }
+  .terminal-bar span { margin-right: 8px; font-size: 15px; }
+  .terminal-body {
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem; line-height: 1.9; color: var(--green);
+  }
+  .terminal-body .t-dim { color: #2d5a2d; }
+  .terminal-body .t-warn { color: var(--accent3); }
+  .terminal-body .t-info { color: #5b9bd5; }
+  .terminal-body .t-bold { color: #c3e6c3; font-weight: 700; }
+  .terminal-body .t-prompt { color: var(--muted); }
+
+  /* ── CONCEPT BOX ── */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .concept-card:hover { border-color: rgba(92,110,248,.3); transform: translateY(-2px); }
+  .concept-card .cc-icon { font-size: 24px; margin-bottom: 10px; }
+  .concept-card .cc-title { font-size: .88rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .concept-card .cc-desc { font-size: .78rem; color: var(--muted); line-height: 1.6; }
+  .concept-card .cc-code {
+    margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px 10px;
+    color: var(--accent2);
+    white-space: pre;
+  }
+
+  /* ── CHALLENGE BOX ── */
+  .challenge-box {
+    background: linear-gradient(135deg, rgba(92,110,248,.08) 0%, rgba(184,127,255,.08) 100%);
+    border: 1px solid rgba(92,110,248,.25);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+  .challenge-box h3 { font-size: 1rem; font-weight: 800; color: var(--purple); margin-bottom: 12px; }
+  .challenge-list { display: flex; flex-direction: column; gap: 8px; }
+  .challenge-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: .85rem; color: var(--text); line-height: 1.6;
+  }
+  .challenge-item::before {
+    content: '▸'; color: var(--purple); flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-track {
+    display: flex; gap: 0;
+    margin-bottom: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    overflow: hidden;
+    padding: 6px;
+    gap: 4px;
+  }
+  .progress-step {
+    flex: 1; padding: 8px 4px;
+    text-align: center;
+    font-size: .7rem; font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background .2s, color .2s;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .03em;
+  }
+  .progress-step.active {
+    background: var(--accent); color: #fff;
+  }
+  .progress-step.done {
+    background: rgba(62,207,142,.12); color: var(--green);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #1f2840; border-radius: 3px; }
+
+  /* ── FOOTER ── */
+  .demo-footer {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 48px 48px;
+    display: flex; align-items: center; gap: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+  .demo-footer .brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--muted);
+  }
+  .demo-footer .brand strong { color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .hero, .main, .demo-footer { padding-left: 20px; padding-right: 20px; }
+    .hero h1 { font-size: 1.6rem; }
+    .vs-menu { display: none; }
+    .progress-step { font-size: .6rem; }
+  }
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="demos.html" class="nav-back">← Demos</a>
-  <div class="nav-title">Demo <strong>01 / 06</strong> · M01</div>
-  <div class="nav-badge">Writing Apps · .NET 8</div>
-  <a href="demo2.html" class="nav-next">Demo 02 →</a>
-</nav>
+<!-- VS 2022 Menu Bar -->
+<div class="vs-bar">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M2 4.5L8.5 2L22 12L8.5 22L2 19.5V4.5Z" fill="#5c6ef8" opacity=".8"/>
+      <path d="M8.5 2L22 12L8.5 22V14L15 12L8.5 10V2Z" fill="#5c6ef8"/>
+    </svg>
+    Visual Studio 2022
+  </div>
+  <div class="vs-menu">
+    <span>File</span><span>Edit</span><span>View</span>
+    <span>Build</span><span>Debug</span><span>Tools</span><span>Help</span>
+  </div>
+  <div class="vs-spacer"></div>
+  <span style="font-size:10px;">Demo 1 — Module 1</span>
+  <div class="vs-badge">.NET 8</div>
+</div>
 
-<!-- HERO -->
+<!-- Hero -->
 <section class="hero">
-  <div class="hero-inner">
-    <div>
-      <div class="hero-eyebrow">Demo 01 · Module 01</div>
-      <h1>Writing <em>Apps</em><br/>in C# &amp; .NET 8</h1>
-      <p class="hero-desc">Before writing a single line, understand the full picture — how C# becomes a running program, what the CLR does, how to structure a project, and every CLI command you'll use daily.</p>
-      <div class="hero-pills">
-        <span class="pill">.NET 8 SDK</span><span class="pill">CLR / JIT</span><span class="pill">Roslyn Compiler</span>
-        <span class="pill">dotnet CLI</span><span class="pill">Program.cs</span><span class="pill">.csproj</span><span class="pill">NuGet</span>
-      </div>
-      <div class="hero-progress">
-        <div class="hp-label">Course Progress</div>
-        <div class="hp-bar"><div class="hp-fill"></div></div>
-        <div class="hp-text">Demo 1 of 6 · ~45 min · Beginner</div>
-      </div>
-    </div>
-    <!-- CLR Pipeline Card -->
-    <div class="pipeline-card">
-      <div class="pc-header">
-        <div class="pc-title">CLR Execution Pipeline</div>
-        <div class="pc-sub">Click any stage to understand it</div>
-      </div>
-      <div class="pipe-stages">
-        <div class="ps active" onclick="setPipe(this,0)">
-          <div class="ps-icon">📝</div>
-          <div class="ps-info"><div class="ps-name">C# Source Code</div><div class="ps-sub">.cs files you write</div></div>
-          <div class="ps-arrow">▶</div>
-        </div>
-        <div class="pc-connector">↓</div>
-        <div class="ps" onclick="setPipe(this,1)">
-          <div class="ps-icon">🔬</div>
-          <div class="ps-info"><div class="ps-name">Roslyn Compiler</div><div class="ps-sub">Type-checks, emits IL</div></div>
-          <div class="ps-arrow">▶</div>
-        </div>
-        <div class="pc-connector">↓</div>
-        <div class="ps" onclick="setPipe(this,2)">
-          <div class="ps-icon">📦</div>
-          <div class="ps-info"><div class="ps-name">IL / Assembly (.dll)</div><div class="ps-sub">CPU-neutral bytecode</div></div>
-          <div class="ps-arrow">▶</div>
-        </div>
-        <div class="pc-connector">↓</div>
-        <div class="ps" onclick="setPipe(this,3)">
-          <div class="ps-icon">⚡</div>
-          <div class="ps-info"><div class="ps-name">JIT Compiler</div><div class="ps-sub">IL → native at runtime</div></div>
-          <div class="ps-arrow">▶</div>
-        </div>
-        <div class="pc-connector">↓</div>
-        <div class="ps" onclick="setPipe(this,4)">
-          <div class="ps-icon">💻</div>
-          <div class="ps-info"><div class="ps-name">Native CPU Code</div><div class="ps-sub">x64 / ARM64 instructions</div></div>
-          <div class="ps-arrow">▶</div>
-        </div>
-      </div>
-      <div class="pc-detail">
-        <div class="pcd-title" id="pipeTitle">📝 C# Source Code</div>
-        <div class="pcd-body" id="pipeBody">You write high-level C# in .cs files. Nothing executes yet — this is just text. The Roslyn compiler reads every .cs file in your project folder.</div>
-      </div>
-    </div>
+  <div class="module-tag">📦 Module 1 · Demo 1</div>
+  <h1>Building Your First<br/><span>.NET 8 Application</span></h1>
+  <p>A hands-on walkthrough: create a Console project in Visual Studio 2022, explore the auto-generated <code style="font-family:'JetBrains Mono',monospace;color:var(--accent2);background:rgba(0,212,170,.08);padding:2px 6px;border-radius:4px;">Program.cs</code>, run it, and understand what happens under the hood.</p>
+  <div class="hero-meta">
+    <div class="meta-chip"><div class="dot" style="background:var(--green)"></div>Hands-on Lab</div>
+    <div class="meta-chip"><div class="dot" style="background:var(--accent3)"></div>~25 minutes</div>
+    <div class="meta-chip"><div class="dot" style="background:var(--accent)"></div>VS 2022 · .NET 8.0</div>
+    <div class="meta-chip"><div class="dot" style="background:var(--purple)"></div>C# 12 · Top-level Statements</div>
   </div>
 </section>
 
-<div class="content">
+<!-- Main Content -->
+<main class="main">
 
-<!-- SECTION 1: KEY CONCEPTS -->
-<div class="sec-label reveal">
-  <div class="sl-tag">01 · Concepts</div>
-  <div class="sl-title">What You Need to Know</div>
-  <div class="sl-line"></div>
-</div>
-<div class="concept-grid reveal">
-  <div class="cc blue">
-    <div class="cc-icon">🌐</div>
-    <div class="cc-title">.NET 8 — Runtime + SDK</div>
-    <div class="cc-body">The <strong>SDK</strong> is your development kit — compiler, tools, project templates. The <strong>Runtime</strong> is what end users install to run your app. LTS (Long-Term Support) = security patches until <strong>November 2026</strong>. Always target net8.0 for new projects.</div>
-    <div class="cc-code">dotnet --version       // 8.x.x
-dotnet --list-runtimes // installed runtimes
-dotnet --list-sdks     // installed SDKs</div>
-  </div>
-  <div class="cc blue">
-    <div class="cc-icon">🔬</div>
-    <div class="cc-title">Roslyn — The C# Compiler</div>
-    <div class="cc-body">Roslyn reads your <code>.cs</code> files, builds an AST (Abstract Syntax Tree), runs type-checking, and emits <strong>IL (Intermediate Language)</strong> into a <code>.dll</code>. Errors like "CS0029: Cannot convert string to int" come from Roslyn — <em>before</em> your code ever runs.</div>
-    <div class="cc-code">// Roslyn catches this at BUILD time:
-int x = "hello"; // CS0029 ← compile error
-// You never run bad-typed code</div>
-  </div>
-  <div class="cc green">
-    <div class="cc-icon">⚡</div>
-    <div class="cc-title">JIT — Just-In-Time Compiler</div>
-    <div class="cc-body">When your app runs, the CLR's JIT compiles each method from IL to native CPU instructions <em>the first time it's called</em>. <strong>Tiered compilation</strong>: Tier 0 = fast (quick startup), Tier 1 = optimised (hot path). Subsequent calls use the cached native code.</div>
-    <div class="cc-code">// .NET 8 also supports Native AOT:
-// dotnet publish --aot
-// → no JIT, instant startup, smaller size
-// Used for serverless / containers</div>
-  </div>
-  <div class="cc green">
-    <div class="cc-icon">🗑️</div>
-    <div class="cc-title">Garbage Collector (GC)</div>
-    <div class="cc-body">The GC manages heap memory — you never call <code>free()</code>. It uses <strong>generations</strong>: Gen0 (new, collected often), Gen1, Gen2 (long-lived). Most objects die in Gen0 — collections are fast. The GC only frees memory; <code>IDisposable</code> frees other <em>resources</em> (files, connections).</div>
-    <div class="cc-code">// GC frees MEMORY automatically.
-// IDisposable frees RESOURCES manually.
-await using var conn = new SqlConnection(cs);
-// conn auto-disposed at end of scope ✓</div>
-  </div>
-  <div class="cc amber">
-    <div class="cc-icon">📁</div>
-    <div class="cc-title">SDK-Style .csproj</div>
-    <div class="cc-body">The project file is minimal XML — no file lists, no GUIDs. The SDK auto-includes all <code>.cs</code> files. Key properties: <code>TargetFramework</code>, <code>Nullable</code>, <code>ImplicitUsings</code>. Solution files (<code>.sln</code>) group multiple projects together.</div>
-    <div class="cc-code">&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
-  &lt;PropertyGroup&gt;
-    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
-    &lt;Nullable&gt;enable&lt;/Nullable&gt;
-    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
-  &lt;/PropertyGroup&gt;
-&lt;/Project&gt;</div>
-  </div>
-  <div class="cc amber">
-    <div class="cc-icon">⌨️</div>
-    <div class="cc-title">Top-Level Statements</div>
-    <div class="cc-body">.NET 6+ allows <code>Program.cs</code> without a class or <code>Main</code> method. The compiler generates the entry point. Only ONE file per project can use top-level statements. <code>ImplicitUsings</code> auto-adds <code>System</code>, <code>System.Linq</code>, etc.</div>
-    <div class="cc-code">// Old way (still valid):
-class Program {
-  static void Main(string[] args) { ... }
-}
-// New way (.NET 6+):
-Console.WriteLine("Hello!"); // just this</div>
-  </div>
-</div>
-
-<!-- SECTION 2: VS 2022 SETUP -->
-<div class="sec-label reveal">
-  <div class="sl-tag">02 · Setup</div>
-  <div class="sl-title">Create Your First Project in VS 2022</div>
-  <div class="sl-line"></div>
-</div>
-<div class="setup-box reveal">
-  <div class="sb-header">
-    <div class="sb-vs-logo">⚙️</div>
-    <div>
-      <div class="sb-h-title">Visual Studio 2022 — Step-by-Step Setup</div>
-      <div class="sb-h-sub">Follow exactly — every menu path and shortcut is listed</div>
-    </div>
-  </div>
-  <div class="sb-steps">
-    <div class="sb-step">
-      <div class="ss-num">1</div>
-      <div class="ss-body">
-        <div class="ss-title">Open Visual Studio 2022</div>
-        <div class="ss-desc">Launch VS 2022. On the start screen click <strong>"Create a new project"</strong>. In the search box type <strong>Console</strong> and select <strong>"Console App"</strong> — make sure it shows <strong>C#</strong> tag (not VB or F#).</div>
-        <div class="ss-menu">File → New → Project → Console App (C#)</div>
-        <div class="ss-note">⚠ Make sure you pick "Console App" not "Console App (.NET Framework)" — they are different!</div>
+  <!-- Objectives -->
+  <section>
+    <div class="section-label">🎯 Learning Objectives</div>
+    <div class="objective-card">
+      <div class="obj-item">
+        <div class="obj-icon">🏗️</div>
+        <div class="obj-text">
+          <strong>Create a project</strong>
+          <span>Use VS 2022 wizard to scaffold a .NET 8 Console App</span>
+        </div>
+      </div>
+      <div class="obj-item">
+        <div class="obj-icon">📄</div>
+        <div class="obj-text">
+          <strong>Read Program.cs</strong>
+          <span>Understand top-level statements, namespaces &amp; entry point</span>
+        </div>
+      </div>
+      <div class="obj-item">
+        <div class="obj-icon">▶️</div>
+        <div class="obj-text">
+          <strong>Build &amp; Run</strong>
+          <span>Compile via MSBuild, run in terminal, read output</span>
+        </div>
+      </div>
+      <div class="obj-item">
+        <div class="obj-icon">🔍</div>
+        <div class="obj-text">
+          <strong>Understand the CLR</strong>
+          <span>Trace the path from .cs → IL → JIT → native execution</span>
+        </div>
       </div>
     </div>
-    <div class="sb-step">
-      <div class="ss-num">2</div>
-      <div class="ss-body">
-        <div class="ss-title">Configure the Project</div>
-        <div class="ss-desc">Fill in the dialog exactly as shown:</div>
-        <div class="ss-cmd">Project name: ERP.Enrollment</div>
-        <div class="ss-cmd" style="margin-top:6px">Location: C:\Training\DotNet8Course\</div>
-        <div class="ss-cmd" style="margin-top:6px">Solution name: ERP</div>
-        <div class="ss-note">✓ Check "Place solution and project in the same directory" OFF — keep them separate for a real solution structure.</div>
-      </div>
-    </div>
-    <div class="sb-step">
-      <div class="ss-num">3</div>
-      <div class="ss-body">
-        <div class="ss-title">Select Framework &amp; Options</div>
-        <div class="ss-desc">In the "Additional information" dialog:</div>
-        <div class="ss-menu">Framework: .NET 8.0 (Long Term Support)</div>
-        <div class="ss-cmd" style="margin-top:8px">✓ Do not use top-level statements — UNCHECK this</div>
-        <div class="ss-note">We'll keep top-level statements (leave unchecked) to write minimal code. VS will generate the clean Program.cs with just Console.WriteLine.</div>
-      </div>
-    </div>
-    <div class="sb-step">
-      <div class="ss-num">4</div>
-      <div class="ss-body">
-        <div class="ss-title">Explore What VS Created</div>
-        <div class="ss-desc">Look at Solution Explorer (right panel). You'll see:</div>
-        <div class="ss-path">ERP.sln</div>
-        <div class="ss-path" style="margin-left:16px">ERP.Enrollment/</div>
-        <div class="ss-path" style="margin-left:32px">ERP.Enrollment.csproj</div>
-        <div class="ss-path" style="margin-left:32px">Program.cs</div>
-        <div class="ss-note">Open ERP.Enrollment.csproj — notice how minimal it is. Just 7 lines vs hundreds in old .NET Framework projects.</div>
-      </div>
-    </div>
-    <div class="sb-step">
-      <div class="ss-num">5</div>
-      <div class="ss-body">
-        <div class="ss-title">Run Your First Program</div>
-        <div class="ss-desc">Press <strong>F5</strong> (or Ctrl+F5 to run without debugger). You should see a console window with "Hello, World!" — that's your .NET 8 app running through the full CLR pipeline.</div>
-        <div class="ss-menu">F5 → Debug and Run</div>
-        <div class="ss-menu" style="margin-top:6px">Ctrl+F5 → Run without Debug (keeps window open)</div>
-        <div class="ss-note">Use Ctrl+F5 during development — it keeps the console open so you can see output without attaching a debugger.</div>
-      </div>
-    </div>
-    <div class="sb-step">
-      <div class="ss-num">6</div>
-      <div class="ss-body">
-        <div class="ss-title">Open Terminal Inside VS</div>
-        <div class="ss-desc">You can also run CLI commands inside VS 2022 without leaving the IDE:</div>
-        <div class="ss-menu">View → Terminal  (or  Ctrl+` )</div>
-        <div class="ss-cmd" style="margin-top:8px">dotnet run</div>
-        <div class="ss-cmd" style="margin-top:6px">dotnet build</div>
-        <div class="ss-note">The terminal opens at the solution root. Navigate to the project folder first: cd ERP.Enrollment</div>
-      </div>
-    </div>
-  </div>
-</div>
+  </section>
 
-<!-- SECTION 3: CODE DEMOS -->
-<div class="sec-label reveal">
-  <div class="sl-tag">03 · Code</div>
-  <div class="sl-title">Annotated Code Walkthroughs</div>
-  <div class="sl-line"></div>
-</div>
-<div class="code-demo reveal">
-  <div class="cd-tabs">
-    <div class="cd-tab active" onclick="showTab(this,'ct1')">Program.cs</div>
-    <div class="cd-tab" onclick="showTab(this,'ct2')">.csproj File</div>
-    <div class="cd-tab" onclick="showTab(this,'ct3')">NuGet Packages</div>
-    <div class="cd-tab" onclick="showTab(this,'ct4')">GlobalUsings.cs</div>
-    <div class="cd-tab" onclick="showTab(this,'ct5')">bin/ &amp; obj/ folders</div>
+  <!-- Step Progress -->
+  <div class="progress-track" id="progressTrack">
+    <div class="progress-step active" onclick="scrollStep(0)">1 · Create</div>
+    <div class="progress-step" onclick="scrollStep(1)">2 · Explore</div>
+    <div class="progress-step" onclick="scrollStep(2)">3 · Modify</div>
+    <div class="progress-step" onclick="scrollStep(3)">4 · Run</div>
+    <div class="progress-step" onclick="scrollStep(4)">5 · Concepts</div>
+    <div class="progress-step" onclick="scrollStep(5)">6 · Challenge</div>
   </div>
 
-  <!-- Tab 1: Program.cs -->
-  <div class="cd-panel active" id="ct1">
-    <div class="code-side">
-      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">Program.cs</div></div>
-      <div class="code-block"><span class="cm">// .NET 8 top-level statements
-// No class Program, no static void Main
-// The compiler generates the entry point for you.</span>
+  <!-- STEPS -->
+  <div class="steps" id="stepsContainer">
 
-<span class="cm">// ImplicitUsings=enable means these are auto-added:
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;  ... and more</span>
+    <!-- Step 1 -->
+    <div class="step-card open" id="step0">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Create a New Project in Visual Studio 2022</div>
+          <div class="step-subtitle">Launch → New Project → Console App → .NET 8.0</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">a</div>
+            <div class="ins-text">Open <strong>Visual Studio 2022</strong>. On the start screen, click <strong>"Create a new project"</strong>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">b</div>
+            <div class="ins-text">In the search box type <strong>Console</strong>. Select <strong>"Console App"</strong> (the one labelled <em>C#, Linux, macOS, Windows</em>). Click <strong>Next</strong>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">c</div>
+            <div class="ins-text">Set <strong>Project name</strong> → <kbd>HelloDotNet8</kbd> &nbsp;|&nbsp; <strong>Location</strong> → a folder of your choice. Click <strong>Next</strong>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">d</div>
+            <div class="ins-text">On the <strong>Additional information</strong> screen, set <strong>Framework</strong> → <kbd>.NET 8.0 (Long-term support)</kbd>. Leave "Do not use top-level statements" <strong>unchecked</strong>. Click <strong>Create</strong>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">e</div>
+            <div class="ins-text">VS 2022 scaffolds the project. Notice in <strong>Solution Explorer</strong>: <code style="color:var(--accent2)">HelloDotNet8.csproj</code> and <code style="color:var(--accent2)">Program.cs</code>.</div>
+          </div>
+        </div>
+        <div class="screenshot-hint">📸 Trainer Tip: Show the "Additional Information" dialog → Framework dropdown. Students must confirm ".NET 8.0 (Long-term support)".</div>
+      </div>
+    </div>
 
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"🏫 ERP Enrollment System v1.0"</span>);
+    <!-- Step 2 -->
+    <div class="step-card" id="step1">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Explore the Project Structure</div>
+          <div class="step-subtitle">Solution Explorer · .csproj · Program.cs</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">a</div>
+            <div class="ins-text">In <strong>Solution Explorer</strong>, double-click <strong>HelloDotNet8.csproj</strong>. Note the XML — this is the <strong>MSBuild project file</strong>.</div>
+          </div>
+        </div>
 
-<span class="cm">// var = local type inference (still strongly typed)</span>
-<span class="kw">var</span> appName      = <span class="str">"ERP Core"</span>;         <span class="cm">// inferred: string</span>
-<span class="kw">const int</span> MAX    = <span class="num">30</span>;                  <span class="cm">// compile-time constant</span>
-<span class="kw">var</span> version      = <span class="num">1.0</span>;                 <span class="cm">// inferred: double</span>
+        <div class="code-block">
+          <div class="code-topbar">
+            <div class="code-dot" style="background:#f06a6a"></div>
+            <div class="code-dot" style="background:#f7c948"></div>
+            <div class="code-dot" style="background:#3ecf8e"></div>
+            <span class="code-filename">HelloDotNet8.csproj</span>
+            <button class="code-copy" onclick="copyCode(this)">COPY</button>
+          </div>
+          <pre><span class="p">&lt;</span><span class="cl">Project</span> <span class="a">Sdk</span><span class="p">="</span><span class="s">Microsoft.NET.Sdk</span><span class="p">"&gt;</span>
 
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"\n{appName} — Max Batch: {MAX}"</span>);
+  <span class="p">&lt;</span><span class="cl">PropertyGroup</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="a">OutputType</span><span class="p">&gt;</span><span class="s">Exe</span><span class="p">&lt;/</span><span class="a">OutputType</span><span class="p">&gt;</span>          <span class="c">&lt;!-- builds an executable --&gt;</span>
+    <span class="p">&lt;</span><span class="a">TargetFramework</span><span class="p">&gt;</span><span class="s">net8.0</span><span class="p">&lt;/</span><span class="a">TargetFramework</span><span class="p">&gt;</span>  <span class="c">&lt;!-- targets .NET 8 runtime --&gt;</span>
+    <span class="p">&lt;</span><span class="a">Nullable</span><span class="p">&gt;</span><span class="s">enable</span><span class="p">&lt;/</span><span class="a">Nullable</span><span class="p">&gt;</span>           <span class="c">&lt;!-- C# nullable reference types --&gt;</span>
+    <span class="p">&lt;</span><span class="a">ImplicitUsings</span><span class="p">&gt;</span><span class="s">enable</span><span class="p">&lt;/</span><span class="a">ImplicitUsings</span><span class="p">&gt;</span> <span class="c">&lt;!-- auto-imports System, etc. --&gt;</span>
+  <span class="p">&lt;/</span><span class="cl">PropertyGroup</span><span class="p">&gt;</span>
 
-<span class="cm">// List&lt;string&gt; — generic collection</span>
-<span class="kw">var</span> roster = <span class="kw">new</span> <span class="cls">List</span>&lt;<span class="kw">string</span>&gt;
+<span class="p">&lt;/</span><span class="cl">Project</span><span class="p">&gt;</span></pre>
+        </div>
+
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">b</div>
+            <div class="ins-text">Now open <strong>Program.cs</strong>. You will see the auto-generated default file — just one line! This is <strong>C# 9+ Top-Level Statements</strong>.</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-topbar">
+            <div class="code-dot" style="background:#f06a6a"></div>
+            <div class="code-dot" style="background:#f7c948"></div>
+            <div class="code-dot" style="background:#3ecf8e"></div>
+            <span class="code-filename">Program.cs — Auto-generated (default)</span>
+          </div>
+          <pre><span class="c">// See https://aka.ms/new-console-template for more information</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"Hello, World!"</span><span class="p">);</span></pre>
+        </div>
+
+        <div class="screenshot-hint">💡 Key point: No <code>class Program</code>, no <code>static void Main</code>. The compiler wraps this in a hidden entry point automatically.</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" id="step2">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Modify Program.cs — Try It Yourself</div>
+          <div class="step-subtitle">Write real code: variables, interpolation, loops, user input</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">a</div>
+            <div class="ins-text"><strong>Replace</strong> the entire content of <code>Program.cs</code> with the code below. Type it manually — do not paste — to build muscle memory.</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-topbar">
+            <div class="code-dot" style="background:#f06a6a"></div>
+            <div class="code-dot" style="background:#f7c948"></div>
+            <div class="code-dot" style="background:#3ecf8e"></div>
+            <span class="code-filename">Program.cs — Your Version</span>
+            <button class="code-copy" onclick="copyCode(this)">COPY</button>
+          </div>
+          <pre><span class="c">// ─────────────────────────────────────────────────
+//  Demo 1 · Module 1 — .NET 8 & Azure AI Training
+//  HelloDotNet8 · Program.cs
+// ─────────────────────────────────────────────────</span>
+
+<span class="c">// 1️⃣  Basic output</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">ForegroundColor</span> <span class="p">=</span> <span class="cl">ConsoleColor</span><span class="p">.</span><span class="n">Cyan</span><span class="p">;</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"═══════════════════════════════════"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"  Welcome to .NET 8 — Demo 1        "</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"═══════════════════════════════════"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">ResetColor</span><span class="p">();</span>
+
+<span class="c">// 2️⃣  Variables and string interpolation</span>
+<span class="k">string</span> <span class="n">courseName</span> <span class="p">=</span> <span class="s">".NET 8 & Azure AI"</span><span class="p">;</span>
+<span class="k">int</span>    <span class="n">totalDays</span>  <span class="p">=</span> <span class="num">11</span><span class="p">;</span>
+<span class="k">double</span> <span class="n">version</span>   <span class="p">=</span> <span class="num">8.0</span><span class="p">;</span>
+
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"Course  : {</span><span class="n">courseName</span><span class="s">}"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"Duration: {</span><span class="n">totalDays</span><span class="s">} days"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"Runtime : .NET v{</span><span class="n">version</span><span class="s">}"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">()</span><span class="p">;</span>
+
+<span class="c">// 3️⃣  User input</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">Write</span><span class="p">(</span><span class="s">"Enter your name: "</span><span class="p">);</span>
+<span class="k">string</span><span class="p">?</span> <span class="n">name</span> <span class="p">=</span> <span class="cl">Console</span><span class="p">.</span><span class="m">ReadLine</span><span class="p">();</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"Hello, {</span><span class="n">name</span><span class="s">}! Let's build something awesome.\n"</span><span class="p">);</span>
+
+<span class="c">// 4️⃣  Simple loop — print module days</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"── Course Modules ──"</span><span class="p">);</span>
+<span class="k">string</span><span class="p">[]</span> <span class="n">modules</span> <span class="p">=</span>
+<span class="p">[</span>
+    <span class="s">"Writing Applications in C# & .NET 8"</span><span class="p">,</span>
+    <span class="s">"OOP Fundamentals"</span><span class="p">,</span>
+    <span class="s">"Collections & LINQ"</span><span class="p">,</span>
+    <span class="s">"Async & Parallel Programming"</span><span class="p">,</span>
+    <span class="s">"Azure AI Integration"</span>
+<span class="p">];</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">int</span> <span class="n">i</span> <span class="p">=</span> <span class="num">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">modules</span><span class="p">.</span><span class="m">Length</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+<span class="p">{</span>
+    <span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"  [{</span><span class="n">i</span> <span class="p">+</span> <span class="num">1</span><span class="s">}] {</span><span class="n">modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="s">}"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c">// 5️⃣  Environment information (runtime introspection)</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">()</span><span class="p">;</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"── Runtime Info ──"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$".NET Version : {</span><span class="cl">Environment</span><span class="p">.</span><span class="n">Version</span><span class="s">}"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"OS Platform  : {</span><span class="cl">Environment</span><span class="p">.</span><span class="n">OSVersion</span><span class="s">}"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"Machine Name : {</span><span class="cl">Environment</span><span class="p">.</span><span class="n">MachineName</span><span class="s">}"</span><span class="p">);</span>
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"64-bit OS    : {</span><span class="cl">Environment</span><span class="p">.</span><span class="n">Is64BitOperatingSystem</span><span class="s">}"</span><span class="p">);</span>
+
+<span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">"\n✅ Program completed successfully."</span><span class="p">);</span></pre>
+        </div>
+
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">b</div>
+            <div class="ins-text">Notice IntelliSense auto-completing as you type. Hover over <code>Console</code> to read the tooltip — VS 2022 shows the full XML docs inline.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">c</div>
+            <div class="ins-text">Observe the <strong>array initializer</strong> syntax on line with <code>modules</code> — this is <strong>C# 12 collection expressions</strong> using <kbd>[ ]</kbd> instead of <kbd>new string[]{ }</kbd>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card" id="step3">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Build &amp; Run the Application</div>
+          <div class="step-subtitle">F5 · dotnet run · Output window</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">a</div>
+            <div class="ins-text">Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to <strong>Build</strong> the solution. Check the <strong>Output</strong> window (View → Output) — look for <em>"Build succeeded"</em>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">b</div>
+            <div class="ins-text">Press <kbd>F5</kbd> to <strong>Run with Debugger</strong>. The console window opens — type your name when prompted and press <kbd>Enter</kbd>.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">c</div>
+            <div class="ins-text">Alternatively, open the <strong>Developer PowerShell</strong> (View → Terminal) and run:</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-topbar">
+            <div class="code-dot" style="background:#f06a6a"></div>
+            <div class="code-dot" style="background:#f7c948"></div>
+            <div class="code-dot" style="background:#3ecf8e"></div>
+            <span class="code-filename">Terminal — dotnet CLI</span>
+          </div>
+          <pre><span class="n">dotnet run</span></pre>
+        </div>
+
+        <!-- Expected Output Terminal -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span>▶</span> Expected Output
+          </div>
+          <div class="terminal-body">
+<span class="t-info">═══════════════════════════════════</span>
+<span class="t-info">  Welcome to .NET 8 — Demo 1        </span>
+<span class="t-info">═══════════════════════════════════</span>
+<span class="t-bold">Course  : .NET 8 & Azure AI</span>
+<span class="t-bold">Duration: 11 days</span>
+<span class="t-bold">Runtime : .NET v8.0</span>
+
+<span class="t-prompt">Enter your name: </span><span class="t-warn">Raushan</span>
+Hello, Raushan! Let's build something awesome.
+
+── Course Modules ──
+  [1] Writing Applications in C# & .NET 8
+  [2] OOP Fundamentals
+  [3] Collections & LINQ
+  [4] Async & Parallel Programming
+  [5] Azure AI Integration
+
+── Runtime Info ──
+.NET Version : <span class="t-warn">8.0.x</span>
+OS Platform  : <span class="t-dim">Microsoft Windows NT 10.0.xxxxx.0</span>
+Machine Name : <span class="t-dim">TRAINER-PC</span>
+64-bit OS    : <span class="t-warn">True</span>
+
+<span class="t-bold">✅ Program completed successfully.</span></div>
+        </div>
+
+        <div class="instruction-list">
+          <div class="instruction">
+            <div class="ins-bullet">d</div>
+            <div class="ins-text"><strong>Set a breakpoint</strong>: Click the grey margin to the left of the <code>for</code> loop line. A red dot appears. Press <kbd>F5</kbd> again — execution pauses. Press <kbd>F10</kbd> (Step Over) to step through the loop one iteration at a time. Hover over <code>i</code> to see its live value.</div>
+          </div>
+          <div class="instruction">
+            <div class="ins-bullet">e</div>
+            <div class="ins-text">Press <kbd>F5</kbd> to continue. Press <kbd>Shift</kbd>+<kbd>F5</kbd> to stop debugging. <strong>Remove the breakpoint</strong> by clicking the red dot again.</div>
+          </div>
+        </div>
+
+        <div class="screenshot-hint">📸 Trainer Tip: Show the bin/Debug/net8.0/ folder in Explorer. Point out HelloDotNet8.dll (IL assembly) and HelloDotNet8.exe (launcher). Open the .dll in ILSpy to reveal the hidden Main() wrapper.</div>
+      </div>
+    </div>
+
+    <!-- Step 5 — Concepts -->
+    <div class="step-card" id="step4">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">05</div>
+        <div>
+          <div class="step-title">Understand the Concepts</div>
+          <div class="step-subtitle">CLR · JIT · IL · Top-level Statements · Implicit Usings</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="concept-grid">
+
+          <div class="concept-card">
+            <div class="cc-icon">⚙️</div>
+            <div class="cc-title">CLR — Common Language Runtime</div>
+            <div class="cc-desc">The virtual machine of .NET. Manages memory (GC), type safety, exception handling, and JIT compilation. Your code never runs directly — the CLR runs it.</div>
+            <div class="cc-code">Source → IL → JIT → Native</div>
+          </div>
+
+          <div class="concept-card">
+            <div class="cc-icon">🔥</div>
+            <div class="cc-title">JIT — Just-In-Time Compiler</div>
+            <div class="cc-desc">.NET 8 uses RyuJIT. Converts IL bytecode to native CPU instructions at runtime. First run compiles; subsequent calls use the cached native code. .NET 8 adds Tiered Compilation for hot paths.</div>
+            <div class="cc-code">IL Bytecode → x64 Native</div>
+          </div>
+
+          <div class="concept-card">
+            <div class="cc-icon">📝</div>
+            <div class="cc-title">Top-Level Statements</div>
+            <div class="cc-desc">C# 9+ feature. No boilerplate class/Main needed. The compiler silently wraps your code in a <code>&lt;Program&gt;$</code> class with a synthesized entry point. Cleaner, less ceremony.</div>
+            <div class="cc-code">// compiler generates:
+static void Main(string[] args)
 {
-    <span class="str">"Alice Sharma"</span>,
-    <span class="str">"Bob Kapoor"</span>,
-    <span class="str">"Riya Patel"</span>
-};
+    // your top-level code
+}</div>
+          </div>
 
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Enrolled: {roster.Count} / {MAX}"</span>);
+          <div class="concept-card">
+            <div class="cc-icon">📦</div>
+            <div class="cc-title">Implicit Usings</div>
+            <div class="cc-desc">Enabled by <code>ImplicitUsings</code> in .csproj. A global using file is auto-generated: System, System.IO, System.Linq, System.Threading.Tasks, etc. are always available — no explicit using needed.</div>
+            <div class="cc-code">// auto-injected globally:
+global using System;
+global using System.Linq;
+global using System.IO;</div>
+          </div>
 
-<span class="kw">foreach</span> (<span class="kw">var</span> name <span class="kw">in</span> roster)
-    <span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  ↳ {name}"</span>);
+          <div class="concept-card">
+            <div class="cc-icon">🏛️</div>
+            <div class="cc-title">.NET 8 Ecosystem</div>
+            <div class="cc-desc">LTS release (3 years support). Unifies .NET Framework, .NET Core, Xamarin into one platform. Ships with C# 12, improved performance, Native AOT, and built-in AI/ML abstractions.</div>
+            <div class="cc-code">dotnet --version
+// 8.0.xxx</div>
+          </div>
 
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"\nSession complete. Press any key..."</span>);
-<span class="cls">Console</span>.<span class="fn">ReadKey</span>();</div>
-    </div>
-    <div class="ann-side">
-      <div class="ann-title">Line-by-Line</div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">No class / no Main</div></div>
-        <div class="ai-body">Top-level statements (C# 10+). The Roslyn compiler wraps everything in a generated <code>static async Task Main(string[] args)</code>. You can still access <code>args</code> as a built-in variable.</div>
-        <div class="ai-code">// args is available automatically</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">var — type inference</div></div>
-        <div class="ai-body"><code>var</code> is NOT dynamic. The type is resolved at compile time by Roslyn. <code>var appName = "ERP"</code> → type is <code>string</code>. You get full IntelliSense and type safety.</div>
-        <div class="ai-code">var x = "hi"; // string, not dynamic</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">const int MAX = 30</div></div>
-        <div class="ai-body">Compile-time constant — the value <code>30</code> is baked directly into IL. Zero runtime overhead. Can only be primitives or string. Use for fixed business rules: max batch size, fee rate, etc.</div>
-        <div class="ai-code">const decimal GST = 0.18m;</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">4</div><div class="ai-label">$"" Interpolated String</div></div>
-        <div class="ai-body">Evaluated left-to-right. The compiler converts it to a <code>String.Format</code> call or a <code>DefaultInterpolatedStringHandler</code> (faster, .NET 6+). Format specifiers work inside: <code>{fee:C2}</code> for currency.</div>
-        <div class="ai-code">$"{fee:C2}" // ₹ 15,000.00</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">5</div><div class="ai-label">Console.ReadKey()</div></div>
-        <div class="ai-body">Keeps the console window open by waiting for a keypress. Use <code>Ctrl+F5</code> in VS to run without debugger — it keeps the window open automatically without needing ReadKey.</div>
-        <div class="ai-code">Console.ReadKey(); // wait for input</div>
+          <div class="concept-card">
+            <div class="cc-icon">📁</div>
+            <div class="cc-title">Project Structure</div>
+            <div class="cc-desc">MSBuild (.csproj) is the build engine. The SDK-style project is minimal by default. NuGet packages, build targets, and publish profiles are all configured here.</div>
+            <div class="cc-code">HelloDotNet8/
+  Program.cs
+  HelloDotNet8.csproj
+  bin/   ← output
+  obj/   ← intermediate</div>
+          </div>
+
+        </div>
       </div>
     </div>
+
+    <!-- Step 6 — Challenge -->
+    <div class="step-card" id="step5">
+      <div class="step-header" onclick="toggleStep(this)">
+        <div class="step-num">06</div>
+        <div>
+          <div class="step-title">Try-It Challenges</div>
+          <div class="step-subtitle">Extend what you built — go further on your own</div>
+        </div>
+        <div class="step-chevron">▾</div>
+      </div>
+      <div class="step-body">
+        <div class="challenge-box">
+          <h3>🚀 Extend HelloDotNet8 — Pick Any 2</h3>
+          <div class="challenge-list">
+            <div class="challenge-item">Add a <strong>while loop</strong> that keeps asking for names until the user types <kbd>exit</kbd>.</div>
+            <div class="challenge-item">Use <code>DateTime.Now</code> to print a greeting: <em>"Good morning, Raushan!"</em> or <em>"Good evening, Raushan!"</em> depending on the current hour.</div>
+            <div class="challenge-item">Create a <strong>local function</strong> called <code>PrintBanner(string title)</code> and call it at the top of Program.cs.</div>
+            <div class="challenge-item">Use <code>Environment.GetCommandLineArgs()</code> to print all CLI args, then run with <kbd>dotnet run -- arg1 arg2</kbd>.</div>
+            <div class="challenge-item">Add a <code>try { } catch (Exception ex) { }</code> block around the user input section. Test what happens when you press <kbd>Ctrl+C</kbd> mid-input.</div>
+            <div class="challenge-item"><strong>Bonus</strong>: Open <strong>IL DASM</strong> (Developer Tools → IL Disassembler) or install <strong>ILSpy</strong> extension and inspect the hidden <code>&lt;Program&gt;$</code> class that wraps your top-level code.</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-topbar">
+            <div class="code-dot" style="background:#f06a6a"></div>
+            <div class="code-dot" style="background:#f7c948"></div>
+            <div class="code-dot" style="background:#3ecf8e"></div>
+            <span class="code-filename">Hint — Local Function Pattern</span>
+          </div>
+          <pre><span class="c">// Local function — defined inside top-level scope</span>
+<span class="k">void</span> <span class="m">PrintBanner</span><span class="p">(</span><span class="k">string</span> <span class="n">title</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">int</span> <span class="n">width</span> <span class="p">=</span> <span class="n">title</span><span class="p">.</span><span class="m">Length</span> <span class="p">+</span> <span class="num">4</span><span class="p">;</span>
+    <span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="k">new</span> <span class="k">string</span><span class="p">(</span><span class="s">'─'</span><span class="p">,</span> <span class="n">width</span><span class="p">));</span>
+    <span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="s">$"  {</span><span class="n">title</span><span class="s">}  "</span><span class="p">);</span>
+    <span class="cl">Console</span><span class="p">.</span><span class="m">WriteLine</span><span class="p">(</span><span class="k">new</span> <span class="k">string</span><span class="p">(</span><span class="s">'─'</span><span class="p">,</span> <span class="n">width</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c">// call it at the top</span>
+<span class="m">PrintBanner</span><span class="p">(</span><span class="s">"HelloDotNet8 · Demo 1"</span><span class="p">);</span></pre>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps -->
+
+  <!-- Quick Reference -->
+  <section>
+    <div class="section-label">⚡ Quick Reference — Keyboard Shortcuts</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">F5</div>
+        <div class="cc-desc">Start Debugging (build + run)</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">Ctrl+F5</div>
+        <div class="cc-desc">Run without Debugger</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">Ctrl+Shift+B</div>
+        <div class="cc-desc">Build Solution</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">F10 / F11</div>
+        <div class="cc-desc">Step Over / Step Into (debug)</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">Ctrl+`</div>
+        <div class="cc-desc">Open Terminal in VS 2022</div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-title" style="font-family:'JetBrains Mono',monospace">dotnet run</div>
+        <div class="cc-desc">Build + execute via CLI</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="demo-footer">
+  <div class="brand">
+    <strong>RR Skillverse</strong> · .NET 8 &amp; Azure AI Training · Module 1 · Demo 1
   </div>
-
-  <!-- Tab 2: csproj -->
-  <div class="cd-panel" id="ct2">
-    <div class="code-side">
-      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">ERP.Enrollment.csproj</div></div>
-      <div class="code-block"><span class="cm">&lt;!-- SDK-style project — minimal XML --&gt;</span>
-<span class="cm">&lt;!-- The SDK auto-includes ALL .cs files --&gt;</span>
-
-&lt;<span class="cls">Project</span> <span class="prop">Sdk</span>=<span class="str">"Microsoft.NET.Sdk"</span>&gt;
-
-  &lt;<span class="cls">PropertyGroup</span>&gt;
-
-    <span class="cm">&lt;!-- Target framework --&gt;</span>
-    &lt;<span class="cls">OutputType</span>&gt;Exe&lt;/<span class="cls">OutputType</span>&gt;
-    &lt;<span class="cls">TargetFramework</span>&gt;net8.0&lt;/<span class="cls">TargetFramework</span>&gt;
-
-    <span class="cm">&lt;!-- Nullable reference types (recommended) --&gt;</span>
-    &lt;<span class="cls">Nullable</span>&gt;enable&lt;/<span class="cls">Nullable</span>&gt;
-
-    <span class="cm">&lt;!-- Auto-add common using statements --&gt;</span>
-    &lt;<span class="cls">ImplicitUsings</span>&gt;enable&lt;/<span class="cls">ImplicitUsings</span>&gt;
-
-    <span class="cm">&lt;!-- App metadata (optional) --&gt;</span>
-    &lt;<span class="cls">AssemblyName</span>&gt;ERP.Enrollment&lt;/<span class="cls">AssemblyName</span>&gt;
-    &lt;<span class="cls">RootNamespace</span>&gt;ERP.Enrollment&lt;/<span class="cls">RootNamespace</span>&gt;
-
-    <span class="cm">&lt;!-- Treat warnings as errors in Release --&gt;</span>
-    &lt;<span class="cls">TreatWarningsAsErrors</span>
-      <span class="prop">Condition</span>=<span class="str">"'$(Configuration)'=='Release'"</span>&gt;
-      true
-    &lt;/<span class="cls">TreatWarningsAsErrors</span>&gt;
-
-  &lt;/<span class="cls">PropertyGroup</span>&gt;
-
-&lt;/<span class="cls">Project</span>&gt;</div>
-    </div>
-    <div class="ann-side">
-      <div class="ann-title">Project File Explained</div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">OutputType: Exe vs Library</div></div>
-        <div class="ai-body"><code>Exe</code> = runnable application (has an entry point). <code>Library</code> = class library with no entry point (used as a dependency). ASP.NET Core apps use <code>Exe</code> even though they're web apps.</div>
-        <div class="ai-code">Exe = runnable | Library = no main</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">Nullable=enable</div></div>
-        <div class="ai-body">Activates nullable reference type analysis. <code>string name</code> cannot be null — the compiler warns if you try. <code>string? name</code> explicitly allows null. Prevents 60–70% of NullReferenceExceptions at compile time.</div>
-        <div class="ai-code">string  name = null; // CS8600 warning
-string? name = null; // OK ✓</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">TreatWarningsAsErrors</div></div>
-        <div class="ai-body">In Release builds, any compiler warning becomes a build error. This forces your CI/CD pipeline to fail if warning-level issues exist. A warning in dev is a bug in production.</div>
-        <div class="ai-code">Condition="Release" // only in prod builds</div>
-      </div>
-    </div>
+  <div style="flex:1"></div>
+  <div class="brand" style="color:#1f2840">
+    Koenig Solutions · Trainer: Raushan Ranjan
   </div>
-
-  <!-- Tab 3: NuGet -->
-  <div class="cd-panel" id="ct3">
-    <div class="code-side">
-      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">Adding NuGet Packages</div></div>
-      <div class="code-block"><span class="cm">// METHOD 1: CLI (recommended for precision)</span>
-dotnet add package Serilog --version <span class="num">3.1.1</span>
-dotnet add package Serilog.Sinks.Console --version <span class="num">5.0.1</span>
-dotnet add package Serilog.Sinks.File --version <span class="num">5.0.0</span>
-
-<span class="cm">// METHOD 2: VS 2022 NuGet Manager
-// Right-click project → Manage NuGet Packages
-// Browse tab → search "Serilog" → Install</span>
-
-<span class="cm">// What gets added to .csproj automatically:</span>
-&lt;<span class="cls">ItemGroup</span>&gt;
-  &lt;<span class="cls">PackageReference</span>
-    <span class="prop">Include</span>=<span class="str">"Serilog"</span>
-    <span class="prop">Version</span>=<span class="str">"3.1.1"</span> /&gt;
-  &lt;<span class="cls">PackageReference</span>
-    <span class="prop">Include</span>=<span class="str">"Serilog.Sinks.Console"</span>
-    <span class="prop">Version</span>=<span class="str">"5.0.1"</span> /&gt;
-&lt;/<span class="cls">ItemGroup</span>&gt;
-
-<span class="cm">// RESTORE (happens automatically on build):
-// dotnet restore
-// Packages cached at: ~/.nuget/packages/
-// Never commit the packages folder to Git!</span>
-
-<span class="cm">// CHECK OUTDATED:
-// dotnet list package --outdated</span></div>
-    </div>
-    <div class="ann-side">
-      <div class="ann-title">NuGet Essentials</div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">NuGet = .NET's npm</div></div>
-        <div class="ai-body">NuGet is the package manager for .NET — like npm for Node.js or pip for Python. Over 600,000 packages at nuget.org. Packages are versioned DLLs distributed as .nupkg files.</div>
-        <div class="ai-code">nuget.org → search → add reference</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">Pin versions exactly</div></div>
-        <div class="ai-body">Always pin major versions to avoid unexpected breaking changes. Use <code>--version 3.1.1</code> not just <code>dotnet add package Serilog</code> (which gets latest — could be a major version bump).</div>
-        <div class="ai-code">Version="3.1.1" ← exact pin</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">.gitignore packages</div></div>
-        <div class="ai-body">Never commit the <code>packages/</code> or <code>.nuget/</code> folders to Git. The <code>.csproj</code> references are enough — <code>dotnet restore</code> downloads everything. The default <code>.gitignore</code> from GitHub already handles this.</div>
-        <div class="ai-code">dotnet restore # re-downloads all packages</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab 4: GlobalUsings -->
-  <div class="cd-panel" id="ct4">
-    <div class="code-side">
-      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">GlobalUsings.cs  (create this file)</div></div>
-      <div class="code-block"><span class="cm">// Create this file: ERP.Enrollment/GlobalUsings.cs
-// These usings apply to EVERY .cs file in the project.
-// No need to repeat them in each file.</span>
-
-<span class="cm">// ImplicitUsings=enable already adds:
-//   using System;
-//   using System.Collections.Generic;
-//   using System.IO;
-//   using System.Linq;
-//   using System.Net.Http;
-//   using System.Threading;
-//   using System.Threading.Tasks;</span>
-
-<span class="cm">// Add YOUR app-wide usings here:</span>
-<span class="kw">global using</span> Microsoft.Extensions.Logging;
-<span class="kw">global using</span> ERP.Enrollment.Models;
-<span class="kw">global using</span> ERP.Enrollment.Services;
-<span class="kw">global using</span> ERP.Enrollment.Exceptions;
-
-<span class="cm">// Result: every other .cs file in this project
-// has access to all these namespaces
-// WITHOUT any using statement at the top.
-
-// This replaces 5-8 using lines per file.
-// In a 50-file project, that's 250+ lines saved.</span></div>
-    </div>
-    <div class="ann-side">
-      <div class="ann-title">Global Usings (C# 10)</div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">global using = project-wide</div></div>
-        <div class="ai-body">A <code>global using</code> applies the namespace to every file in the project. No performance cost — this is purely a compile-time directive. The IL output is identical to adding the <code>using</code> in every file.</div>
-        <div class="ai-code">global using System.Text.Json;</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">Convention: one file</div></div>
-        <div class="ai-body">Convention is to put all global usings in a single file named <code>GlobalUsings.cs</code> at the project root. Teams use this as the "dependency manifest" — one place to see all third-party namespaces in use.</div>
-        <div class="ai-code">ERP.Enrollment/GlobalUsings.cs</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">global using static</div></div>
-        <div class="ai-body">You can also do <code>global using static System.Console</code> — then you can write <code>WriteLine("hi")</code> without the <code>Console.</code> prefix everywhere. Common in test projects with <code>using static Assert</code>.</div>
-        <div class="ai-code">global using static System.Console;</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab 5: bin/obj -->
-  <div class="cd-panel" id="ct5">
-    <div class="code-side">
-      <div class="code-bar"><div class="cb-dots"><div class="cb-dot r"></div><div class="cb-dot y"></div><div class="cb-dot g"></div></div><div class="cb-file">Project Folder Structure (after build)</div></div>
-      <div class="code-block"><span class="cm">ERP.Enrollment/
-├── ERP.Enrollment.csproj       ← project file
-├── Program.cs                  ← your code
-├── GlobalUsings.cs             ← global usings
-├── Models/
-│   ├── Student.cs
-│   └── Course.cs
-│
-├── obj/                        ← BUILD INTERMEDIATES
-│   ├── Debug/
-│   │   └── net8.0/
-│   │       ├── ERP.Enrollment.assets.json
-│   │       └── *.cs (generated code)
-│   └── project.assets.json     ← NuGet dependency graph
-│
-└── bin/                        ← BUILD OUTPUTS
-    ├── Debug/
-    │   └── net8.0/
-    │       ├── ERP.Enrollment.dll   ← YOUR assembly (IL)
-    │       ├── ERP.Enrollment.exe   ← launcher (Windows)
-    │       ├── ERP.Enrollment.pdb   ← debug symbols
-    │       └── *.dll               ← dependency DLLs
-    └── Release/
-        └── net8.0/
-            └── ERP.Enrollment.dll  ← optimised build</span>
-
-<span class="cm">// VIEW THE IL (disassemble your DLL):
-// ildasm bin/Debug/net8.0/ERP.Enrollment.dll
-// Or use: dotnet tool install -g dotnet-ildasm</span></div>
-    </div>
-    <div class="ann-side">
-      <div class="ann-title">Build Outputs Explained</div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">1</div><div class="ai-label">obj/ — intermediates</div></div>
-        <div class="ai-body">The <code>obj/</code> folder holds intermediate build files — generated code, NuGet dependency graphs, compile caches. Never commit to Git. Delete it with <code>dotnet clean</code> if you have weird build errors.</div>
-        <div class="ai-code">dotnet clean # removes obj/ and bin/</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">2</div><div class="ai-label">bin/ — your assembly</div></div>
-        <div class="ai-body">The <code>.dll</code> in <code>bin/</code> is your compiled IL assembly. The <code>.exe</code> is just a tiny launcher that calls into the DLL. The <code>.pdb</code> holds debug symbols — line numbers and variable names for the debugger.</div>
-        <div class="ai-code">.dll = IL code | .pdb = debug info</div>
-      </div>
-      <div class="ann-item">
-        <div class="ai-line"><div class="ai-num">3</div><div class="ai-label">Debug vs Release</div></div>
-        <div class="ai-body">Debug builds include debug info, disable optimisations, and are slower. Release builds are optimised, smaller, and have no debug symbols. Always test performance with Release builds — Debug is misleadingly slower.</div>
-        <div class="ai-code">dotnet build -c Release</div>
-      </div>
-    </div>
-  </div>
-</div><!-- /code-demo -->
-
-<!-- SECTION 4: CLI TERMINAL -->
-<div class="sec-label reveal">
-  <div class="sl-tag">04 · CLI</div>
-  <div class="sl-title">dotnet CLI — Interactive Command Reference</div>
-  <div class="sl-line"></div>
-</div>
-<div class="terminal-wrap reveal">
-  <div class="term-header">
-    <div class="term-dots"><div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div></div>
-    <div class="term-label">Developer PowerShell / Terminal — click a command to see its output</div>
-  </div>
-  <div class="term-body" id="termBody">
-    <span class="t-dim"># Click any command button below to see output</span>
-    <br/><span class="t-cursor">█</span>
-  </div>
-  <div class="term-btns">
-    <div class="tbtn" onclick="runCmd(this,'new')">dotnet new console</div>
-    <div class="tbtn" onclick="runCmd(this,'build')">dotnet build</div>
-    <div class="tbtn" onclick="runCmd(this,'run')">dotnet run</div>
-    <div class="tbtn" onclick="runCmd(this,'publish')">dotnet publish</div>
-    <div class="tbtn" onclick="runCmd(this,'test')">dotnet test</div>
-    <div class="tbtn" onclick="runCmd(this,'add')">dotnet add package</div>
-    <div class="tbtn" onclick="runCmd(this,'clean')">dotnet clean</div>
-    <div class="tbtn" onclick="runCmd(this,'watch')">dotnet watch</div>
-  </div>
-</div>
-
-<!-- SECTION 5: TRY IT YOURSELF -->
-<div class="sec-label reveal">
-  <div class="sl-tag">05 · Practice</div>
-  <div class="sl-title">Try It Yourself — 3 Exercises</div>
-  <div class="sl-line"></div>
-</div>
-<div class="try-box reveal">
-  <div class="try-header">
-    <div class="try-icon">🧪</div>
-    <div>
-      <div class="try-h-title">Hands-on Exercises</div>
-      <div class="try-h-sub">Type this code into VS 2022 and run it. Expected output is shown for each exercise.</div>
-    </div>
-  </div>
-  <div class="try-body">
-    <div class="try-task">
-      <div class="tt-num">Exercise 1 of 3</div>
-      <div class="tt-title">Your First ERP Console App</div>
-      <div class="tt-desc">Replace the contents of <code>Program.cs</code> with the code below. Run with <strong>Ctrl+F5</strong>. Observe how <code>var</code>, <code>const</code>, and string interpolation work together.</div>
-      <div class="tt-code"><span class="kw">const int</span> MAX_STUDENTS = <span class="num">30</span>;
-<span class="kw">var</span> batchName = <span class="str">"Batch A — 2025"</span>;
-
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"================================="</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  ERP Enrollment System"</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"  {batchName}"</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">"================================="</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Max capacity : {MAX_STUDENTS}"</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$".NET version : {Environment.Version}"</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"OS           : {Environment.OSVersion}"</span>);
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Machine      : {Environment.MachineName}"</span>);</div>
-      <div class="tt-expected">
-        <div class="te-label">Expected Output</div>
-        <div class="te-out">=================================
-  ERP Enrollment System
-  Batch A — 2025
-=================================
-Max capacity : 30
-.NET version : 8.0.x
-OS           : Microsoft Windows NT 10.0.xxxx.0
-Machine      : YOUR-PC-NAME</div>
-      </div>
-    </div>
-
-    <div class="try-task">
-      <div class="tt-num">Exercise 2 of 3</div>
-      <div class="tt-title">Create a Models Folder + Student Class</div>
-      <div class="tt-desc">In Solution Explorer, right-click the project → <strong>Add → New Folder</strong> → name it <code>Models</code>. Then right-click <code>Models</code> → <strong>Add → Class</strong> → name it <code>Student.cs</code>. Add the code below.</div>
-      <div class="tt-code"><span class="cm">// Models/Student.cs</span>
-<span class="kw">namespace</span> ERP.Enrollment.Models;
-
-<span class="kw">public class</span> <span class="cls">Student</span>
-{
-    <span class="kw">public int</span>    <span class="prop">Id</span>       { <span class="kw">get</span>; <span class="kw">set</span>; }
-    <span class="kw">public string</span> <span class="prop">Name</span>     { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
-    <span class="kw">public string</span> <span class="prop">Email</span>    { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="str">""</span>;
-    <span class="kw">public decimal</span> <span class="prop">Fee</span>    { <span class="kw">get</span>; <span class="kw">set</span>; }
-}
-
-<span class="cm">// Then in Program.cs, add:</span>
-<span class="kw">using</span> ERP.Enrollment.Models;
-
-<span class="kw">var</span> s = <span class="kw">new</span> <span class="cls">Student</span> { Id=<span class="num">1</span>, Name=<span class="str">"Alice"</span>, Email=<span class="str">"alice@erp.com"</span>, Fee=<span class="num">15000m</span> };
-<span class="cls">Console</span>.<span class="fn">WriteLine</span>(<span class="str">$"Student: {s.Name} | Fee: {s.Fee:C0}"</span>);</div>
-      <div class="tt-expected">
-        <div class="te-label">Expected Output</div>
-        <div class="te-out">Student: Alice | Fee: ₹15,000</div>
-      </div>
-    </div>
-
-    <div class="try-task">
-      <div class="tt-num">Exercise 3 of 3</div>
-      <div class="tt-title">Run dotnet CLI Commands in VS Terminal</div>
-      <div class="tt-desc">Open <strong>View → Terminal</strong> in VS 2022. Navigate to your project folder and run these commands in order. Observe the output at each step.</div>
-      <div class="tt-code"><span class="cm"># Step 1: Build and check for errors</span>
-dotnet build
-
-<span class="cm"># Step 2: Run the application</span>
-dotnet run
-
-<span class="cm"># Step 3: Build optimised Release</span>
-dotnet build --configuration Release
-
-<span class="cm"># Step 4: Publish self-contained (optional)</span>
-dotnet publish -c Release -r win-x64 --self-contained
-
-<span class="cm"># Step 5: Check what's in bin/</span>
-dir bin\Release\net8.0\</div>
-      <div class="tt-expected">
-        <div class="te-label">Step 1 — dotnet build</div>
-        <div class="te-out">Build succeeded.
-  0 Warning(s)
-  0 Error(s)
-
-Time Elapsed 00:00:02.34</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SECTION 6: COMMON MISTAKES -->
-<div class="sec-label reveal">
-  <div class="sl-tag">06 · Watch Out</div>
-  <div class="sl-title">Common Mistakes — and How to Fix Them</div>
-  <div class="sl-line"></div>
-</div>
-<div class="mistakes-box reveal">
-  <div class="mb-header">
-    <div>⚠️</div>
-    <div class="mb-title">Mistakes Beginners Make in M01</div>
-  </div>
-  <div class="mistakes-body">
-    <div class="mistake">
-      <div class="mk-icon">❌</div>
-      <div class="mk-body">
-        <strong>Picking ".NET Framework" instead of ".NET 8"</strong> in the New Project dialog. They look similar but are completely different platforms. .NET Framework is Windows-only and legacy. .NET 8 is modern, cross-platform, and LTS.
-        <span class="mk-fix">Fix: Look for "(Long Term Support)" label in the framework dropdown. Always pick net8.0.</span>
-      </div>
-    </div>
-    <div class="mistake">
-      <div class="mk-icon">❌</div>
-      <div class="mk-body">
-        <strong>Using <code>double</code> for money values</strong>: <code>double fee = 15000.50;</code> This causes floating-point rounding errors. <code>0.1 + 0.2 = 0.30000000000000004</code> in double.
-        <span class="mk-fix">Fix: Always use decimal for money: decimal fee = 15000.50m;  (note the 'm' suffix)</span>
-      </div>
-    </div>
-    <div class="mistake">
-      <div class="mk-icon">❌</div>
-      <div class="mk-body">
-        <strong>Closing the console window immediately</strong>: You run the app with F5 and the window disappears before you can read the output.
-        <span class="mk-fix">Fix: Use Ctrl+F5 (Run Without Debugging) — VS keeps the console open. Or add Console.ReadKey(); at the end.</span>
-      </div>
-    </div>
-    <div class="mistake">
-      <div class="mk-icon">❌</div>
-      <div class="mk-body">
-        <strong>Forgetting the namespace after creating a class</strong>: You create <code>Student.cs</code> in a Models folder but CS0246 error says type not found. The namespace in <code>Student.cs</code> doesn't match what you used in <code>Program.cs</code>.
-        <span class="mk-fix">Fix: Use file-scoped namespaces: namespace ERP.Enrollment.Models;  (note the semicolon, no braces)</span>
-      </div>
-    </div>
-    <div class="mistake">
-      <div class="mk-icon">❌</div>
-      <div class="mk-body">
-        <strong>CS8618 warning on string properties</strong>: With <code>Nullable=enable</code>, non-nullable string properties must be initialised. <code>public string Name { get; set; }</code> gets a warning.
-        <span class="mk-fix">Fix: Add a default initialiser: public string Name { get; set; } = "";</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- NEXT -->
-<div class="next-nav reveal">
-  <div class="nn-left">
-    <div class="nn-label">Next up · Demo 02</div>
-    <div class="nn-title">Types of Data &amp; Expressions</div>
-    <div class="nn-desc">Value types vs reference types with a live stack/heap visualiser. Why decimal always wins for money. Safe nullable patterns.</div>
-  </div>
-  <a href="demo2.html" class="nn-btn">Demo 02 →</a>
-</div>
-
-</div><!-- /content -->
+</footer>
 
 <script>
-// CLR PIPELINE
-const pipeData = [
-  { title:"📝 C# Source Code", body:"You write high-level C# in .cs files. Nothing executes yet — this is purely text. Roslyn reads every .cs file in the project directory. You can have hundreds of files; the build system finds them all automatically (SDK-style project)." },
-  { title:"🔬 Roslyn Compiler", body:"Roslyn parses C# into an Abstract Syntax Tree, then performs type-checking, flow analysis, and nullable analysis. Errors (CS0029, CS8618) are reported here — before any code runs. Then it emits Intermediate Language (IL) bytecode." },
-  { title:"📦 IL Assembly (.dll)", body:"Intermediate Language (IL / MSIL / CIL) is CPU-neutral bytecode — like Java bytecode. Stored in .dll files. IL is verifiable: the CLR checks it's type-safe before executing. Disassemble with: ildasm ERP.Enrollment.dll" },
-  { title:"⚡ JIT Compiler", body:"When a method is called for the first time, the CLR's JIT converts its IL to native CPU instructions. .NET 8 uses Tiered Compilation: Tier 0 = quick JIT (fast startup), Tier 1 = heavily optimised (hot paths). Results are cached." },
-  { title:"💻 Native CPU Code", body:"Pure x64 (or ARM64) machine instructions — as fast as C++. The JIT can even inline across assembly boundaries. .NET 8 also supports Native AOT (Ahead-of-Time): dotnet publish --aot → no JIT, instant startup, ideal for serverless." }
-];
-function setPipe(el, i) {
-  document.querySelectorAll('.ps').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('pipeTitle').textContent = pipeData[i].title;
-  document.getElementById('pipeBody').textContent = pipeData[i].body;
-}
-
-// TABS
-function showTab(el, id) {
-  document.querySelectorAll('.cd-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.cd-panel').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById(id).classList.add('active');
-}
-
-// CLI TERMINAL
-const cmds = {
-  new: {
-    cmd: 'dotnet new console -n ERP.Enrollment',
-    out: `<span class="t-out">The template "Console App" was created successfully.</span>
-
-<span class="t-dim">Processing post-creation actions...</span>
-<span class="t-dim">Restoring C:\\Training\\ERP.Enrollment\\ERP.Enrollment.csproj:</span>
-<span class="t-out">  Restore succeeded.</span>
-
-<span class="t-dim">Files created:</span>
-<span class="t-out">  ERP.Enrollment\\ERP.Enrollment.csproj
-  ERP.Enrollment\\Program.cs</span>
-
-<span class="t-dim">Next:</span>
-<span class="t-out">  cd ERP.Enrollment && dotnet run</span>`
-  },
-  build: {
-    cmd: 'dotnet build',
-    out: `<span class="t-dim">Build started 11:42:07 AM...</span>
-<span class="t-dim">  1>------ Build started: Project: ERP.Enrollment ------</span>
-<span class="t-dim">  1>ERP.Enrollment -> Restore complete (0.6s)</span>
-<span class="t-out">  1>ERP.Enrollment -> bin\\Debug\\net8.0\\ERP.Enrollment.dll</span>
-
-<span class="t-out">Build succeeded.</span>
-<span class="t-dim">    0 Warning(s)</span>
-<span class="t-dim">    0 Error(s)</span>
-
-<span class="t-dim">Time Elapsed 00:00:02.31</span>`
-  },
-  run: {
-    cmd: 'dotnet run',
-    out: `<span class="t-dim">Building ERP.Enrollment...</span>
-<span class="t-out">🏫 ERP Enrollment System v1.0
-ERP Core — Max Batch: 30
-Enrolled: 3 / 30
-  ↳ Alice Sharma
-  ↳ Bob Kapoor
-  ↳ Riya Patel
-
-Session complete. Press any key...</span>`
-  },
-  publish: {
-    cmd: 'dotnet publish -c Release -r win-x64 --self-contained',
-    out: `<span class="t-dim">Build started...</span>
-<span class="t-out">  Restore complete (0.4s)
-  ERP.Enrollment -> bin\\Release\\net8.0\\win-x64\\publish\\</span>
-
-<span class="t-dim">Published files:</span>
-<span class="t-out">  ERP.Enrollment.exe    → 12.4 MB (includes .NET 8 runtime)
-  ERP.Enrollment.dll    → 18.5 KB (your IL code)</span>
-
-<span class="t-dim">Self-contained: runs on any Windows x64
-without .NET installed on target machine.</span>`
-  },
-  test: {
-    cmd: 'dotnet test',
-    out: `<span class="t-out">Test run for ERP.Tests (.NET 8.0)</span>
-<span class="t-dim">Starting test execution...</span>
-
-<span class="t-out">  ✓ Student_CanCreate_WithValidData (12ms)
-  ✓ Fee_WithGST_ReturnsCorrectDecimal (3ms)
-  ✓ Enrollment_OverCapacity_ThrowsException (5ms)
-  ✓ Grade_Switch_ReturnsCorrectGrade (2ms)</span>
-
-<span class="t-out">Test Run Successful.
-Total: 4 | Passed: 4 | Failed: 0 | Duration: 0.8s</span>`
-  },
-  add: {
-    cmd: 'dotnet add package Serilog --version 3.1.1',
-    out: `<span class="t-dim">  Determining packages to restore...</span>
-<span class="t-out">  Writing lock file to disk...</span>
-<span class="t-dim">  Installing Serilog 3.1.1...</span>
-<span class="t-out">  PackageReference "Serilog" v3.1.1 added to:
-    ERP.Enrollment\\ERP.Enrollment.csproj</span>
-
-<span class="t-dim">  License: Apache-2.0 ✓
-  Cached at: C:\\Users\\You\\.nuget\\packages\\serilog\\3.1.1\\</span>
-<span class="t-out">  Restore succeeded.</span>`
-  },
-  clean: {
-    cmd: 'dotnet clean',
-    out: `<span class="t-dim">Build started...</span>
-<span class="t-out">  Cleaning ERP.Enrollment...</span>
-<span class="t-dim">  Removing: bin\\Debug\\net8.0\\ERP.Enrollment.dll
-  Removing: bin\\Debug\\net8.0\\ERP.Enrollment.pdb
-  Removing: obj\\Debug\\net8.0\\ (intermediates)</span>
-
-<span class="t-out">Clean succeeded.</span>
-<span class="t-dim">Use 'dotnet build' to rebuild from scratch.</span>`
-  },
-  watch: {
-    cmd: 'dotnet watch run',
-    out: `<span class="t-out">dotnet watch 🔥 Hot reload enabled.</span>
-<span class="t-dim">  Watching: *.cs, *.csproj, *.json</span>
-<span class="t-out">🏫 ERP Enrollment System v1.0</span>
-<span class="t-dim">  ...</span>
-<span class="t-warn">  File changed: Program.cs
-  Applying hot reload changes...</span>
-<span class="t-out">  Changes applied without restart! ✓</span>
-<span class="t-dim">  (Ctrl+C to stop)</span>`
+  // Toggle step accordion
+  function toggleStep(header) {
+    const card = header.closest('.step-card');
+    const isOpen = card.classList.contains('open');
+    card.classList.toggle('open', !isOpen);
+    updateProgress();
   }
-};
-function runCmd(btn, key) {
-  document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const c = cmds[key];
-  document.getElementById('termBody').innerHTML =
-    `<span class="t-prompt">PS C:\\Training\\ERP.Enrollment></span> <span class="t-cmd">${c.cmd}</span>\n\n${c.out}\n\n<span class="t-cursor">█</span>`;
-}
 
-// REVEAL
-const ro = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } });
-}, { threshold: 0.07 });
-document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  // Scroll to step and open it
+  function scrollStep(idx) {
+    const card = document.getElementById('step' + idx);
+    if (!card) return;
+    card.classList.add('open');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    updateProgress();
+  }
+
+  // Update top progress bar highlight
+  function updateProgress() {
+    const steps = document.querySelectorAll('.progress-step');
+    const cards = document.querySelectorAll('.step-card');
+    cards.forEach((card, i) => {
+      if (card.classList.contains('open')) {
+        steps[i].classList.add('active');
+        steps[i].classList.remove('done');
+      } else {
+        steps[i].classList.remove('active');
+      }
+    });
+  }
+
+  // Copy code to clipboard
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText || pre.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ COPIED';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'COPY';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Auto-highlight progress steps based on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        const idx = parseInt(id.replace('step', ''));
+        const steps = document.querySelectorAll('.progress-step');
+        steps.forEach((s, i) => {
+          s.classList.remove('active');
+          if (i < idx) s.classList.add('done');
+          else s.classList.remove('done');
+        });
+        if (steps[idx]) steps[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('.step-card').forEach(c => observer.observe(c));
 </script>
 </body>
 </html>
