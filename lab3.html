@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lab 3 — Structs, Enums & Collections | RR Skillverse</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1f2e;
+    --border:    #2a3044;
+    --gold:      #c9a84c;
+    --gold-dim:  #a07830;
+    --text:      #d4d8e8;
+    --text-dim:  #7a8099;
+    --green:     #4caf82;
+    --blue:      #4a90d9;
+    --red:       #e05c5c;
+    --code-bg:   #12151f;
+    --tag-bg:    #1e2638;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar-brand { display: flex; align-items: center; gap: 10px; }
+  .topbar-brand .dot { width: 28px; height: 28px; border-radius: 6px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #0f1117; }
+  .topbar-brand span { font-weight: 600; color: var(--text); font-size: 15px; }
+  .topbar-brand small { color: var(--text-dim); font-size: 12px; margin-left: 6px; }
+  .topbar-nav { display: flex; gap: 6px; }
+  .topbar-nav a { color: var(--text-dim); font-size: 13px; text-decoration: none; padding: 5px 12px; border-radius: 5px; transition: all 0.2s; }
+  .topbar-nav a:hover { color: var(--gold); background: var(--tag-bg); }
+  .topbar-nav a.active { color: var(--gold); background: var(--tag-bg); }
+
+  .layout { display: flex; min-height: calc(100vh - 57px); }
+
+  .sidebar { width: 240px; min-width: 240px; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 0; position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto; }
+  .sidebar-section { padding: 0 16px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-top: 16px; }
+  .sidebar a { display: block; padding: 8px 20px; font-size: 13px; color: var(--text-dim); text-decoration: none; border-left: 2px solid transparent; transition: all 0.15s; }
+  .sidebar a:hover { color: var(--text); background: var(--tag-bg); border-left-color: var(--border); }
+  .sidebar a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.07); }
+  .sidebar a.sub { padding-left: 32px; font-size: 12.5px; }
+
+  .main { flex: 1; padding: 40px 48px; max-width: 900px; }
+
+  .lab-header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 36px; }
+  .lab-tag { display: inline-block; background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; }
+  .lab-header h1 { font-size: 26px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .lab-header p { color: var(--text-dim); font-size: 14px; max-width: 600px; }
+  .lab-meta { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+  .lab-meta span { font-size: 12px; color: var(--text-dim); }
+  .lab-meta span b { color: var(--text); }
+
+  .module-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 40px; overflow: hidden; }
+  .module-block-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .module-num { background: var(--gold); color: #0f1117; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+  .module-block-header h2 { font-size: 16px; font-weight: 600; color: #fff; }
+  .module-body { padding: 24px; }
+
+  .step { margin-bottom: 32px; }
+  .step:last-child { margin-bottom: 0; }
+  .step-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .step-title .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--tag-bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+  .step p { font-size: 14px; color: var(--text); margin-bottom: 12px; }
+
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; margin: 12px 0; overflow: hidden; }
+  .code-header { background: var(--surface); padding: 7px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .code-header span { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .copy-btn { font-size: 11px; color: var(--text-dim); background: none; border: 1px solid var(--border); border-radius: 3px; padding: 2px 8px; cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .copy-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+  pre { padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: #c9d1e8; }
+
+  .kw  { color: #7eb8f7; }
+  .cm  { color: #516070; font-style: italic; }
+  .st  { color: #9ecf7a; }
+  .nm  { color: #f0c070; }
+  .fn  { color: #e09060; }
+
+  .callout { border-radius: 6px; padding: 14px 16px; margin: 14px 0; font-size: 13.5px; border-left: 3px solid; display: flex; gap: 10px; }
+  .callout-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+  .callout.info  { background: rgba(74,144,217,0.08); border-color: var(--blue); }
+  .callout.tip   { background: rgba(76,175,130,0.08); border-color: var(--green); }
+  .callout.warn  { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+  .callout p { margin: 0; color: var(--text); }
+  .callout strong { color: #fff; }
+
+  .output-block { background: #0a0d14; border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin: 10px 0; }
+  .output-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--green); font-weight: 600; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+  .output-block pre { padding: 0; color: #8db88d; font-size: 13px; }
+
+  .try-it { background: rgba(76,175,130,0.05); border: 1px solid rgba(76,175,130,0.2); border-radius: 6px; padding: 16px 18px; margin-top: 20px; }
+  .try-it-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green); margin-bottom: 10px; }
+  .try-it ul { padding-left: 18px; }
+  .try-it li { font-size: 13.5px; color: var(--text); margin-bottom: 5px; }
+
+  hr.section-div { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .compare-box { border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .compare-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 7px 14px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; }
+  .compare-label.a { background: rgba(74,144,217,0.1); color: var(--blue); }
+  .compare-label.b { background: rgba(76,175,130,0.1); color: var(--green); }
+  .compare-box pre { background: var(--code-bg); padding: 14px; font-size: 12.5px; }
+
+  .page-footer { border-top: 1px solid var(--border); margin-top: 48px; padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-dim); flex-wrap: wrap; gap: 8px; }
+  .page-footer a { color: var(--gold-dim); text-decoration: none; }
+  .nav-btns { display: flex; gap: 10px; }
+  .nav-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--tag-bg); border: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 8px 16px; border-radius: 6px; text-decoration: none; transition: all 0.2s; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 768px) { .sidebar { display: none; } .main { padding: 24px 20px; } .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="dot">RR</div>
+    <div>
+      <span>RR Skillverse</span>
+      <small>by Raushan Ranjan, MCT</small>
+    </div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="index.html">Home</a>
+    <a href="lab1.html">Lab 1</a>
+    <a href="lab2.html">Lab 2</a>
+    <a href="capstone1.html">Capstone 1</a>
+    <a href="lab3.html" class="active">Lab 3</a>
+    <a href="lab4.html">Lab 4</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Lab 3</div>
+    <a href="#module6" class="active">Module 6 — Structs &amp; Enums</a>
+    <a href="#m6-struct" class="sub">struct</a>
+    <a href="#m6-struct-vs-class" class="sub">struct vs class</a>
+    <a href="#m6-enum" class="sub">enum basics</a>
+    <a href="#m6-enum-switch" class="sub">enum in switch</a>
+    <a href="#m6-enum-flags" class="sub">Flags enum</a>
+
+    <div class="sidebar-section">Module 7</div>
+    <a href="#module7">Module 7 — Collections &amp; LINQ</a>
+    <a href="#m7-list" class="sub">List&lt;T&gt;</a>
+    <a href="#m7-dict" class="sub">Dictionary&lt;K,V&gt;</a>
+    <a href="#m7-ienumerable" class="sub">IEnumerable&lt;T&gt;</a>
+    <a href="#m7-linq" class="sub">LINQ queries</a>
+    <a href="#m7-linq-method" class="sub">LINQ method syntax</a>
+
+    <div class="sidebar-section">Practice</div>
+    <a href="#exercises">Exercises</a>
+    <a href="lab4.html">→ Lab 4</a>
+  </aside>
+
+  <main class="main">
+
+    <div class="lab-header">
+      <div class="lab-tag">Day 3 — Lab 3</div>
+      <h1>Structs, Enums, Collections &amp; LINQ</h1>
+      <p>You will learn how to group related data using structs, give meaningful names to fixed values using enums, store multiple items in collections, and query them with LINQ.</p>
+      <div class="lab-meta">
+        <span>📦 <b>Modules covered:</b> 6, 7</span>
+        <span>⏱ <b>Duration:</b> ~90 minutes</span>
+        <span>🛠 <b>Tool:</b> Visual Studio 2022</span>
+        <span>🎯 <b>Builds on:</b> Labs 1 &amp; 2</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════ MODULE 6 ═══════════════ -->
+    <div class="module-block" id="module6">
+      <div class="module-block-header">
+        <span class="module-num">MODULE 6</span>
+        <h2>Structs &amp; Enums</h2>
+      </div>
+      <div class="module-body">
+
+        <!-- struct basics -->
+        <div class="step" id="m6-struct">
+          <div class="step-title"><span class="step-num">1</span> What is a struct?</div>
+          <p>A <strong>struct</strong> is a way to group a few related pieces of data together under one name. It is a <strong>value type</strong> — just like int or double — which means when you copy it you get a completely independent copy.</p>
+          <p>Use a struct when the data is small, simple, and represents a single concept — like a coordinate point, a date range, or a money amount.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Defining and using a struct — write outside your class, at the bottom of the file</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Define the struct — bottom of Module6.cs, outside the class</span>
+<span class="kw">struct</span> Point
+{
+    <span class="kw">public int</span> X;
+    <span class="kw">public int</span> Y;
+
+    <span class="kw">public</span> Point(<span class="kw">int</span> x, <span class="kw">int</span> y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    <span class="kw">public void</span> <span class="fn">Print</span>()
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="st">"X = "</span> + X + <span class="st">", Y = "</span> + Y);
+    }
+}
+
+<span class="cm">// Using it inside Run()</span>
+Point p1 = <span class="kw">new</span> <span class="fn">Point</span>(<span class="nm">3</span>, <span class="nm">7</span>);
+p1.<span class="fn">Print</span>();   <span class="cm">// X = 3, Y = 7</span>
+
+<span class="cm">// Accessing fields directly</span>
+Console.<span class="fn">WriteLine</span>(p1.X);   <span class="cm">// 3</span>
+Console.<span class="fn">WriteLine</span>(p1.Y);   <span class="cm">// 7</span></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>X = 3, Y = 7
+3
+7</pre>
+          </div>
+        </div>
+
+        <!-- struct vs class -->
+        <div class="step" id="m6-struct-vs-class">
+          <div class="step-title"><span class="step-num">2</span> struct vs class — the copy difference</div>
+          <p>This is the most important thing to understand about structs. When you copy a struct, you get an independent copy. When you copy a class, both variables point to the same object.</p>
+
+          <div class="compare">
+            <div class="compare-box">
+              <div class="compare-label a">struct — independent copy</div>
+              <pre>Point p1 = <span class="kw">new</span> <span class="fn">Point</span>(<span class="nm">3</span>, <span class="nm">7</span>);
+Point p2 = p1;   <span class="cm">// copy</span>
+p2.X = <span class="nm">99</span>;
+
+<span class="cm">// p1.X is still 3</span>
+<span class="cm">// p2.X is 99</span>
+<span class="cm">// They are independent</span></pre>
+            </div>
+            <div class="compare-box">
+              <div class="compare-label b">class — shared reference</div>
+              <pre>Student s1 = <span class="kw">new</span> <span class="fn">Student</span>();
+s1.Name = <span class="st">"Raushan"</span>;
+Student s2 = s1;  <span class="cm">// same object</span>
+s2.Name = <span class="st">"Rahul"</span>;
+
+<span class="cm">// s1.Name is now "Rahul" too</span>
+<span class="cm">// Both point to same object</span></pre>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Proving the difference — run this yourself</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// struct copy — independent</span>
+Point p1 = <span class="kw">new</span> <span class="fn">Point</span>(<span class="nm">3</span>, <span class="nm">7</span>);
+Point p2 = p1;
+p2.X = <span class="nm">99</span>;
+Console.<span class="fn">WriteLine</span>(<span class="st">"p1.X = "</span> + p1.X);   <span class="cm">// 3  — unchanged</span>
+Console.<span class="fn">WriteLine</span>(<span class="st">"p2.X = "</span> + p2.X);   <span class="cm">// 99</span></pre>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-icon">ℹ</span>
+            <p><strong>When to use struct:</strong> small data (2–4 fields), represents one concept, value-copy behaviour makes sense, no inheritance needed.<br/>
+            <strong>When to use class:</strong> larger or complex objects, needs inheritance, you want two variables to share the same object.</p>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Create a struct called <code style="font-family:'JetBrains Mono';font-size:12px;">CourseFee</code> with two fields: <code style="font-family:'JetBrains Mono';font-size:12px;">double Amount</code> and <code style="font-family:'JetBrains Mono';font-size:12px;">string Currency</code>. Add a <code style="font-family:'JetBrains Mono';font-size:12px;">Print()</code> method to it.</li>
+              <li>Create two CourseFee variables, copy one to the other, change the copy — confirm the original is unchanged.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- enum basics -->
+        <div class="step" id="m6-enum">
+          <div class="step-title"><span class="step-num">3</span> enum — named constants</div>
+          <p>An <strong>enum</strong> is a set of named constants. Instead of writing magic numbers like 0, 1, 2 in your code, you give each value a meaningful name. This makes the code much easier to read and prevents mistakes.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Defining and using an enum — write outside your class</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Define at the bottom of the file, outside the class</span>
+<span class="kw">enum</span> EnrollmentStatus
+{
+    Pending   = <span class="nm">0</span>,
+    Active    = <span class="nm">1</span>,
+    Completed = <span class="nm">2</span>,
+    Withdrawn = <span class="nm">3</span>
+}
+
+<span class="cm">// Using it inside Run()</span>
+EnrollmentStatus status = EnrollmentStatus.Active;
+
+Console.<span class="fn">WriteLine</span>(status);         <span class="cm">// Active  (prints the name)</span>
+Console.<span class="fn">WriteLine</span>((<span class="kw">int</span>)status);    <span class="cm">// 1       (prints the number)</span>
+
+<span class="cm">// Comparing</span>
+<span class="kw">if</span> (status == EnrollmentStatus.Active)
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"Student can log in"</span>);
+}</pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>Active
+1
+Student can log in</pre>
+          </div>
+
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <p>Without enums you might write <code style="font-family:'JetBrains Mono';font-size:12px;">if (status == 1)</code> — but what does 1 mean? With an enum it reads like English: <code style="font-family:'JetBrains Mono';font-size:12px;">if (status == EnrollmentStatus.Active)</code>. Anyone reading the code immediately understands it.</p>
+          </div>
+        </div>
+
+        <!-- enum in switch -->
+        <div class="step" id="m6-enum-switch">
+          <div class="step-title"><span class="step-num">4</span> enum in a switch statement</div>
+          <p>Enums and switch work very naturally together. The compiler will warn you if you forget to handle one of the enum values.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>switch on an enum</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre>EnrollmentStatus status = EnrollmentStatus.Completed;
+
+<span class="kw">switch</span> (status)
+{
+    <span class="kw">case</span> EnrollmentStatus.Pending:
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Send welcome email"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">case</span> EnrollmentStatus.Active:
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Allow portal access"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">case</span> EnrollmentStatus.Completed:
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Issue certificate"</span>);   <span class="cm">// ← this runs</span>
+        <span class="kw">break</span>;
+    <span class="kw">case</span> EnrollmentStatus.Withdrawn:
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Process refund"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Unknown status"</span>);
+        <span class="kw">break</span>;
+}</pre>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Add a second enum called <code style="font-family:'JetBrains Mono';font-size:12px;">CourseLevel</code> with values: Beginner, Intermediate, Advanced.</li>
+              <li>Write a switch on <code style="font-family:'JetBrains Mono';font-size:12px;">CourseLevel</code> that prints the recommended duration for each level.</li>
+              <li>Use <code style="font-family:'JetBrains Mono';font-size:12px;">Enum.TryParse&lt;EnrollmentStatus&gt;("Completed", out var result)</code> to convert a string to an enum value. Print the result.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Flags enum -->
+        <div class="step" id="m6-enum-flags">
+          <div class="step-title"><span class="step-num">5</span> [Flags] enum — combining values</div>
+          <p>A Flags enum lets a variable hold <strong>multiple values at the same time</strong>. Each value must be a power of 2 so they can be combined using the <code style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);">|</code> operator without overlapping.</p>
+          <p>A real use case: a trainer can hold certifications in Azure <em>and</em> .NET <em>and</em> GitHub all at once.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>[Flags] enum — write outside the class</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre>[Flags]
+<span class="kw">enum</span> Certification
+{
+    None   = <span class="nm">0</span>,
+    Azure  = <span class="nm">1</span>,    <span class="cm">// binary: 0001</span>
+    DotNet = <span class="nm">2</span>,    <span class="cm">// binary: 0010</span>
+    GitHub = <span class="nm">4</span>,    <span class="cm">// binary: 0100</span>
+    PowerBI= <span class="nm">8</span>     <span class="cm">// binary: 1000</span>
+}
+
+<span class="cm">// Combine certifications with |</span>
+Certification myCerts = Certification.Azure | Certification.DotNet;
+Console.<span class="fn">WriteLine</span>(myCerts);              <span class="cm">// Azure, DotNet</span>
+
+<span class="cm">// Check if a specific cert is held</span>
+Console.<span class="fn">WriteLine</span>(myCerts.<span class="fn">HasFlag</span>(Certification.Azure));   <span class="cm">// True</span>
+Console.<span class="fn">WriteLine</span>(myCerts.<span class="fn">HasFlag</span>(Certification.GitHub));  <span class="cm">// False</span>
+
+<span class="cm">// Add a certification</span>
+myCerts |= Certification.GitHub;
+Console.<span class="fn">WriteLine</span>(myCerts);              <span class="cm">// Azure, DotNet, GitHub</span>
+
+<span class="cm">// Remove a certification</span>
+myCerts &amp;= ~Certification.DotNet;
+Console.<span class="fn">WriteLine</span>(myCerts);              <span class="cm">// Azure, GitHub</span></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>Azure, DotNet
+True
+False
+Azure, DotNet, GitHub
+Azure, GitHub</pre>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Create your own Flags enum called <code style="font-family:'JetBrains Mono';font-size:12px;">Permission</code> with Read, Write, Delete, Admin. Give a user Read + Write, then check if they have Delete permission.</li>
+              <li>What happens if you forget to make the values powers of 2? Try it with 1, 2, 3, 4 instead of 1, 2, 4, 8.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════ MODULE 7 ═══════════════ -->
+    <div class="module-block" id="module7">
+      <div class="module-block-header">
+        <span class="module-num">MODULE 7</span>
+        <h2>Built-in Collections &amp; LINQ</h2>
+      </div>
+      <div class="module-body">
+
+        <!-- List -->
+        <div class="step" id="m7-list">
+          <div class="step-title"><span class="step-num">1</span> List&lt;T&gt; — a resizable list</div>
+          <p>An array has a fixed size — once created you cannot add or remove items. A <strong>List&lt;T&gt;</strong> is like an array but it can grow and shrink. The <code style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);">T</code> is a placeholder for the type — for example <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;string&gt;</code> holds strings, <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;int&gt;</code> holds integers.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Creating and using a List&lt;string&gt;</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Create an empty list</span>
+List&lt;<span class="kw">string</span>&gt; courses = <span class="kw">new</span> List&lt;<span class="kw">string</span>&gt;();
+
+<span class="cm">// Add items</span>
+courses.<span class="fn">Add</span>(<span class="st">"C# Basics"</span>);
+courses.<span class="fn">Add</span>(<span class="st">"Azure AI"</span>);
+courses.<span class="fn">Add</span>(<span class="st">"Blazor"</span>);
+courses.<span class="fn">Add</span>(<span class="st">"EF Core"</span>);
+
+<span class="cm">// Count items</span>
+Console.<span class="fn">WriteLine</span>(<span class="st">"Count: "</span> + courses.Count);   <span class="cm">// 4</span>
+
+<span class="cm">// Access by index</span>
+Console.<span class="fn">WriteLine</span>(courses[<span class="nm">0</span>]);   <span class="cm">// C# Basics</span>
+
+<span class="cm">// Loop through all items</span>
+<span class="kw">foreach</span> (<span class="kw">string</span> course <span class="kw">in</span> courses)
+{
+    Console.<span class="fn">WriteLine</span>(course);
+}
+
+<span class="cm">// Remove an item</span>
+courses.<span class="fn">Remove</span>(<span class="st">"Blazor"</span>);
+Console.<span class="fn">WriteLine</span>(<span class="st">"After remove: "</span> + courses.Count);   <span class="cm">// 3</span>
+
+<span class="cm">// Check if an item exists</span>
+Console.<span class="fn">WriteLine</span>(courses.<span class="fn">Contains</span>(<span class="st">"Azure AI"</span>));   <span class="cm">// True</span></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>Count: 4
+C# Basics
+C# Basics
+Azure AI
+Blazor
+EF Core
+After remove: 3
+True</pre>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-icon">ℹ</span>
+            <p>You can also initialise a list with values in one line:<br/>
+            <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;string&gt; names = new List&lt;string&gt; { "Raushan", "Rahul", "Priya" };</code></p>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Create a <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;int&gt;</code> of marks for 5 students. Print the total using a foreach loop.</li>
+              <li>Try <code style="font-family:'JetBrains Mono';font-size:12px;">courses.Insert(1, "New Course")</code> — where does it appear?</li>
+              <li>Try <code style="font-family:'JetBrains Mono';font-size:12px;">courses.Sort()</code> and print the list again — what changed?</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dictionary -->
+        <div class="step" id="m7-dict">
+          <div class="step-title"><span class="step-num">2</span> Dictionary&lt;K,V&gt; — key-value pairs</div>
+          <p>A <strong>Dictionary</strong> stores pairs of keys and values. You look up a value using its key — like a real dictionary where you look up a word (key) to find its definition (value). Keys must be unique.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Creating and using a Dictionary</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// Key = student ID (string), Value = marks (int)</span>
+Dictionary&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt; studentMarks = <span class="kw">new</span> Dictionary&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt;();
+
+<span class="cm">// Add entries</span>
+studentMarks.<span class="fn">Add</span>(<span class="st">"S001"</span>, <span class="nm">85</span>);
+studentMarks.<span class="fn">Add</span>(<span class="st">"S002"</span>, <span class="nm">72</span>);
+studentMarks.<span class="fn">Add</span>(<span class="st">"S003"</span>, <span class="nm">91</span>);
+
+<span class="cm">// Look up by key</span>
+Console.<span class="fn">WriteLine</span>(studentMarks[<span class="st">"S001"</span>]);   <span class="cm">// 85</span>
+
+<span class="cm">// Safe lookup — does not crash if key is missing</span>
+<span class="kw">if</span> (studentMarks.<span class="fn">ContainsKey</span>(<span class="st">"S099"</span>))
+{
+    Console.<span class="fn">WriteLine</span>(studentMarks[<span class="st">"S099"</span>]);
+}
+<span class="kw">else</span>
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"Student not found"</span>);
+}
+
+<span class="cm">// TryGetValue — the safest way to look up</span>
+<span class="kw">if</span> (studentMarks.<span class="fn">TryGetValue</span>(<span class="st">"S002"</span>, <span class="kw">out int</span> marks))
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"S002 marks: "</span> + marks);   <span class="cm">// 72</span>
+}
+
+<span class="cm">// Loop through all pairs</span>
+<span class="kw">foreach</span> (<span class="kw">var</span> pair <span class="kw">in</span> studentMarks)
+{
+    Console.<span class="fn">WriteLine</span>(pair.Key + <span class="st">" -> "</span> + pair.Value);
+}</pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>85
+Student not found
+S002 marks: 72
+S001 -> 85
+S002 -> 72
+S003 -> 91</pre>
+          </div>
+
+          <div class="callout warn">
+            <span class="callout-icon">⚠</span>
+            <p>Accessing a key that does not exist with <code style="font-family:'JetBrains Mono';font-size:12px;">dict["missing"]</code> throws a <code style="font-family:'JetBrains Mono';font-size:12px;">KeyNotFoundException</code>. Always use <code style="font-family:'JetBrains Mono';font-size:12px;">ContainsKey</code> or <code style="font-family:'JetBrains Mono';font-size:12px;">TryGetValue</code> when the key might not be there.</p>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Create a dictionary that maps course codes (string) to course names (string). Print all entries.</li>
+              <li>Try adding the same key twice — what exception do you get?</li>
+              <li>Update a value: <code style="font-family:'JetBrains Mono';font-size:12px;">studentMarks["S001"] = 90;</code> then print it — does it update correctly?</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- IEnumerable -->
+        <div class="step" id="m7-ienumerable">
+          <div class="step-title"><span class="step-num">3</span> IEnumerable&lt;T&gt; — the common interface</div>
+          <p><strong>IEnumerable&lt;T&gt;</strong> is the interface that List, array, and Dictionary all implement. It simply means "something you can loop through". When a method accepts <code style="font-family:'JetBrains Mono';font-size:12px;">IEnumerable&lt;T&gt;</code> instead of <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;T&gt;</code>, it works with any collection type.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>A method that accepts any collection</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><span class="cm">// This method works with List, array, or any other collection</span>
+<span class="kw">static void</span> <span class="fn">PrintAll</span>(IEnumerable&lt;<span class="kw">string</span>&gt; items)
+{
+    <span class="kw">foreach</span> (<span class="kw">string</span> item <span class="kw">in</span> items)
+    {
+        Console.<span class="fn">WriteLine</span>(item);
+    }
+}
+
+<span class="cm">// You can pass a List...</span>
+List&lt;<span class="kw">string</span>&gt; courseList = <span class="kw">new</span> List&lt;<span class="kw">string</span>&gt; { <span class="st">"C#"</span>, <span class="st">"Azure"</span>, <span class="st">"Blazor"</span> };
+<span class="fn">PrintAll</span>(courseList);
+
+<span class="cm">// ...or an array — same method, no changes needed</span>
+<span class="kw">string</span>[] courseArray = { <span class="st">"EF Core"</span>, <span class="st">"REST API"</span> };
+<span class="fn">PrintAll</span>(courseArray);</pre>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-icon">ℹ</span>
+            <p>You will not often write <code style="font-family:'JetBrains Mono';font-size:12px;">IEnumerable&lt;T&gt;</code> explicitly yet — but it appears everywhere in LINQ and in method signatures in real projects. Knowing what it means will help you read real code.</p>
+          </div>
+        </div>
+
+        <!-- LINQ query syntax -->
+        <div class="step" id="m7-linq">
+          <div class="step-title"><span class="step-num">4</span> LINQ — query syntax</div>
+          <p><strong>LINQ</strong> (Language Integrated Query) lets you query collections using a syntax that looks similar to SQL. Instead of writing loops with if statements to filter and sort data, LINQ lets you express what you want in a single readable line.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>LINQ query syntax — filter, order, select</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre>List&lt;<span class="kw">int</span>&gt; marks = <span class="kw">new</span> List&lt;<span class="kw">int</span>&gt; { <span class="nm">85</span>, <span class="nm">42</span>, <span class="nm">91</span>, <span class="nm">67</span>, <span class="nm">55</span>, <span class="nm">78</span>, <span class="nm">38</span> };
+
+<span class="cm">// Filter — only marks >= 60</span>
+<span class="kw">var</span> passing = <span class="kw">from</span> m <span class="kw">in</span> marks
+              <span class="kw">where</span> m >= <span class="nm">60</span>
+              <span class="kw">select</span> m;
+
+<span class="kw">foreach</span> (<span class="kw">int</span> m <span class="kw">in</span> passing)
+{
+    Console.<span class="fn">Write</span>(m + <span class="st">" "</span>);   <span class="cm">// 85 91 67 78</span>
+}
+Console.<span class="fn">WriteLine</span>();
+
+<span class="cm">// Order ascending</span>
+<span class="kw">var</span> sorted = <span class="kw">from</span> m <span class="kw">in</span> marks
+             <span class="kw">orderby</span> m
+             <span class="kw">select</span> m;
+
+<span class="kw">foreach</span> (<span class="kw">int</span> m <span class="kw">in</span> sorted)
+{
+    Console.<span class="fn">Write</span>(m + <span class="st">" "</span>);   <span class="cm">// 38 42 55 67 78 85 91</span>
+}
+Console.<span class="fn">WriteLine</span>();
+
+<span class="cm">// Filter AND order together</span>
+<span class="kw">var</span> topStudents = <span class="kw">from</span> m <span class="kw">in</span> marks
+                  <span class="kw">where</span> m >= <span class="nm">75</span>
+                  <span class="kw">orderby</span> m descending
+                  <span class="kw">select</span> m;
+
+<span class="kw">foreach</span> (<span class="kw">int</span> m <span class="kw">in</span> topStudents)
+{
+    Console.<span class="fn">Write</span>(m + <span class="st">" "</span>);   <span class="cm">// 91 85 78</span>
+}</pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>85 91 67 78
+38 42 55 67 78 85 91
+91 85 78</pre>
+          </div>
+        </div>
+
+        <!-- LINQ method syntax -->
+        <div class="step" id="m7-linq-method">
+          <div class="step-title"><span class="step-num">5</span> LINQ — method syntax</div>
+          <p>The same LINQ operations can also be written as method calls chained together. This is the style you will see most often in real .NET projects. Both do the same thing — it is a matter of preference.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>LINQ method syntax — the most common style</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre">List&lt;<span class="kw">int</span>&gt; marks = <span class="kw">new</span> List&lt;<span class="kw">int</span>&gt; { <span class="nm">85</span>, <span class="nm">42</span>, <span class="nm">91</span>, <span class="nm">67</span>, <span class="nm">55</span>, <span class="nm">78</span>, <span class="nm">38</span> };
+
+<span class="cm">// Where — filter</span>
+<span class="kw">var</span> passing = marks.<span class="fn">Where</span>(m => m >= <span class="nm">60</span>);
+
+<span class="cm">// OrderBy — sort ascending</span>
+<span class="kw">var</span> sorted = marks.<span class="fn">OrderBy</span>(m => m);
+
+<span class="cm">// OrderByDescending</span>
+<span class="kw">var</span> topFirst = marks.<span class="fn">OrderByDescending</span>(m => m);
+
+<span class="cm">// Count — how many pass?</span>
+<span class="kw">int</span> passCount = marks.<span class="fn">Count</span>(m => m >= <span class="nm">60</span>);
+Console.<span class="fn">WriteLine</span>(<span class="st">"Passing: "</span> + passCount);   <span class="cm">// 4</span>
+
+<span class="cm">// Sum, Min, Max, Average</span>
+Console.<span class="fn">WriteLine</span>(<span class="st">"Total : "</span> + marks.<span class="fn">Sum</span>());
+Console.<span class="fn">WriteLine</span>(<span class="st">"Min   : "</span> + marks.<span class="fn">Min</span>());
+Console.<span class="fn">WriteLine</span>(<span class="st">"Max   : "</span> + marks.<span class="fn">Max</span>());
+Console.<span class="fn">WriteLine</span>(<span class="st">"Avg   : "</span> + marks.<span class="fn">Average</span>());
+
+<span class="cm">// Chain multiple operations together</span>
+<span class="kw">var</span> result = marks
+    .<span class="fn">Where</span>(m => m >= <span class="nm">60</span>)
+    .<span class="fn">OrderByDescending</span>(m => m)
+    .<span class="fn">ToList</span>();             <span class="cm">// ToList materialises the result</span>
+
+<span class="kw">foreach</span> (<span class="kw">int</span> m <span class="kw">in</span> result)
+    Console.<span class="fn">Write</span>(m + <span class="st">" "</span>);   <span class="cm">// 91 85 78 67</span></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">Output</div>
+            <pre>Passing: 4
+Total : 456
+Min   : 38
+Max   : 91
+Avg   : 65.142857142857142
+91 85 78 67</pre>
+          </div>
+
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <p>The <code style="font-family:'JetBrains Mono';font-size:12px;">m => m >= 60</code> part is called a <strong>lambda expression</strong> — a short anonymous function. Read it as: "for each item m, return whether m is greater than or equal to 60". You do not need to fully understand lambdas yet — just know the pattern and use it.</p>
+          </div>
+
+          <div class="try-it">
+            <div class="try-it-title">✦ Try It</div>
+            <ul>
+              <li>Create a list of 6 student names. Use LINQ to find all names that start with the letter 'R' — use <code style="font-family:'JetBrains Mono';font-size:12px;">.Where(n => n.StartsWith("R"))</code>.</li>
+              <li>From your marks list, use LINQ to get only the failing marks (below 50), sort them, and print them.</li>
+              <li>Find the average of only the passing marks (>= 50) using <code style="font-family:'JetBrains Mono';font-size:12px;">.Where(...).Average()</code>.</li>
+              <li>Use <code style="font-family:'JetBrains Mono';font-size:12px;">.First()</code> and <code style="font-family:'JetBrains Mono';font-size:12px;">.Last()</code> on a sorted list — what do they return?</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Exercises -->
+    <div class="module-block" id="exercises" style="border-color: rgba(201,168,76,0.3);">
+      <div class="module-block-header" style="background:rgba(201,168,76,0.06);">
+        <span class="module-num" style="background:var(--gold-dim);">EXERCISES</span>
+        <h2>Lab 3 Practice Problems</h2>
+      </div>
+      <div class="module-body">
+        <p style="margin-bottom:20px; color:var(--text-dim);">Use only concepts from Modules 1–7.</p>
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> Course Catalog with struct</div>
+          <p>Create a struct called <code style="font-family:'JetBrains Mono';font-size:12px;">Course</code> with fields: <code style="font-family:'JetBrains Mono';font-size:12px;">string Name</code>, <code style="font-family:'JetBrains Mono';font-size:12px;">int Days</code>, <code style="font-family:'JetBrains Mono';font-size:12px;">double Price</code>. Create a <code style="font-family:'JetBrains Mono';font-size:12px;">List&lt;Course&gt;</code> with at least 4 courses. Print all of them using foreach.</p>
+        </div>
+
+        <hr class="section-div" />
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">2</span> Enrollment Status Tracker</div>
+          <p>Create a <code style="font-family:'JetBrains Mono';font-size:12px;">Dictionary&lt;string, EnrollmentStatus&gt;</code> that maps student IDs to their status. Add 5 entries. Loop through the dictionary and print only the students whose status is <code style="font-family:'JetBrains Mono';font-size:12px;">Active</code>.</p>
+        </div>
+
+        <hr class="section-div" />
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">3</span> LINQ Marks Report</div>
+          <p>Given a list of 8 marks, use LINQ (method syntax) to print:</p>
+          <ul style="padding-left:20px; margin-top:8px; font-size:14px; color:var(--text);">
+            <li style="margin-bottom:4px;">How many students passed (≥ 50)</li>
+            <li style="margin-bottom:4px;">The highest and lowest mark</li>
+            <li style="margin-bottom:4px;">The class average</li>
+            <li style="margin-bottom:4px;">All marks above 70, sorted highest first</li>
+          </ul>
+        </div>
+
+        <hr class="section-div" />
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">4</span> Certification Checker</div>
+          <p>Create a <code style="font-family:'JetBrains Mono';font-size:12px;">Flags</code> enum for certifications. Ask the user to enter a certification name. Use <code style="font-family:'JetBrains Mono';font-size:12px;">Enum.TryParse</code> to convert it to the enum value and add it to a trainer's certification set using <code style="font-family:'JetBrains Mono';font-size:12px;">|=</code>. Print all current certifications after each addition.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div>
+        <strong style="color:var(--gold);">RR Skillverse</strong> &nbsp;·&nbsp;
+        Raushan Ranjan, MCT &nbsp;·&nbsp;
+        Koenig Solutions, Noida
+      </div>
+      <div class="nav-btns">
+        <a class="nav-btn" href="capstone1.html">← Capstone 1</a>
+        <a class="nav-btn" href="lab4.html">Lab 4 — Events &amp; Interfaces →</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+  const headings = document.querySelectorAll('[id]');
+  const sideLinks = document.querySelectorAll('.sidebar a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    sideLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  });
+</script>
+</body>
+</html>
