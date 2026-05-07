@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Intelligent Enterprise Development with .NET 8 &amp; Azure AI | RR Skillverse</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg:       #0c0f18;
+  --surface:  #141827;
+  --surface2: #1b2135;
+  --border:   #262d42;
+  --gold:     #c9a84c;
+  --gold-dim: #8a6e2f;
+  --gold-glow:rgba(201,168,76,0.15);
+  --text:     #d8dce8;
+  --text-dim: #68728f;
+  --green:    #4caf82;
+  --blue:     #4a90d9;
+  --orange:   #d9784a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background grid ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Glow orb ── */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  width: 800px; height: 600px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════ HERO ══════════════ */
+.hero {
+  position: relative;
+  z-index: 1;
+  padding: 72px 40px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 48px;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px 8px 10px;
+}
+
+.brand-dot {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  background: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 14px;
+  color: #0c0f18;
+  letter-spacing: -0.5px;
+}
+
+.brand-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.brand-text small {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+.hero-divider {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+.hero-course-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--gold-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Hero title */
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px; height: 1px;
+  background: var(--gold);
+}
+
+h1.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+h1.hero-title span {
+  color: var(--gold);
+}
+
+.hero-subtitle {
+  font-size: 17px;
+  color: var(--text-dim);
+  margin-bottom: 36px;
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+/* ── Progress bar ── */
+.progress-track {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  max-width: 420px;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 33.3%;
+  background: linear-gradient(to right, var(--gold-dim), var(--gold));
+  border-radius: 99px;
+  animation: progressIn 1.2s ease forwards;
+}
+
+@keyframes progressIn {
+  from { width: 0; }
+  to   { width: 33.3%; }
+}
+
+.progress-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.progress-label span {
+  color: var(--gold);
+}
+
+/* ══════════════ TIMELINE / CONTENT ══════════════ */
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px 80px;
+}
+
+/* Day section */
+.day-section {
+  margin-bottom: 52px;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.day-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.day-pill.days1-2  { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.25); }
+.day-pill.days3    { background: rgba(74,144,217,0.12);  color: var(--blue); border: 1px solid rgba(74,144,217,0.25); }
+
+.day-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.day-header-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ── Card ── */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.card.lab::before    { background: radial-gradient(ellipse at top left, rgba(201,168,76,0.08), transparent 60%); }
+.card.cap::before    { background: radial-gradient(ellipse at top left, rgba(74,144,217,0.08), transparent 60%); }
+
+.card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+.card.lab:hover  { border-color: rgba(201,168,76,0.4); }
+.card.cap:hover  { border-color: rgba(74,144,217,0.4); }
+
+.card:hover::before { opacity: 1; }
+
+/* Card type tag */
+.card-type {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.card.lab  .card-type { background: rgba(201,168,76,0.1); color: var(--gold);  border: 1px solid rgba(201,168,76,0.2); }
+.card.cap  .card-type { background: rgba(74,144,217,0.1);  color: var(--blue);  border: 1px solid rgba(74,144,217,0.2); }
+
+/* Card number */
+.card-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+/* Card title */
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  padding-right: 60px;
+}
+
+/* Card desc */
+.card-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin-bottom: 18px;
+  flex: 1;
+}
+
+/* Module tags */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+/* Card footer */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.card-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  gap: 14px;
+}
+
+.card-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: gap 0.2s;
+}
+
+.card.lab  .card-cta { color: var(--gold); }
+.card.cap  .card-cta { color: var(--blue); }
+
+.card:hover .card-cta { gap: 9px; }
+
+/* Arrow */
+.arrow {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.card:hover .arrow { transform: translateX(3px); }
+
+/* ── Capstone full-width ── */
+.card.cap-full {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: 32px;
+  align-items: center;
+  padding: 28px 32px;
+}
+
+.cap-full-left { flex: 1; }
+.cap-full-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+  align-items: flex-end;
+}
+
+.cap-full-modules {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--orange);
+}
+
+/* ══════════════ CAPSTONE 3 HERO CARD ══════════════ */
+.cap3-banner {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  padding: 0 40px;
+}
+
+.cap3-card {
+  background: var(--surface);
+  border: 1px solid rgba(217,120,74,0.3);
+  border-radius: 14px;
+  padding: 36px 40px;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+  transition: border-color 0.25s, transform 0.2s, box-shadow 0.2s;
+}
+
+.cap3-card::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(217,120,74,0.1), transparent 65%);
+  pointer-events: none;
+}
+
+.cap3-card:hover {
+  border-color: rgba(217,120,74,0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+
+.cap3-inner {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.cap3-left { flex: 1; }
+
+.cap3-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.cap3-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.cap3-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  max-width: 560px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.cap3-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.cap3-tags .tag {
+  border-color: rgba(217,120,74,0.2);
+  color: var(--text-dim);
+}
+
+.cap3-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.cap3-badge {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  background: rgba(217,120,74,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--orange);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.3;
+}
+
+.cap3-open {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: gap 0.2s;
+}
+
+.cap3-card:hover .cap3-open { gap: 9px; }
+
+/* ══════════════ FOOTER ══════════════ */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 28px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-brand {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.footer-brand span { color: var(--gold); }
+
+.footer-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* ══════════════ ANIMATIONS ══════════════ */
+.hero {
+  animation: fadeUp 0.6s ease both;
+}
+
+.day-section:nth-child(1) { animation: fadeUp 0.6s 0.1s ease both; }
+.day-section:nth-child(2) { animation: fadeUp 0.6s 0.2s ease both; }
+.cap3-banner               { animation: fadeUp 0.6s 0.3s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════ RESPONSIVE ══════════════ */
+@media (max-width: 700px) {
+  .hero, .content, .cap3-banner { padding-left: 20px; padding-right: 20px; }
+  .cap3-inner { flex-direction: column; align-items: flex-start; }
+  .cap3-right { align-items: flex-start; }
+  .card.cap-full { flex-direction: column; }
+  .cap-full-right { align-items: flex-start; }
+  .hero-stats { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-top">
+    <div class="brand-badge">
+      <div class="brand-dot">RR</div>
+      <div class="brand-text">
+        RR Skillverse
+        <small>Raushan Ranjan, MCT &nbsp;·&nbsp; Koenig Solutions, Noida</small>
+      </div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-course-tag">11-Day Programme</div>
+  </div>
+
+  <div class="hero-eyebrow">Course Portal</div>
+  <h1 class="hero-title">
+    Intelligent Enterprise<br/>
+    Development with<br/>
+    <span>.NET 8 &amp; Azure AI</span>
+  </h1>
+  <p class="hero-subtitle">
+    Hands-on labs, guided capstone projects, and real code — from C# fundamentals to Azure AI-powered enterprise apps.
+  </p>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-value">11</span>
+      <span class="stat-label">Days</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">4</span>
+      <span class="stat-label">Labs (Days 1–3)</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">3</span>
+      <span class="stat-label">Capstones</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">9</span>
+      <span class="stat-label">Modules covered</span>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill"></div>
+  </div>
+  <div class="progress-label">
+    <span>Days 1–3 complete</span> &nbsp;·&nbsp; Days 4–11 coming soon
+  </div>
+</section>
+
+<!-- ══════════ DAYS 1–2 ══════════ -->
+<section class="content">
+
+  <div class="day-section">
+    <div class="day-header">
+      <span class="day-pill days1-2">Days 1–2</span>
+      <div class="day-line"></div>
+      <span class="day-header-title">C# Foundations</span>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- Lab 1 -->
+      <a class="card lab" href="lab1.html" target="_blank" rel="noopener">
+        <span class="card-type">Lab</span>
+        <div class="card-num">Lab 01</div>
+        <div class="card-title">C# Basics, Types &amp; Control Flow</div>
+        <div class="card-desc">Set up your first .NET 8 console project. Walk through the CLR pipeline, value vs reference types, operators, type conversion, nullable types, and all control flow constructs.</div>
+        <div class="card-tags">
+          <span class="tag">M1 — Ecosystem</span>
+          <span class="tag">M2 — Types</span>
+          <span class="tag">M3 — Control Flow</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>3 modules</span>
+            <span>~90 min</span>
+          </div>
+          <div class="card-cta">Open Lab <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+      <!-- Lab 2 -->
+      <a class="card lab" href="lab2.html" target="_blank" rel="noopener">
+        <span class="card-type">Lab</span>
+        <div class="card-num">Lab 02</div>
+        <div class="card-title">Methods, Exceptions &amp; Logging</div>
+        <div class="card-desc">Break code into reusable methods, define overloads, refactor repeated logic, handle multiple exception types, create custom exceptions, and simulate structured logging.</div>
+        <div class="card-tags">
+          <span class="tag">M4 — Methods</span>
+          <span class="tag">M5 — Exceptions</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>2 modules</span>
+            <span>~90 min</span>
+          </div>
+          <div class="card-cta">Open Lab <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+      <!-- Capstone 1 -->
+      <a class="card cap" href="capstone1.html" target="_blank" rel="noopener">
+        <span class="card-type">Capstone</span>
+        <div class="card-num">Capstone 01</div>
+        <div class="card-title">Student Registration Console App</div>
+        <div class="card-desc">Build a complete registration app in 5 guided phases — user input, validation with a custom exception, fee calculation overloads, grade logic, and full error logging.</div>
+        <div class="card-tags">
+          <span class="tag">M1–M5</span>
+          <span class="tag">Custom Exception</span>
+          <span class="tag">Method Overloads</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>Modules 1–5</span>
+            <span>~60 min</span>
+          </div>
+          <div class="card-cta">Open Project <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════ DAY 3 ══════════ -->
+  <div class="day-section">
+    <div class="day-header">
+      <span class="day-pill days3">Day 3</span>
+      <div class="day-line"></div>
+      <span class="day-header-title">Data Structures, Events &amp; OOP</span>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- Lab 3 -->
+      <a class="card lab" href="lab3.html" target="_blank" rel="noopener">
+        <span class="card-type">Lab</span>
+        <div class="card-num">Lab 03</div>
+        <div class="card-title">Structs, Enums, Collections &amp; LINQ</div>
+        <div class="card-desc">Group data with structs, give names to constants with enums (including Flags), store collections with List and Dictionary, and query them with LINQ in both syntaxes.</div>
+        <div class="card-tags">
+          <span class="tag">M6 — Structs &amp; Enums</span>
+          <span class="tag">M7 — LINQ</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>2 modules</span>
+            <span>~90 min</span>
+          </div>
+          <div class="card-cta">Open Lab <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+      <!-- Lab 4 -->
+      <a class="card lab" href="lab4.html" target="_blank" rel="noopener">
+        <span class="card-type">Lab</span>
+        <div class="card-num">Lab 04</div>
+        <div class="card-title">Events, Classes &amp; Interfaces</div>
+        <div class="card-desc">Define delegates and multicast events, build a publisher/subscriber enrollment service, design classes with validated properties, and write your first interface with two swappable implementations.</div>
+        <div class="card-tags">
+          <span class="tag">M8 — Events</span>
+          <span class="tag">M9 — Interfaces</span>
+          <span class="tag">SOLID</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>2 modules</span>
+            <span>~90 min</span>
+          </div>
+          <div class="card-cta">Open Lab <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+      <!-- Capstone 2 -->
+      <a class="card cap" href="capstone2.html" target="_blank" rel="noopener">
+        <span class="card-type">Capstone</span>
+        <div class="card-num">Capstone 02</div>
+        <div class="card-title">Grade Tracker Application</div>
+        <div class="card-desc">A 5-phase app: build a typed student roster, fire grade events with two handlers, generate reports through an IReportGenerator interface, and analyse results with LINQ.</div>
+        <div class="card-tags">
+          <span class="tag">M6–M9</span>
+          <span class="tag">Events</span>
+          <span class="tag">Interfaces</span>
+          <span class="tag">LINQ</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            <span>Modules 6–9</span>
+            <span>~75 min</span>
+          </div>
+          <div class="card-cta">Open Project <span class="arrow">→</span></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ CAPSTONE 3 — FULL WIDTH ══════════ -->
+<div class="cap3-banner">
+  <a class="cap3-card" href="capstone3.html" target="_blank" rel="noopener">
+    <div class="cap3-inner">
+      <div class="cap3-left">
+        <div class="cap3-eyebrow">Consolidation Capstone &nbsp;·&nbsp; Modules 1–9</div>
+        <div class="cap3-title">Mini ERP Console Application</div>
+        <div class="cap3-desc">
+          Your first complete multi-component application. Combines all 9 modules into a working ERP with a student roster, course catalog, enrollment service with events, grade tracking, LINQ-powered analytics, interface-driven reports, and an interactive menu loop.
+        </div>
+        <div class="cap3-tags">
+          <span class="tag">Models &amp; Enums</span>
+          <span class="tag">Repositories</span>
+          <span class="tag">Event Services</span>
+          <span class="tag">Custom Exceptions</span>
+          <span class="tag">LINQ Analytics</span>
+          <span class="tag">Interface Reports</span>
+          <span class="tag">Menu Loop</span>
+        </div>
+      </div>
+      <div class="cap3-right">
+        <div class="cap3-badge">All<br/>Modules<br/>1–9</div>
+        <div class="cap3-open">Open Capstone <span class="arrow">→</span></div>
+      </div>
+    </div>
+  </a>
+</div>
+
+<!-- ══════════ COMING SOON ══════════ -->
+<section class="content" style="padding-top:0">
+  <div class="day-section">
+    <div class="day-header">
+      <span class="day-pill" style="background:rgba(104,114,143,0.1);color:var(--text-dim);border:1px solid var(--border);">Days 4–11</span>
+      <div class="day-line"></div>
+      <span class="day-header-title">Coming Soon</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" style="opacity:.45;pointer-events:none;cursor:default;">
+        <span class="card-type" style="background:rgba(104,114,143,0.1);color:var(--text-dim);border-color:var(--border)">Upcoming</span>
+        <div class="card-num">Lab 05</div>
+        <div class="card-title" style="color:var(--text-dim)">Inheritance &amp; Polymorphism</div>
+        <div class="card-desc">Base classes, virtual/override, abstract classes, and sealed classes. Refactor the ERP models into a proper hierarchy.</div>
+        <div class="card-tags"><span class="tag">M10</span></div>
+        <div class="card-footer"><div class="card-meta"><span>Day 4</span></div><div class="card-cta" style="color:var(--text-dim)">Coming soon</div></div>
+      </div>
+
+      <div class="card" style="opacity:.45;pointer-events:none;cursor:default;">
+        <span class="card-type" style="background:rgba(104,114,143,0.1);color:var(--text-dim);border-color:var(--border)">Upcoming</span>
+        <div class="card-num">Lab 06</div>
+        <div class="card-title" style="color:var(--text-dim)">Generics &amp; File I/O</div>
+        <div class="card-desc">Generic classes and methods, reading and writing files, JSON serialization, and persisting the ERP data between sessions.</div>
+        <div class="card-tags"><span class="tag">M11–M12</span></div>
+        <div class="card-footer"><div class="card-meta"><span>Day 4</span></div><div class="card-cta" style="color:var(--text-dim)">Coming soon</div></div>
+      </div>
+
+      <div class="card" style="opacity:.45;pointer-events:none;cursor:default;">
+        <span class="card-type" style="background:rgba(104,114,143,0.1);color:var(--text-dim);border-color:var(--border)">Upcoming</span>
+        <div class="card-num">Lab 07–11</div>
+        <div class="card-title" style="color:var(--text-dim)">EF Core, Azure AI &amp; Blazor</div>
+        <div class="card-desc">Entity Framework Core, Azure OpenAI integration, REST APIs with ASP.NET, Blazor WebAssembly, and the final enterprise capstone.</div>
+        <div class="card-tags"><span class="tag">M13–M28</span></div>
+        <div class="card-footer"><div class="card-meta"><span>Days 5–11</span></div><div class="card-cta" style="color:var(--text-dim)">Coming soon</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="site-footer">
+  <div class="footer-brand">
+    <span>RR Skillverse</span> &nbsp;·&nbsp; Raushan Ranjan, MCT &nbsp;·&nbsp; Koenig Solutions, Noida
+  </div>
+  <div class="footer-note">
+    .NET 8 &amp; Azure AI — 11-Day Programme &nbsp;·&nbsp; All labs open in a new tab
+  </div>
+</footer>
+
+</body>
+</html>
