@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Capstone 3 — Mini ERP Console App | RR Skillverse</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#0f1117;--surface:#1a1f2e;--border:#2a3044;--gold:#c9a84c;--gold-dim:#a07830;--text:#d4d8e8;--text-dim:#7a8099;--green:#4caf82;--blue:#4a90d9;--red:#e05c5c;--code-bg:#12151f;--tag-bg:#1e2638;--cap:#c97a3a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .topbar-brand{display:flex;align-items:center;gap:10px}
+  .topbar-brand .dot{width:28px;height:28px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0f1117}
+  .topbar-brand span{font-weight:600;color:var(--text);font-size:15px}
+  .topbar-brand small{color:var(--text-dim);font-size:12px;margin-left:6px}
+  .topbar-nav{display:flex;gap:6px}
+  .topbar-nav a{color:var(--text-dim);font-size:13px;text-decoration:none;padding:5px 12px;border-radius:5px;transition:all .2s}
+  .topbar-nav a:hover{color:var(--gold);background:var(--tag-bg)}
+  .topbar-nav a.active{color:var(--gold);background:var(--tag-bg)}
+  .layout{display:flex;min-height:calc(100vh - 57px)}
+  .sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto}
+  .sidebar-section{padding:0 16px 8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-top:16px}
+  .sidebar a{display:block;padding:8px 20px;font-size:13px;color:var(--text-dim);text-decoration:none;border-left:2px solid transparent;transition:all .15s}
+  .sidebar a:hover{color:var(--text);background:var(--tag-bg);border-left-color:var(--border)}
+  .sidebar a.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,0.07)}
+  .sidebar a.sub{padding-left:32px;font-size:12.5px}
+  .main{flex:1;padding:40px 48px;max-width:960px}
+
+  .cap-header{border:1px solid rgba(201,120,58,0.35);background:rgba(201,120,58,0.06);border-radius:10px;padding:28px 32px;margin-bottom:36px}
+  .cap-tag{display:inline-block;background:rgba(201,120,58,0.15);color:var(--cap);border:1px solid rgba(201,120,58,0.3);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:12px}
+  .cap-header h1{font-size:24px;font-weight:600;color:#fff;margin-bottom:8px}
+  .cap-header p{color:var(--text-dim);font-size:14px;max-width:680px}
+  .cap-meta{display:flex;gap:20px;margin-top:16px;flex-wrap:wrap}
+  .cap-meta span{font-size:12px;color:var(--text-dim)}
+  .cap-meta span b{color:var(--text)}
+  .skills-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .skill-badge{background:var(--tag-bg);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:12px;color:var(--text-dim)}
+
+  /* architecture diagram */
+  .arch-diagram{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:24px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:#c9d1e8;line-height:1.9}
+
+  .phase{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:32px;overflow:hidden}
+  .phase-header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .phase-num{background:var(--cap);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;white-space:nowrap}
+  .phase-header h2{font-size:15px;font-weight:600;color:#fff}
+  .phase-header .phase-hint{font-size:12px;color:var(--text-dim);margin-left:auto}
+  .phase-body{padding:24px}
+  .step{margin-bottom:28px}
+  .step:last-child{margin-bottom:0}
+  .step-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .step-title .step-num{width:22px;height:22px;border-radius:50%;background:var(--tag-bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--cap);font-weight:700;flex-shrink:0}
+  .step p{font-size:14px;color:var(--text);margin-bottom:10px}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;margin:12px 0;overflow:hidden}
+  .code-header{background:var(--surface);padding:7px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .code-header span{font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+  .copy-btn{font-size:11px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:3px;padding:2px 8px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+  .copy-btn:hover{color:var(--gold);border-color:var(--gold-dim)}
+  .copy-btn.copied{color:var(--green);border-color:var(--green)}
+  pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;color:#c9d1e8}
+  .kw{color:#7eb8f7}.cm{color:#516070;font-style:italic}.st{color:#9ecf7a}.nm{color:#f0c070}.fn{color:#e09060}
+  .callout{border-radius:6px;padding:14px 16px;margin:14px 0;font-size:13.5px;border-left:3px solid;display:flex;gap:10px}
+  .callout-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+  .callout.info{background:rgba(74,144,217,0.08);border-color:var(--blue)}
+  .callout.tip{background:rgba(76,175,130,0.08);border-color:var(--green)}
+  .callout.warn{background:rgba(201,168,76,0.08);border-color:var(--gold)}
+  .callout p{margin:0;color:var(--text)}
+  .callout strong{color:#fff}
+  .output-block{background:#0a0d14;border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin:10px 0}
+  .output-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:600;margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+  .output-block pre{padding:0;color:#8db88d;font-size:13px}
+  hr.section-div{border:none;border-top:1px solid var(--border);margin:24px 0}
+
+  /* module map */
+  .module-map{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+  .map-cell{background:var(--tag-bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:13px}
+  .map-cell strong{display:block;color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .map-cell span{color:var(--text-dim);font-size:12px}
+
+  .checklist{list-style:none;padding:0}
+  .checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text)}
+  .checklist li:last-child{border-bottom:none}
+  .checklist li .chk{width:18px;height:18px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;margin-top:2px;background:var(--tag-bg)}
+  .checklist li code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);background:var(--tag-bg);padding:1px 5px;border-radius:3px}
+
+  .extension{border:1px solid rgba(76,175,130,0.2);background:rgba(76,175,130,0.04);border-radius:8px;padding:20px 24px;margin-top:8px}
+  .extension-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:12px}
+  .extension ul{padding-left:18px}
+  .extension li{font-size:13.5px;color:var(--text);margin-bottom:6px}
+
+  .page-footer{border-top:1px solid var(--border);margin-top:48px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-dim);flex-wrap:wrap;gap:8px}
+  .page-footer a{color:var(--gold-dim);text-decoration:none}
+  .nav-btns{display:flex;gap:10px}
+  .nav-btn{display:inline-flex;align-items:center;gap:6px;background:var(--tag-bg);border:1px solid var(--border);color:var(--text);font-size:13px;padding:8px 16px;border-radius:6px;text-decoration:none;transition:all .2s}
+  .nav-btn:hover{border-color:var(--gold);color:var(--gold)}
+  @media(max-width:768px){.sidebar{display:none}.main{padding:24px 20px}.module-map{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="dot">RR</div>
+    <div><span>RR Skillverse</span><small>by Raushan Ranjan, MCT</small></div>
+  </div>
+  <nav class="topbar-nav">
+    <a href="index.html">Home</a>
+    <a href="capstone2.html">Capstone 2</a>
+    <a href="capstone3.html" class="active">Capstone 3</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">Capstone 3</div>
+    <a href="#overview" class="active">Overview</a>
+    <a href="#architecture" class="sub">App architecture</a>
+    <a href="#expected" class="sub">Expected output</a>
+
+    <div class="sidebar-section">Build It</div>
+    <a href="#phase1">Phase 1 — Models &amp; Enums</a>
+    <a href="#phase2">Phase 2 — Repositories</a>
+    <a href="#phase3">Phase 3 — Services &amp; Events</a>
+    <a href="#phase4">Phase 4 — Reports</a>
+    <a href="#phase5">Phase 5 — Menu loop</a>
+    <a href="#phase6">Phase 6 — Wire it up</a>
+
+    <div class="sidebar-section">Finish</div>
+    <a href="#checklist">Checklist</a>
+    <a href="#extend">Extend It</a>
+  </aside>
+
+  <main class="main">
+
+    <div class="cap-header" id="overview">
+      <div class="cap-tag">Capstone Project 3 — Consolidation</div>
+      <h1>Mini ERP Console Application</h1>
+      <p>This is your first complete application that combines <strong>all 9 modules</strong> into one cohesive program. It is a simplified ERP with a student roster, course catalog, enrollment management, fee calculation, grade tracking, event notifications, and a LINQ-powered analytics report — all driven by an interactive menu loop.</p>
+      <div class="cap-meta">
+        <span>⏱ <b>Duration:</b> ~2 hours</span>
+        <span>📦 <b>Modules:</b> 1–9</span>
+        <span>📁 <b>File:</b> Capstone3.cs</span>
+      </div>
+      <div class="skills-row">
+        <span class="skill-badge">Variables &amp; Types</span>
+        <span class="skill-badge">Conditions &amp; Loops</span>
+        <span class="skill-badge">Methods</span>
+        <span class="skill-badge">Exceptions &amp; Logging</span>
+        <span class="skill-badge">struct</span>
+        <span class="skill-badge">enum</span>
+        <span class="skill-badge">List&amp;Dictionary</span>
+        <span class="skill-badge">LINQ</span>
+        <span class="skill-badge">Events</span>
+        <span class="skill-badge">Classes &amp; Properties</span>
+        <span class="skill-badge">Interfaces</span>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="phase" id="architecture">
+      <div class="phase-header">
+        <span class="phase-num">DESIGN</span>
+        <h2>App architecture — what you are building</h2>
+      </div>
+      <div class="phase-body">
+        <div class="arch-diagram">
+<span style="color:var(--gold)">Capstone3.Run()</span>
+  │
+  ├─ <span style="color:var(--blue)">Menu loop</span>         (while + switch) ──── user picks 1-5
+  │
+  ├─ <span style="color:var(--green)">ERP Models</span>        (classes + properties)
+  │    ├─ ErpStudent      Id, Name, Age, Status (enum)
+  │    └─ ErpCourse       Code, Title, DurationDays, Price
+  │
+  ├─ <span style="color:var(--green)">Repositories</span>      (Dictionary + List)
+  │    ├─ StudentRepo     holds all students
+  │    └─ CourseRepo      holds all courses
+  │
+  ├─ <span style="color:var(--cap)">EnrollmentService</span>  (class + event)
+  │    ├─ Enroll(student, course) → validates → fires OnEnrolled
+  │    └─ event OnEnrolled        → email + log handlers subscribe
+  │
+  ├─ <span style="color:var(--cap)">GradeService</span>      (class + event, from Capstone 2)
+  │    └─ PostGrade(student, marks) → fires OnGradePosted
+  │
+  └─ <span style="color:#c97a3a)">IReportGenerator</span>  (interface)
+       ├─ EnrollmentReport   → who is enrolled in what
+       └─ AnalyticsReport    → LINQ: top students, averages, pass rate
+        </div>
+
+        <div class="module-map">
+          <div class="map-cell"><strong>M1–M3</strong><span>Console I/O, types, if/switch, loops, try/catch</span></div>
+          <div class="map-cell"><strong>M4–M5</strong><span>Methods, overloads, custom exceptions, logging</span></div>
+          <div class="map-cell"><strong>M6</strong><span>Enums for status; structs not needed here (classes used instead)</span></div>
+          <div class="map-cell"><strong>M7</strong><span>List&lt;T&gt; for courses; Dictionary for student lookup; LINQ analytics</span></div>
+          <div class="map-cell"><strong>M8</strong><span>Events on EnrollmentService and GradeService</span></div>
+          <div class="map-cell"><strong>M9</strong><span>Classes with properties, IReportGenerator interface, single responsibility</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expected output -->
+    <div class="phase" id="expected">
+      <div class="phase-header">
+        <span class="phase-num">OVERVIEW</span>
+        <h2>What the running app looks like</h2>
+      </div>
+      <div class="phase-body">
+        <div class="output-block">
+          <div class="output-label">Expected Console Output (abbreviated)</div>
+          <pre">=========================================
+  Mini ERP — RR Skillverse
+  Intelligent Enterprise Development
+=========================================
+
+=== MAIN MENU ===
+1. Show Students
+2. Show Courses
+3. Enroll Student
+4. Post Grade
+5. Run Reports
+0. Exit
+Choice: 3
+
+Student ID: S001
+Course Code: AZ-204
+[INFO] 14:10:05 - Enrolling S001 in AZ-204
+[EVENT] Email: Raushan enrolled in Azure Developer
+[EVENT] Log  : Enrollment recorded
+
+=== MAIN MENU ===
+...
+Choice: 4
+
+Student ID: S001
+Marks: 88
+[EVENT] Email: Raushan scored 88 (Grade: B)
+[EVENT] Log  : Grade posted
+
+=== MAIN MENU ===
+...
+Choice: 5
+
+--- Enrollment Report ---
+S001 | Raushan  | AZ-204 | Azure Developer   | Active
+S002 | Priya    | CS-001 | C# Foundations    | Active
+
+--- Analytics Report ---
+Total enrolled  : 2
+Average marks   : 82.0
+Top student     : Priya (91)
+Pass rate       : 100%
+Top scorers     : Priya (91)  Raushan (88)
+
+Choice: 0
+Goodbye!</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 1 -->
+    <div class="phase" id="phase1">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 1</span>
+        <h2>Models — Enums &amp; Classes</h2>
+        <span class="phase-hint">M6, M9</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> Create Capstone3.cs — add models at the bottom of the file</div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Enums and model classes — bottom of Capstone3.cs</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="cm">// ── Enums ──────────────────────────────────</span>
+<span class="kw">enum</span> ErpStatus { Active, Inactive, Suspended }
+
+<span class="cm">// ── Student model ──────────────────────────</span>
+<span class="kw">class</span> ErpStudent
+{
+    <span class="kw">public string</span>    Id     { <span class="kw">get</span>; }
+    <span class="kw">public string</span>    Name   { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span>       Age    { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public ErpStatus</span> Status { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span>       Marks  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public string</span>    EnrolledCourseCode { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">ErpStudent</span>(<span class="kw">string</span> id, <span class="kw">string</span> name, <span class="kw">int</span> age)
+    {
+        Id     = id;
+        Name   = name;
+        Age    = age;
+        Status = ErpStatus.Active;
+        Marks  = <span class="nm">0</span>;
+        EnrolledCourseCode = <span class="st">""</span>;
+    }
+
+    <span class="kw">public string</span> <span class="fn">GetGrade</span>()
+    {
+        <span class="kw">if</span> (Marks >= <span class="nm">90</span>) <span class="kw">return</span> <span class="st">"A"</span>;
+        <span class="kw">if</span> (Marks >= <span class="nm">75</span>) <span class="kw">return</span> <span class="st">"B"</span>;
+        <span class="kw">if</span> (Marks >= <span class="nm">50</span>) <span class="kw">return</span> <span class="st">"C"</span>;
+        <span class="kw">return</span> <span class="st">"F"</span>;
+    }
+}
+
+<span class="cm">// ── Course model ───────────────────────────</span>
+<span class="kw">class</span> ErpCourse
+{
+    <span class="kw">public string</span> Code         { <span class="kw">get</span>; }
+    <span class="kw">public string</span> Title        { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span>    DurationDays { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public double</span> Price        { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="fn">ErpCourse</span>(<span class="kw">string</span> code, <span class="kw">string</span> title, <span class="kw">int</span> days, <span class="kw">double</span> price)
+    {
+        Code         = code;
+        Title        = title;
+        DurationDays = days;
+        Price        = price;
+    }
+
+    <span class="kw">public double</span> <span class="fn">PriceWithGST</span>() => Price + (Price * <span class="nm">0.18</span>);
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase" id="phase2">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 2</span>
+        <h2>Repositories — in-memory data stores</h2>
+        <span class="phase-hint">M7 — Dictionary + List</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> Add two simple repository classes</div>
+          <p>A repository is just a class that holds and manages a collection. It gives you clean methods like <code style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);">Add</code>, <code style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);">GetById</code>, <code style="font-family:'JetBrains Mono';font-size:12px;color:var(--gold);">GetAll</code> — instead of accessing the raw Dictionary everywhere.</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>StudentRepo and CourseRepo — bottom of file</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="kw">class</span> StudentRepo
+{
+    <span class="kw">private</span> Dictionary&lt;<span class="kw">string</span>, ErpStudent&gt; _students =
+        <span class="kw">new</span> Dictionary&lt;<span class="kw">string</span>, ErpStudent&gt;();
+
+    <span class="kw">public void</span> <span class="fn">Add</span>(ErpStudent s)    => _students[s.Id] = s;
+
+    <span class="kw">public</span> ErpStudent <span class="fn">GetById</span>(<span class="kw">string</span> id)
+    {
+        _students.<span class="fn">TryGetValue</span>(id, <span class="kw">out</span> ErpStudent s);
+        <span class="kw">return</span> s;   <span class="cm">// null if not found</span>
+    }
+
+    <span class="kw">public</span> List&lt;ErpStudent&gt; <span class="fn">GetAll</span>() => _students.Values.<span class="fn">ToList</span>();
+}
+
+<span class="kw">class</span> CourseRepo
+{
+    <span class="kw">private</span> Dictionary&lt;<span class="kw">string</span>, ErpCourse&gt; _courses =
+        <span class="kw">new</span> Dictionary&lt;<span class="kw">string</span>, ErpCourse&gt;();
+
+    <span class="kw">public void</span> <span class="fn">Add</span>(ErpCourse c)    => _courses[c.Code] = c;
+
+    <span class="kw">public</span> ErpCourse <span class="fn">GetByCode</span>(<span class="kw">string</span> code)
+    {
+        _courses.<span class="fn">TryGetValue</span>(code, <span class="kw">out</span> ErpCourse c);
+        <span class="kw">return</span> c;
+    }
+
+    <span class="kw">public</span> List&lt;ErpCourse&gt; <span class="fn">GetAll</span>() => _courses.Values.<span class="fn">ToList</span>();
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase" id="phase3">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 3</span>
+        <h2>Services &amp; Events</h2>
+        <span class="phase-hint">M4, M5, M8</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> EnrollmentService with event and custom exception</div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>EnrollmentService + AlreadyEnrolledException — bottom of file</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="kw">class</span> AlreadyEnrolledException : Exception
+{
+    <span class="kw">public</span> <span class="fn">AlreadyEnrolledException</span>(<span class="kw">string</span> msg) : <span class="fn">base</span>(msg) { }
+}
+
+<span class="kw">class</span> EnrollmentService
+{
+    <span class="kw">public event</span> Action&lt;ErpStudent, ErpCourse&gt; OnEnrolled;
+
+    <span class="kw">public void</span> <span class="fn">Enroll</span>(ErpStudent student, ErpCourse course)
+    {
+        <span class="kw">if</span> (student == <span class="kw">null</span>) <span class="kw">throw new</span> Exception(<span class="st">"Student not found"</span>);
+        <span class="kw">if</span> (course  == <span class="kw">null</span>) <span class="kw">throw new</span> Exception(<span class="st">"Course not found"</span>);
+
+        <span class="kw">if</span> (student.EnrolledCourseCode != <span class="st">""</span>)
+            <span class="kw">throw new</span> AlreadyEnrolledException(
+                student.Name + <span class="st">" is already enrolled in "</span> + student.EnrolledCourseCode);
+
+        student.EnrolledCourseCode = course.Code;
+        OnEnrolled?.<span class="fn">Invoke</span>(student, course);
+    }
+}
+
+<span class="cm">// GradeService (same as Capstone 2)</span>
+<span class="kw">class</span> ErpGradeService
+{
+    <span class="kw">public event</span> Action&lt;<span class="kw">string</span>, <span class="kw">int</span>&gt; OnGradePosted;
+
+    <span class="kw">public void</span> <span class="fn">PostGrade</span>(ErpStudent student, <span class="kw">int</span> marks)
+    {
+        <span class="kw">if</span> (student == <span class="kw">null</span>) <span class="kw">throw new</span> Exception(<span class="st">"Student not found"</span>);
+        student.Marks = marks;
+        OnGradePosted?.<span class="fn">Invoke</span>(student.Name, marks);
+    }
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase" id="phase4">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 4</span>
+        <h2>Reports via IReportGenerator</h2>
+        <span class="phase-hint">M7 (LINQ), M9 (interface)</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> Interface + two report implementations</div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>IErpReport + EnrollmentReport + AnalyticsReport — bottom of file</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="kw">interface</span> IErpReport
+{
+    <span class="kw">void</span> <span class="fn">Print</span>(List&lt;ErpStudent&gt; students, List&lt;ErpCourse&gt; courses);
+}
+
+<span class="kw">class</span> EnrollmentReport : IErpReport
+{
+    <span class="kw">public void</span> <span class="fn">Print</span>(List&lt;ErpStudent&gt; students, List&lt;ErpCourse&gt; courses)
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="st">"--- Enrollment Report ---"</span>);
+        <span class="kw">var</span> enrolled = students.<span class="fn">Where</span>(s => s.EnrolledCourseCode != <span class="st">""</span>);
+        <span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> enrolled)
+        {
+            <span class="kw">var</span> course = courses.<span class="fn">FirstOrDefault</span>(c => c.Code == s.EnrolledCourseCode);
+            <span class="kw">string</span> courseTitle = course != <span class="kw">null</span> ? course.Title : <span class="st">"Unknown"</span>;
+            Console.<span class="fn">WriteLine</span>(s.Id + <span class="st">" | "</span> + s.Name.<span class="fn">PadRight</span>(<span class="nm">8</span>) +
+                             <span class="st">" | "</span> + s.EnrolledCourseCode +
+                             <span class="st">" | "</span> + courseTitle.<span class="fn">PadRight</span>(<span class="nm">20</span>) +
+                             <span class="st">" | "</span> + s.Status);
+        }
+    }
+}
+
+<span class="kw">class</span> AnalyticsReport : IErpReport
+{
+    <span class="kw">public void</span> <span class="fn">Print</span>(List&lt;ErpStudent&gt; students, List&lt;ErpCourse&gt; courses)
+    {
+        Console.<span class="fn">WriteLine</span>(<span class="st">"--- Analytics Report ---"</span>);
+        <span class="kw">var</span> graded = students.<span class="fn">Where</span>(s => s.Marks > <span class="nm">0</span>).<span class="fn">ToList</span>();
+        <span class="kw">if</span> (graded.Count == <span class="nm">0</span>) { Console.<span class="fn">WriteLine</span>(<span class="st">"No grades posted yet."</span>); <span class="kw">return</span>; }
+
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Total graded    : "</span> + graded.Count);
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Average marks   : "</span> + graded.<span class="fn">Average</span>(s => s.Marks).<span class="fn">ToString</span>(<span class="st">"F1"</span>));
+
+        <span class="kw">var</span> top = graded.<span class="fn">OrderByDescending</span>(s => s.Marks).<span class="fn">First</span>();
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Top student     : "</span> + top.Name + <span class="st">" ("</span> + top.Marks + <span class="st">")"</span>);
+
+        <span class="kw">int</span> passRate = graded.<span class="fn">Count</span>(s => s.Marks >= <span class="nm">50</span>) * <span class="nm">100</span> / graded.Count;
+        Console.<span class="fn">WriteLine</span>(<span class="st">"Pass rate       : "</span> + passRate + <span class="st">"%"</span>);
+
+        Console.<span class="fn">Write</span>(<span class="st">"Top scorers     : "</span>);
+        <span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> graded.<span class="fn">Where</span>(s => s.Marks >= <span class="nm">75</span>).<span class="fn">OrderByDescending</span>(s => s.Marks))
+            Console.<span class="fn">Write</span>(s.Name + <span class="st">" ("</span> + s.Marks + <span class="st">")  "</span>);
+        Console.<span class="fn">WriteLine</span>();
+    }
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase" id="phase5">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 5</span>
+        <h2>The Interactive Menu Loop</h2>
+        <span class="phase-hint">M1–M4 — loops, switch, methods</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> Add ShowMenu and the main loop as methods inside Capstone3</div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Menu + loop methods inside the Capstone3 class</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="kw">static void</span> <span class="fn">ShowMenu</span>()
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"\n=== MAIN MENU ==="</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"1. Show Students"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"2. Show Courses"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"3. Enroll Student"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"4. Post Grade"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"5. Run Reports"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"0. Exit"</span>);
+    Console.<span class="fn">Write</span>(<span class="st">"Choice: "</span>);
+}
+
+<span class="kw">static void</span> <span class="fn">Log</span>(<span class="kw">string</span> level, <span class="kw">string</span> message)
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"["</span> + level + <span class="st">"] "</span> + DateTime.Now.<span class="fn">ToString</span>(<span class="st">"HH:mm:ss"</span>) +
+                     <span class="st">" - "</span> + message);
+}
+
+<span class="kw">static void</span> <span class="fn">ShowStudents</span>(StudentRepo repo)
+{
+    <span class="kw">var</span> list = repo.<span class="fn">GetAll</span>();
+    <span class="kw">if</span> (list.Count == <span class="nm">0</span>) { Console.<span class="fn">WriteLine</span>(<span class="st">"No students."</span>); <span class="kw">return</span>; }
+    <span class="kw">foreach</span> (<span class="kw">var</span> s <span class="kw">in</span> list)
+        Console.<span class="fn">WriteLine</span>(s.Id + <span class="st">" | "</span> + s.Name + <span class="st">" | Age: "</span> + s.Age + <span class="st">" | "</span> + s.Status);
+}
+
+<span class="kw">static void</span> <span class="fn">ShowCourses</span>(CourseRepo repo)
+{
+    <span class="kw">foreach</span> (<span class="kw">var</span> c <span class="kw">in</span> repo.<span class="fn">GetAll</span>())
+        Console.<span class="fn">WriteLine</span>(c.Code + <span class="st">" | "</span> + c.Title + <span class="st">" | "</span> + c.DurationDays +
+                         <span class="st">" days | ₹"</span> + c.<span class="fn">PriceWithGST</span>().<span class="fn">ToString</span>(<span class="st">"F0"</span>) + <span class="st">" (incl. GST)"</span>);
+}
+
+<span class="kw">static void</span> <span class="fn">HandleEnroll</span>(StudentRepo sRepo, CourseRepo cRepo, EnrollmentService svc)
+{
+    Console.<span class="fn">Write</span>(<span class="st">"Student ID: "</span>);   <span class="kw">string</span> sid = Console.<span class="fn">ReadLine</span>() ?? <span class="st">""</span>;
+    Console.<span class="fn">Write</span>(<span class="st">"Course Code: "</span>);  <span class="kw">string</span> cid = Console.<span class="fn">ReadLine</span>() ?? <span class="st">""</span>;
+
+    <span class="kw">try</span>
+    {
+        <span class="fn">Log</span>(<span class="st">"INFO"</span>, <span class="st">"Enrolling "</span> + sid + <span class="st">" in "</span> + cid);
+        svc.<span class="fn">Enroll</span>(sRepo.<span class="fn">GetById</span>(sid), cRepo.<span class="fn">GetByCode</span>(cid));
+    }
+    <span class="kw">catch</span> (AlreadyEnrolledException ex) { <span class="fn">Log</span>(<span class="st">"ERROR"</span>, ex.Message); }
+    <span class="kw">catch</span> (Exception ex)               { <span class="fn">Log</span>(<span class="st">"ERROR"</span>, ex.Message); }
+}
+
+<span class="kw">static void</span> <span class="fn">HandleGrade</span>(StudentRepo repo, ErpGradeService svc)
+{
+    Console.<span class="fn">Write</span>(<span class="st">"Student ID: "</span>);  <span class="kw">string</span> sid = Console.<span class="fn">ReadLine</span>() ?? <span class="st">""</span>;
+    Console.<span class="fn">Write</span>(<span class="st">"Marks: "</span>);
+    <span class="kw">bool</span> ok = <span class="kw">int</span>.<span class="fn">TryParse</span>(Console.<span class="fn">ReadLine</span>(), <span class="kw">out int</span> marks);
+    <span class="kw">if</span> (!ok) { Console.<span class="fn">WriteLine</span>(<span class="st">"Invalid marks."</span>); <span class="kw">return</span>; }
+
+    <span class="kw">try</span>   { svc.<span class="fn">PostGrade</span>(repo.<span class="fn">GetById</span>(sid), marks); }
+    <span class="kw">catch</span> (Exception ex) { <span class="fn">Log</span>(<span class="st">"ERROR"</span>, ex.Message); }
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="phase" id="phase6">
+      <div class="phase-header">
+        <span class="phase-num">PHASE 6</span>
+        <h2>Wire Everything Together in Run()</h2>
+        <span class="phase-hint">All modules</span>
+      </div>
+      <div class="phase-body">
+
+        <div class="step">
+          <div class="step-title"><span class="step-num">1</span> The complete Run() method</div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Complete Run() — the entire entry point</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre"><span class="kw">public static void</span> <span class="fn">Run</span>()
+{
+    Console.<span class="fn">WriteLine</span>(<span class="st">"========================================="</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  Mini ERP — RR Skillverse"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  Intelligent Enterprise Development"</span>);
+    Console.<span class="fn">WriteLine</span>(<span class="st">"========================================="</span>);
+
+    <span class="cm">// Seed data</span>
+    StudentRepo studentRepo = <span class="kw">new</span> <span class="fn">StudentRepo</span>();
+    studentRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpStudent</span>(<span class="st">"S001"</span>, <span class="st">"Raushan"</span>, <span class="nm">28</span>));
+    studentRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpStudent</span>(<span class="st">"S002"</span>, <span class="st">"Priya"</span>,   <span class="nm">24</span>));
+    studentRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpStudent</span>(<span class="st">"S003"</span>, <span class="st">"Rahul"</span>,   <span class="nm">26</span>));
+
+    CourseRepo courseRepo = <span class="kw">new</span> <span class="fn">CourseRepo</span>();
+    courseRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpCourse</span>(<span class="st">"CS-001"</span>, <span class="st">"C# Foundations"</span>,      <span class="nm">3</span>,  <span class="nm">14999</span>));
+    courseRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpCourse</span>(<span class="st">"AZ-204"</span>, <span class="st">"Azure Developer"</span>,     <span class="nm">5</span>,  <span class="nm">24999</span>));
+    courseRepo.<span class="fn">Add</span>(<span class="kw">new</span> <span class="fn">ErpCourse</span>(<span class="st">"AI-001"</span>, <span class="st">"Azure AI Fundamentals"</span>, <span class="nm">11</span>, <span class="nm">29999</span>));
+
+    <span class="cm">// Services + event subscriptions</span>
+    EnrollmentService enrollSvc = <span class="kw">new</span> <span class="fn">EnrollmentService</span>();
+    enrollSvc.OnEnrolled += (s, c) =>
+        Console.<span class="fn">WriteLine</span>(<span class="st">"[EVENT] Email: "</span> + s.Name + <span class="st">" enrolled in "</span> + c.Title);
+    enrollSvc.OnEnrolled += (s, c) =>
+        Console.<span class="fn">WriteLine</span>(<span class="st">"[EVENT] Log  : Enrollment recorded"</span>);
+
+    ErpGradeService gradeSvc = <span class="kw">new</span> <span class="fn">ErpGradeService</span>();
+    gradeSvc.OnGradePosted += (name, marks) =>
+    {
+        <span class="kw">string</span> g = marks >= <span class="nm">90</span> ? <span class="st">"A"</span> : marks >= <span class="nm">75</span> ? <span class="st">"B"</span> : marks >= <span class="nm">50</span> ? <span class="st">"C"</span> : <span class="st">"F"</span>;
+        Console.<span class="fn">WriteLine</span>(<span class="st">"[EVENT] Email: "</span> + name + <span class="st">" scored "</span> + marks + <span class="st">" (Grade: "</span> + g + <span class="st">")"</span>);
+    };
+    gradeSvc.OnGradePosted += (name, marks) =>
+        Console.<span class="fn">WriteLine</span>(<span class="st">"[EVENT] Log  : Grade posted"</span>);
+
+    <span class="cm">// Reports</span>
+    List&lt;IErpReport&gt; reports = <span class="kw">new</span> List&lt;IErpReport&gt;
+    {
+        <span class="kw">new</span> <span class="fn">EnrollmentReport</span>(),
+        <span class="kw">new</span> <span class="fn">AnalyticsReport</span>()
+    };
+
+    <span class="cm">// Main loop</span>
+    <span class="kw">string</span> choice = <span class="st">""</span>;
+    <span class="kw">while</span> (choice != <span class="st">"0"</span>)
+    {
+        <span class="fn">ShowMenu</span>();
+        choice = Console.<span class="fn">ReadLine</span>() ?? <span class="st">"0"</span>;
+
+        <span class="kw">switch</span> (choice)
+        {
+            <span class="kw">case</span> <span class="st">"1"</span>: <span class="fn">ShowStudents</span>(studentRepo); <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="st">"2"</span>: <span class="fn">ShowCourses</span>(courseRepo);   <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="st">"3"</span>: <span class="fn">HandleEnroll</span>(studentRepo, courseRepo, enrollSvc); <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="st">"4"</span>: <span class="fn">HandleGrade</span>(studentRepo, gradeSvc); <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="st">"5"</span>:
+                <span class="kw">var</span> allStudents = studentRepo.<span class="fn">GetAll</span>();
+                <span class="kw">var</span> allCourses  = courseRepo.<span class="fn">GetAll</span>();
+                <span class="kw">foreach</span> (<span class="kw">var</span> r <span class="kw">in</span> reports)
+                {
+                    Console.<span class="fn">WriteLine</span>();
+                    r.<span class="fn">Print</span>(allStudents, allCourses);
+                }
+                <span class="kw">break</span>;
+            <span class="kw">case</span> <span class="st">"0"</span>: Console.<span class="fn">WriteLine</span>(<span class="st">"Goodbye!"</span>); <span class="kw">break</span>;
+            <span class="kw">default</span>: Console.<span class="fn">WriteLine</span>(<span class="st">"Invalid choice. Try again."</span>); <span class="kw">break</span>;
+        }
+    }
+}</pre>
+          </div>
+
+          <div class="callout tip">
+            <span class="callout-icon">💡</span>
+            <p>Lambda expressions <code style="font-family:'JetBrains Mono';font-size:12px;">(s, c) => Console.WriteLine(...)</code> are used to subscribe event handlers inline. This is the same as writing a separate static method and subscribing it — just more concise when the handler is short.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="phase" id="checklist">
+      <div class="phase-header">
+        <span class="phase-num">CHECKLIST</span>
+        <h2>Is your Capstone 3 complete?</h2>
+      </div>
+      <div class="phase-body">
+        <ul class="checklist">
+          <li><span class="chk"></span><span><code>ErpStatus</code> enum is used in <code>ErpStudent</code></span></li>
+          <li><span class="chk"></span><span>Both model classes use properties with getters and setters</span></li>
+          <li><span class="chk"></span><span>Repositories use Dictionary internally and expose clean methods</span></li>
+          <li><span class="chk"></span><span><code>EnrollmentService</code> fires an event on successful enrollment</span></li>
+          <li><span class="chk"></span><span><code>AlreadyEnrolledException</code> is thrown and caught correctly</span></li>
+          <li><span class="chk"></span><span>Both services have two event subscribers each</span></li>
+          <li><span class="chk"></span><span><code>IErpReport</code> interface is implemented by both report classes</span></li>
+          <li><span class="chk"></span><span>LINQ is used inside the analytics report (Where, Average, OrderBy, Count)</span></li>
+          <li><span class="chk"></span><span>The main menu loop handles all 5 options plus invalid input</span></li>
+          <li><span class="chk"></span><span>Errors are caught and logged — the app never crashes on bad input</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Extend it -->
+    <div class="phase" id="extend" style="border-color:rgba(76,175,130,0.25);">
+      <div class="phase-header" style="background:rgba(76,175,130,0.04);">
+        <span class="phase-num" style="background:var(--green);">EXTEND IT</span>
+        <h2>Finished? These challenges push further</h2>
+      </div>
+      <div class="phase-body">
+        <div class="extension">
+          <div class="extension-title">Beyond Capstone 3</div>
+          <ul>
+            <li>Add a menu option 6 — <strong>Remove Student</strong>. Throw a custom exception if the student has an active enrollment. Catch it and prompt the user to unenroll first.</li>
+            <li>Add a <code style="font-family:'JetBrains Mono';font-size:12px;">CourseLevel</code> enum to <code style="font-family:'JetBrains Mono';font-size:12px;">ErpCourse</code> and filter the analytics report by level using LINQ.</li>
+            <li>Add a third report: <strong>Fee Summary</strong> — for each enrolled student, print their course fee with GST. Use LINQ to compute the total revenue.</li>
+            <li>Make the app remember changes between runs by writing the student list to a text file on exit and reading it back on startup. (Preview of Module 11 — File I/O.)</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:16px; padding:16px; background:rgba(201,168,76,0.06); border:1px solid rgba(201,168,76,0.2); border-radius:6px;">
+          <div style="font-size:12px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">What comes next</div>
+          <p style="font-size:13.5px; color:var(--text-dim);">You have now used all 9 foundational modules in a real application. The next phase of the course (Days 4–5) introduces <strong>Inheritance, Polymorphism, File I/O, Generics, and Entity Framework Core</strong> — where this same ERP application gets a real database, proper class hierarchy, and generic repositories.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div>
+        <strong style="color:var(--gold);">RR Skillverse</strong> &nbsp;·&nbsp;
+        Raushan Ranjan, MCT &nbsp;·&nbsp;
+        Koenig Solutions, Noida
+      </div>
+      <div class="nav-btns">
+        <a class="nav-btn" href="capstone2.html">← Capstone 2</a>
+        <a class="nav-btn" href="index.html">Back to Home →</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+  const headings = document.querySelectorAll('[id]');
+  const sideLinks = document.querySelectorAll('.sidebar a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    headings.forEach(h => { if (window.scrollY >= h.offsetTop - 100) current = h.id; });
+    sideLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+  });
+</script>
+</body>
+</html>
