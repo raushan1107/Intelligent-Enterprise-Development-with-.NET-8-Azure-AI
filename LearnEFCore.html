@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EF Core Lab — Code First &amp; Database First | RR Skillverse</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0f1117; --surface:#1a1f2e; --surface2:#141824; --surface3:#0a0c14;
+  --border:#2a3044; --border2:#1e2538;
+  --gold:#c9a84c; --gold-dim:#a07830; --gold-glow:rgba(201,168,76,.12);
+  --text:#d4d8e8; --text-dim:#7a8099; --text-mute:#3e4560;
+  --green:#4caf82; --green-bg:rgba(76,175,130,.09);
+  --blue:#4a90d9; --blue-bg:rgba(74,144,217,.08);
+  --red:#e05c5c; --red-bg:rgba(224,92,92,.08);
+  --orange:#e09060; --purple:#9b7ae8;
+  --cf:#2d7a4f; --cf-bg:rgba(45,122,79,.1); --cf-border:rgba(45,122,79,.25);
+  --db:#1c5bde; --db-bg:rgba(28,91,222,.1); --db-border:rgba(28,91,222,.25);
+  --code-bg:#080b12;
+  --radius:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.75}
+
+/* ── Topbar ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-dot{width:28px;height:28px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0f1117}
+.brand-name{font-weight:600;font-size:15px}
+.brand-sub{font-size:11px;color:var(--text-dim);margin-left:5px}
+.tnav{display:flex;gap:4px}
+.tnav a{font-size:13px;color:var(--text-dim);text-decoration:none;padding:5px 11px;border-radius:5px;transition:.2s}
+.tnav a:hover,.tnav a.active{color:var(--gold);background:var(--gold-glow)}
+
+/* ── Progress Strip ── */
+.pstrip{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:55px;z-index:200}
+.ps-lbl{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+.ps-bar{flex:1;height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+.ps-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:10px;transition:width .5s ease;width:0%}
+.ps-cnt{font-size:12px;font-weight:700;color:var(--gold);white-space:nowrap;min-width:68px;text-align:right}
+
+/* ── Layout ── */
+.layout{display:flex;min-height:calc(100vh - 100px)}
+
+/* ── Sidebar ── */
+.sidebar{width:244px;min-width:244px;background:var(--surface);border-right:1px solid var(--border);padding:16px 0 60px;position:sticky;top:100px;height:calc(100vh - 100px);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border)}
+.sb-sec{padding:14px 16px 5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-mute)}
+.sb-divider{margin:8px 16px;height:1px;background:var(--border2)}
+.sb-a{display:flex;align-items:center;gap:9px;padding:7px 16px 7px 14px;font-size:12.5px;color:var(--text-dim);text-decoration:none;border-left:2px solid transparent;transition:.15s;cursor:pointer}
+.sb-a:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sb-a.sl-active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-glow)}
+.sb-a.sl-done{color:var(--green)}
+.sb-a.sl-done .sb-tick{background:var(--green);border-color:var(--green);color:#fff}
+.sb-tick{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:.3s;color:var(--text-mute)}
+.sb-n{font-size:10px;color:var(--text-mute);font-weight:600;min-width:16px}
+.sb-cf-tag{font-size:9px;font-weight:700;background:var(--cf-bg);color:var(--cf);border:1px solid var(--cf-border);padding:1px 5px;border-radius:3px;margin-left:auto;flex-shrink:0}
+.sb-db-tag{font-size:9px;font-weight:700;background:var(--db-bg);color:#6b9fe8;border:1px solid var(--db-border);padding:1px 5px;border-radius:3px;margin-left:auto;flex-shrink:0}
+
+/* ── Main ── */
+.main{flex:1;padding:36px 52px 80px;max-width:960px}
+
+/* ── Hero ── */
+.hero{border-bottom:1px solid var(--border);padding-bottom:28px;margin-bottom:40px}
+.hero-badges{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 10px;border-radius:4px}
+.badge-lab{background:var(--gold-glow);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.badge-ef{background:rgba(74,144,217,.1);color:var(--blue);border:1px solid rgba(74,144,217,.2)}
+.hero h1{font-size:28px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:10px}
+.hero h1 em{color:var(--gold);font-style:normal}
+.hero p{color:var(--text-dim);font-size:14px;max-width:660px;margin-bottom:18px}
+.hero-meta{display:flex;gap:22px;flex-wrap:wrap}
+.meta-i{font-size:12.5px;color:var(--text-dim);display:flex;align-items:center;gap:5px}
+.meta-i b{color:var(--text)}
+
+/* ── Approach Selector ── */
+.approach-tabs{display:flex;gap:0;margin-bottom:36px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.atab{flex:1;padding:18px 24px;cursor:pointer;transition:.2s;border:none;background:var(--surface);display:flex;flex-direction:column;gap:6px;text-align:left}
+.atab:first-child{border-right:1px solid var(--border)}
+.atab.active-tab{background:var(--surface2)}
+.atab-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.atab-title{font-size:16px;font-weight:700;color:#fff}
+.atab-desc{font-size:12.5px;color:var(--text-dim);line-height:1.5}
+.atab.active-tab .atab-label{color:var(--gold)}
+.atab.cf-tab .atab-label{color:var(--cf)}
+.atab.db-tab .atab-label{color:var(--blue)}
+.atab-indicator{height:3px;border-radius:3px;margin-top:8px;width:40px}
+.atab.cf-tab .atab-indicator{background:var(--cf)}
+.atab.db-tab .atab-indicator{background:var(--blue)}
+
+/* ── Section ── */
+.lab-section{margin-bottom:44px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.section-pill{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
+.section-head h2{font-size:18px;font-weight:700;color:#fff}
+.section-sub{font-size:13px;color:var(--text-dim);margin:-12px 0 20px}
+
+/* ── Comparison table ── */
+.compare-table{width:100%;border-collapse:collapse;margin:16px 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.compare-table th{background:var(--surface);padding:12px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);text-align:left;border-bottom:1px solid var(--border)}
+.compare-table th:first-child{width:200px}
+.compare-table th.cf-h{color:var(--cf)}
+.compare-table th.db-h{color:var(--blue)}
+.compare-table td{padding:11px 16px;font-size:13.5px;border-bottom:1px solid var(--border2);color:var(--text)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:hover td{background:rgba(255,255,255,.015)}
+.compare-table td:first-child{color:var(--text-dim);font-size:12.5px;font-weight:600}
+
+/* ── Step Card ── */
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;transition:border-color .3s}
+.step-card.is-done{border-color:rgba(76,175,130,.3)}
+.step-card.is-open{border-color:rgba(201,168,76,.2)}
+.step-head{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;cursor:pointer;user-select:none}
+.step-num{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text-mute);flex-shrink:0;background:var(--surface2);transition:.3s;margin-top:1px}
+.step-card.is-done .step-num{background:var(--green);border-color:var(--green);color:#fff;font-size:16px}
+.step-card.is-open .step-num{border-color:var(--gold);color:var(--gold)}
+.step-info{flex:1}
+.step-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.step-card.is-done .step-tag{color:var(--green)}
+.step-title{font-size:15px;font-weight:600;color:#fff;line-height:1.4}
+.step-card.is-done .step-title{color:var(--green)}
+.step-arr{font-size:11px;color:var(--text-mute);margin-top:12px;flex-shrink:0;transition:transform .25s}
+.step-card.is-open .step-arr{transform:rotate(180deg)}
+.step-body{display:none;padding:0 20px 24px 70px}
+.step-card.is-open .step-body{display:block}
+
+/* ── Sub-steps ── */
+.sub-steps{display:flex;flex-direction:column;gap:18px;margin:16px 0}
+.sub-step{display:flex;gap:14px;align-items:flex-start}
+.sub-bullet{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.sub-bullet.cf{background:var(--cf-bg);border:1px solid var(--cf-border);color:var(--cf)}
+.sub-bullet.db{background:var(--db-bg);border:1px solid var(--db-border);color:#6b9fe8}
+.sub-bullet.gen{background:var(--gold-glow);border:1px solid rgba(201,168,76,.3);color:var(--gold)}
+.sub-content{flex:1}
+.sub-content p{font-size:14px;color:var(--text);margin-bottom:8px}
+.sub-content p strong{color:#fff}
+.sub-note{font-size:12.5px;color:var(--text-dim);margin-top:4px;line-height:1.6}
+
+/* ── VS Guide boxes ── */
+.vs-guide{background:rgba(74,144,217,.06);border:1px solid rgba(74,144,217,.2);border-radius:6px;padding:16px 18px;margin:12px 0}
+.vs-guide-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.vs-guide ol{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.vs-guide ol li{font-size:13.5px;color:var(--text);line-height:1.6}
+.vs-guide ol li strong{color:#fff}
+.vs-guide ul{padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.vs-guide ul li{font-size:13.5px;color:var(--text)}
+
+/* ── Code Block ── */
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;margin:10px 0;overflow:hidden}
+.code-head{background:var(--surface);padding:7px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.code-head span{font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+.code-head-right{display:flex;align-items:center;gap:8px}
+.file-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.4px}
+.file-cs{background:rgba(124,75,158,.15);color:#b08ad8;border:1px solid rgba(124,75,158,.25)}
+.file-sql{background:rgba(74,144,217,.12);color:#7ab4e8;border:1px solid rgba(74,144,217,.2)}
+.file-xml{background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.file-term{background:rgba(76,175,130,.1);color:var(--green);border:1px solid rgba(76,175,130,.2)}
+.copy-btn{font-size:11px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:3px;padding:2px 9px;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s}
+.copy-btn:hover{color:var(--gold);border-color:var(--gold-dim)}
+.copy-btn.ok{color:var(--green);border-color:var(--green)}
+pre{padding:16px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;color:#bfc8e0}
+.kw{color:#7eb8f7}.cm{color:#3d4f62;font-style:italic}.st{color:#9ecf7a}
+.nm{color:#f0c070}.fn{color:#e09060}.tp{color:#85c5e5}.at{color:#c792ea}
+.sql-kw{color:#7eb8f7}.sql-fn{color:#e09060}.sql-type{color:#85c5e5}.sql-cm{color:#3d4f62;font-style:italic}
+
+/* ── Output box ── */
+.out-wrap{margin:10px 0}
+.out-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-family:'JetBrains Mono',monospace;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.out-lbl::before{content:'';display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%}
+.out-box{background:#060810;border:1px solid var(--border);border-left:3px solid var(--green);border-radius:6px;padding:14px 16px}
+.out-box pre{padding:0;color:#5fa85f;font-size:13px}
+
+/* ── Callouts ── */
+.callout{border-radius:6px;padding:13px 16px;margin:12px 0;font-size:13.5px;border-left:3px solid;display:flex;gap:10px}
+.callout-icon{flex-shrink:0;font-size:15px;margin-top:1px}
+.callout.tip{background:var(--green-bg);border-color:var(--green)}
+.callout.info{background:var(--blue-bg);border-color:var(--blue)}
+.callout.warn{background:var(--gold-glow);border-color:var(--gold)}
+.callout.danger{background:var(--red-bg);border-color:var(--red)}
+.callout p{margin:0;color:var(--text);font-size:13.5px;line-height:1.6}
+.callout strong{color:#fff}
+
+/* ── Screenshot guide ── */
+.ss-guide{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:16px 18px;margin:12px 0}
+.ss-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:10px}
+.ss-path{background:var(--code-bg);border:1px solid var(--border);border-radius:4px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);margin-bottom:8px}
+.ss-path span{color:var(--text-dim)}
+.ss-note{font-size:12.5px;color:var(--text-dim);line-height:1.6}
+
+/* ── NuGet visual guide ── */
+.nuget-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.nuget-table th{background:var(--surface);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);text-align:left;border-bottom:1px solid var(--border)}
+.nuget-table td{padding:10px 14px;border-bottom:1px solid var(--border2);color:var(--text);vertical-align:top}
+.nuget-table tr:last-child td{border-bottom:none}
+.nuget-table .pkg-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)}
+.nuget-table .pkg-why{font-size:12.5px;color:var(--text-dim)}
+.nuget-req{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase}
+.nuget-req.req{background:rgba(224,92,92,.12);color:var(--red);border:1px solid rgba(224,92,92,.2)}
+.nuget-req.opt{background:var(--gold-glow);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+
+/* ── Experiment box ── */
+.exp-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px}
+.exp-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:2px solid var(--purple);color:var(--purple);font-size:12px;font-weight:700;margin-bottom:10px}
+.exp-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:8px}
+.exp-desc{font-size:13.5px;color:var(--text-dim);margin-bottom:14px;line-height:1.7}
+.exp-tasks{display:flex;flex-direction:column;gap:8px}
+.exp-task{display:flex;gap:10px;align-items:flex-start}
+.exp-check{width:18px;height:18px;border-radius:4px;border:1.5px solid rgba(155,122,232,.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;font-size:10px;color:var(--purple);cursor:pointer;transition:.2s;background:transparent;user-select:none}
+.exp-check:hover{background:rgba(155,122,232,.12)}
+.exp-check.chk{background:rgba(155,122,232,.18);border-color:var(--purple)}
+.exp-task-text{font-size:13.5px;color:var(--text);line-height:1.6}
+
+/* ── Mark done btn ── */
+.done-btn{display:inline-flex;align-items:center;gap:7px;margin-top:20px;background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.3);color:var(--green);font-size:13px;font-weight:600;padding:9px 20px;border-radius:6px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.done-btn:hover:not(:disabled){background:rgba(76,175,130,.18);border-color:var(--green)}
+.done-btn:disabled{opacity:.4;cursor:default}
+
+/* Inline code */
+ic{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);background:rgba(201,168,76,.1);padding:1px 6px;border-radius:3px}
+
+hr.div{border:none;border-top:1px solid var(--border);margin:28px 0}
+
+/* ── Completion ── */
+.completion{display:none;background:linear-gradient(135deg,rgba(76,175,130,.1),rgba(201,168,76,.06));border:1px solid rgba(76,175,130,.3);border-radius:var(--radius);padding:32px;text-align:center;margin-top:40px}
+.completion.show{display:block}
+.completion h3{font-size:22px;color:var(--green);margin-bottom:10px}
+.completion p{color:var(--text-dim);font-size:14px;line-height:1.8}
+
+/* ── Footer ── */
+.lab-foot{border-top:1px solid var(--border);margin-top:56px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text-dim)}
+.lab-foot a{color:var(--gold-dim);text-decoration:none}
+.lab-foot a:hover{color:var(--gold)}
+.next-btn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:13px;padding:9px 18px;border-radius:6px;text-decoration:none;transition:.2s}
+.next-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+@media(max-width:900px){.sidebar{display:none}.main{padding:24px 18px}}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot">RR</div>
+    <div><span class="brand-name">RR Skillverse</span><span class="brand-sub">by Raushan Ranjan, MCT</span></div>
+  </div>
+  <nav class="tnav">
+    <a href="index.html">Home</a>
+    <a href="lab-day5.html">Lab 5</a>
+    <a href="efcore-lab.html" class="active">EF Core Lab</a>
+    <a href="capstone1.html">Capstone</a>
+  </nav>
+</div>
+
+<!-- Progress Strip -->
+<div class="pstrip">
+  <span class="ps-lbl">Lab Progress</span>
+  <div class="ps-bar"><div class="ps-fill" id="ps-fill"></div></div>
+  <span class="ps-cnt" id="ps-cnt">0 / 0</span>
+</div>
+
+<div class="layout">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sb-sec">Overview</div>
+  <a class="sb-a" onclick="gotoId('overview')"><span class="sb-n">00</span><span style="flex:1;font-size:12px">Introduction</span></a>
+  <a class="sb-a" onclick="gotoId('packages')"><span class="sb-n">00</span><span style="flex:1;font-size:12px">NuGet Packages</span></a>
+
+  <div class="sb-divider"></div>
+  <div class="sb-sec">Part 1 — Code First</div>
+  <a class="sb-a" onclick="gotoId('cf1')" data-sid="cf1"><span class="sb-n">01</span><span style="flex:1;font-size:12px">Create Project</span><span class="sb-tick" id="t-cf1">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf2')" data-sid="cf2"><span class="sb-n">02</span><span style="flex:1;font-size:12px">Install NuGet</span><span class="sb-tick" id="t-cf2">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf3')" data-sid="cf3"><span class="sb-n">03</span><span style="flex:1;font-size:12px">Employee Entity</span><span class="sb-tick" id="t-cf3">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf4')" data-sid="cf4"><span class="sb-n">04</span><span style="flex:1;font-size:12px">AppDbContext</span><span class="sb-tick" id="t-cf4">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf5')" data-sid="cf5"><span class="sb-n">05</span><span style="flex:1;font-size:12px">Add Migration</span><span class="sb-tick" id="t-cf5">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf6')" data-sid="cf6"><span class="sb-n">06</span><span style="flex:1;font-size:12px">Update Database</span><span class="sb-tick" id="t-cf6">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf7')" data-sid="cf7"><span class="sb-n">07</span><span style="flex:1;font-size:12px">CRUD in Program.cs</span><span class="sb-tick" id="t-cf7">✓</span></a>
+  <a class="sb-a" onclick="gotoId('cf8')" data-sid="cf8"><span class="sb-n">08</span><span style="flex:1;font-size:12px">Add Column Migration</span><span class="sb-tick" id="t-cf8">✓</span></a>
+
+  <div class="sb-divider"></div>
+  <div class="sb-sec">Part 2 — Database First</div>
+  <a class="sb-a" onclick="gotoId('db1')" data-sid="db1"><span class="sb-n">01</span><span style="flex:1;font-size:12px">Create Project</span><span class="sb-tick" id="t-db1">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db2')" data-sid="db2"><span class="sb-n">02</span><span style="flex:1;font-size:12px">Install NuGet</span><span class="sb-tick" id="t-db2">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db3')" data-sid="db3"><span class="sb-n">03</span><span style="flex:1;font-size:12px">Create DB + Tables</span><span class="sb-tick" id="t-db3">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db4')" data-sid="db4"><span class="sb-n">04</span><span style="flex:1;font-size:12px">Scaffold Classes</span><span class="sb-tick" id="t-db4">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db5')" data-sid="db5"><span class="sb-n">05</span><span style="flex:1;font-size:12px">Review Generated Code</span><span class="sb-tick" id="t-db5">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db6')" data-sid="db6"><span class="sb-n">06</span><span style="flex:1;font-size:12px">Program.cs + CRUD</span><span class="sb-tick" id="t-db6">✓</span></a>
+  <a class="sb-a" onclick="gotoId('db7')" data-sid="db7"><span class="sb-n">07</span><span style="flex:1;font-size:12px">Schema Change + Re-scaffold</span><span class="sb-tick" id="t-db7">✓</span></a>
+
+  <div class="sb-divider"></div>
+  <div class="sb-sec">Experiments</div>
+  <a class="sb-a" onclick="gotoId('experiments')"><span style="flex:1;font-size:12px">Try On Your Own</span></a>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+<!-- Hero -->
+<div class="hero" id="overview">
+  <div class="hero-badges">
+    <span class="badge badge-lab">EF Core Lab</span>
+    <span class="badge badge-ef">Entity Framework Core 8</span>
+  </div>
+  <h1>Entity Framework Core — <em>Two Approaches</em></h1>
+  <p>A complete hands-on lab covering both Code First (you design C# classes, EF creates the database) and Database First (database exists first, EF generates your C# classes). Both use Visual Studio 2022 with .NET 8 and LocalDB.</p>
+  <div class="hero-meta">
+    <span class="meta-i">🛠 <b>Visual Studio 2022</b></span>
+    <span class="meta-i">📦 <b>.NET 8.0</b></span>
+    <span class="meta-i">🗄 <b>LocalDB (SQL Server)</b></span>
+    <span class="meta-i">⏱ <b>~2.5 hours</b></span>
+  </div>
+</div>
+
+<!-- Comparison table -->
+<div class="lab-section">
+  <div class="section-head">
+    <span class="section-pill" style="background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)">Before You Start</span>
+    <h2>Code First vs Database First</h2>
+  </div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Aspect</th>
+        <th class="cf-h">Code First</th>
+        <th class="db-h">Database First</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>You create</td><td>C# entity classes</td><td>Tables in SQL Server</td></tr>
+      <tr><td>EF generates</td><td>Database tables via migrations</td><td>C# entity classes via scaffold</td></tr>
+      <tr><td>Key command</td><td><ic>Add-Migration</ic> → <ic>Update-Database</ic></td><td><ic>Scaffold-DbContext</ic></td></tr>
+      <tr><td>Schema changes</td><td>Add C# property → run migration</td><td>ALTER TABLE SQL → re-run scaffold</td></tr>
+      <tr><td>Who controls schema</td><td>Developer (C# code)</td><td>DBA / SQL team</td></tr>
+      <tr><td>Best for</td><td>New greenfield projects</td><td>Existing databases</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout info">
+    <span class="callout-icon">ℹ</span>
+    <p><strong>Both approaches use the same EF Core runtime.</strong> The difference is only in HOW the database and C# classes are created. Once set up, querying, CRUD, and navigation properties work identically.</p>
+  </div>
+</div>
+
+<!-- NuGet Packages Reference -->
+<div class="lab-section" id="packages">
+  <div class="section-head">
+    <span class="section-pill" style="background:rgba(155,122,232,.1);color:var(--purple);border:1px solid rgba(155,122,232,.2)">Reference</span>
+    <h2>NuGet Packages — What Each One Does</h2>
+  </div>
+  <p class="section-sub">Install these through Package Manager. Each step will tell you exactly which ones to install.</p>
+
+  <table class="nuget-table">
+    <thead><tr><th>Package Name</th><th>Why you need it</th><th>Required?</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pkg-name">Microsoft.EntityFrameworkCore</span></td>
+        <td><span class="pkg-why">Core EF library — DbContext, DbSet, LINQ translation. <strong>Pulled in automatically</strong> when you install the SqlServer package. You don't need to install this manually.</span></td>
+        <td><span class="nuget-req req">Auto</span></td>
+      </tr>
+      <tr>
+        <td><span class="pkg-name">Microsoft.EntityFrameworkCore.SqlServer</span></td>
+        <td><span class="pkg-why">SQL Server provider — enables <ic>UseSqlServer()</ic>. Also works with LocalDB. <strong>Install this one.</strong> It brings in the base package automatically.</span></td>
+        <td><span class="nuget-req req">Required</span></td>
+      </tr>
+      <tr>
+        <td><span class="pkg-name">Microsoft.EntityFrameworkCore.Design</span></td>
+        <td><span class="pkg-why">Required for migrations (<ic>Add-Migration</ic>, <ic>Update-Database</ic>) and scaffolding (<ic>Scaffold-DbContext</ic>). Without this, these commands fail.</span></td>
+        <td><span class="nuget-req req">Required</span></td>
+      </tr>
+      <tr>
+        <td><span class="pkg-name">Microsoft.EntityFrameworkCore.Tools</span></td>
+        <td><span class="pkg-why">Adds the EF Core PowerShell commands to Package Manager Console in Visual Studio: <ic>Add-Migration</ic>, <ic>Update-Database</ic>, <ic>Scaffold-DbContext</ic>. <strong>Install this for VS PM Console.</strong></span></td>
+        <td><span class="nuget-req req">Required</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-icon">⚠</span>
+    <p><strong>Version must match your .NET version.</strong> For .NET 8, install version <ic>8.0.x</ic> of all packages. Mixing versions (e.g. SqlServer 8.x with Tools 7.x) causes build errors.</p>
+  </div>
+</div>
+
+<hr class="div"/>
+
+
+<!-- ═══════════════════════════════════════════════
+     PART 1 — CODE FIRST
+═══════════════════════════════════════════════ -->
+<div class="lab-section">
+  <div class="section-head">
+    <span class="section-pill" style="background:var(--cf-bg);color:var(--cf);border:1px solid var(--cf-border)">Part 1 — Code First</span>
+    <h2>Code First Approach</h2>
+  </div>
+  <p class="section-sub">You write C# classes → EF Core creates the database. Project name: <ic>EFCodeFirst</ic></p>
+
+
+  <!-- CF Step 1: Create Project -->
+  <div class="step-card is-open" id="cf1">
+    <div class="step-head" onclick="toggle('cf1')">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 1</div>
+        <div class="step-title">Create a new Console App project in Visual Studio 2022</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="vs-guide">
+        <div class="vs-guide-title">🖥 Visual Studio 2022</div>
+        <ol>
+          <li>Open <strong>Visual Studio 2022</strong></li>
+          <li>On the start screen, click <strong>"Create a new project"</strong></li>
+          <li>In the search box, type <strong>Console</strong> and select <strong>Console App</strong> (make sure it says <strong>C#</strong> and <strong>.NET</strong> — not .NET Framework)</li>
+          <li>Click <strong>Next</strong></li>
+          <li>Project name: <strong>EFCodeFirst</strong></li>
+          <li>Choose a location (e.g. your Desktop or Documents folder)</li>
+          <li>Click <strong>Next</strong></li>
+          <li>Framework: select <strong>.NET 8.0 (Long Term Support)</strong></li>
+          <li>Click <strong>Create</strong></li>
+        </ol>
+      </div>
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p>Visual Studio creates <ic>Program.cs</ic> automatically and opens it. You will see <ic>Console.WriteLine("Hello, World!");</ic> — you will replace this later.</p>
+      </div>
+      <div class="out-wrap">
+        <div class="out-lbl">Solution Explorer should show</div>
+        <div class="out-box"><pre>EFCodeFirst (Solution)
+└── EFCodeFirst (Project)
+    ├── Program.cs
+    └── EFCodeFirst.csproj</pre></div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf1')">✓ Project created — I can see EFCodeFirst in Solution Explorer</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 2: Install NuGet -->
+  <div class="step-card" id="cf2">
+    <div class="step-head" onclick="toggle('cf2')">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 2</div>
+        <div class="step-title">Install NuGet packages via Package Manager</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px">We install 3 packages. All through the Visual Studio NuGet UI — no terminal needed.</p>
+
+      <div class="vs-guide">
+        <div class="vs-guide-title">📦 Open NuGet Package Manager</div>
+        <ol>
+          <li>In the top menu: <strong>Tools → NuGet Package Manager → Manage NuGet Packages for Solution…</strong></li>
+          <li>Click the <strong>Browse</strong> tab</li>
+          <li>Make sure <strong>"Include prerelease"</strong> is <strong>unchecked</strong></li>
+        </ol>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet gen">A</div>
+          <div class="sub-content">
+            <p><strong>Search and install: Microsoft.EntityFrameworkCore.SqlServer</strong></p>
+            <p>In the search box type: <ic>Microsoft.EntityFrameworkCore.SqlServer</ic></p>
+            <p>Click on it in the results. On the right side, tick the checkbox next to <strong>EFCodeFirst</strong>. In the Version dropdown, select <strong>8.0.x</strong> (latest 8.x). Click <strong>Install</strong>. Accept the license if prompted.</p>
+            <p class="sub-note">✓ This also auto-installs Microsoft.EntityFrameworkCore (the base package). You will see it appear in the Installed tab.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet gen">B</div>
+          <div class="sub-content">
+            <p><strong>Search and install: Microsoft.EntityFrameworkCore.Tools</strong></p>
+            <p>Search for: <ic>Microsoft.EntityFrameworkCore.Tools</ic></p>
+            <p>Select version <strong>8.0.x</strong> → tick <strong>EFCodeFirst</strong> → <strong>Install</strong>.</p>
+            <p class="sub-note">✓ This adds the <ic>Add-Migration</ic> and <ic>Update-Database</ic> commands to the Package Manager Console.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet gen">C</div>
+          <div class="sub-content">
+            <p><strong>Search and install: Microsoft.EntityFrameworkCore.Design</strong></p>
+            <p>Search for: <ic>Microsoft.EntityFrameworkCore.Design</ic></p>
+            <p>Select version <strong>8.0.x</strong> → tick <strong>EFCodeFirst</strong> → <strong>Install</strong>.</p>
+            <p class="sub-note">✓ Required for migrations to work. Without this, <ic>Add-Migration</ic> fails with a design-time error.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs-guide">
+        <div class="vs-guide-title">✅ Verify — check the .csproj file</div>
+        <ol>
+          <li>In Solution Explorer, double-click <strong>EFCodeFirst.csproj</strong></li>
+          <li>You should see all three PackageReference entries inside <ic>&lt;ItemGroup&gt;</ic></li>
+        </ol>
+      </div>
+      <div class="code-block">
+        <div class="code-head"><span>EFCodeFirst.csproj — should contain these lines</span><span class="file-tag file-xml">XML</span></div>
+        <pre>&lt;ItemGroup&gt;
+  &lt;PackageReference Include=<span class="st">"Microsoft.EntityFrameworkCore.SqlServer"</span> Version=<span class="st">"8.0.x"</span> /&gt;
+  &lt;PackageReference Include=<span class="st">"Microsoft.EntityFrameworkCore.Tools"</span> Version=<span class="st">"8.0.x"</span> /&gt;
+  &lt;PackageReference Include=<span class="st">"Microsoft.EntityFrameworkCore.Design"</span> Version=<span class="st">"8.0.x"</span> /&gt;
+&lt;/ItemGroup&gt;</pre>
+      </div>
+      <div class="callout warn">
+        <span class="callout-icon">⚠</span>
+        <p><strong>If you see a build error after installing</strong> — go to Build → Rebuild Solution. If it still fails, check that all three packages are version 8.x, not 7.x or 9.x.</p>
+      </div>
+      <button class="done-btn" onclick="markDone('cf2')">✓ 3 packages installed — .csproj shows all 3 PackageReference lines</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 3: Employee entity -->
+  <div class="step-card" id="cf3">
+    <div class="step-head" onclick="toggle('cf3')">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 3</div>
+        <div class="step-title">Create the Employee entity class</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="concept-box" style="background:var(--cf-bg);border:1px solid var(--cf-border);border-radius:6px;padding:16px 18px;margin-bottom:16px">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--cf);margin-bottom:8px">🧠 What is an Entity?</p>
+        <p style="font-size:13.5px;color:var(--text);margin-bottom:6px">An <strong>entity</strong> is a plain C# class that maps to a database table. EF Core reads your class and generates <ic>CREATE TABLE</ic> SQL automatically. Each property becomes a column. The naming convention <ic>Id</ic> or <ic>EmployeeId</ic> is automatically treated as the Primary Key.</p>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>Add a new file called Employee.cs</strong></p>
+            <p>In Solution Explorer → right-click <strong>EFCodeFirst</strong> (the project) → <strong>Add → New Item</strong> → select <strong>C# Class</strong> → name it <strong>Employee.cs</strong> → click <strong>Add</strong></p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>Replace the entire content of Employee.cs with this code:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>Employee.cs</span><div class="code-head-right"><span class="file-tag file-cs">C#</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="kw">using</span> System.ComponentModel.DataAnnotations;
+<span class="kw">using</span> System.ComponentModel.DataAnnotations.Schema;
+
+<span class="kw">namespace</span> EFCodeFirst;
+
+<span class="cm">// This class = one table in the database: dbo.Employees</span>
+<span class="cm">// EF Core reads the properties and creates matching columns</span>
+<span class="kw">public class</span> <span class="tp">Employee</span>
+{
+    <span class="cm">// int Id = EF Core auto-makes this the Primary Key</span>
+    <span class="cm">// SQL Server assigns numbers automatically: 1, 2, 3...</span>
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cm">// [Required]   → NOT NULL column (cannot be empty)</span>
+    <span class="cm">// [MaxLength]  → nvarchar(100) instead of nvarchar(max)</span>
+    [<span class="at">Required</span>]
+    [<span class="at">MaxLength</span>(<span class="nm">100</span>)]
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="st">""</span>;
+
+    [<span class="at">Required</span>]
+    [<span class="at">MaxLength</span>(<span class="nm">150</span>)]
+    <span class="kw">public string</span> Email { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="st">""</span>;
+
+    [<span class="at">Required</span>]
+    [<span class="at">MaxLength</span>(<span class="nm">50</span>)]
+    <span class="kw">public string</span> Department { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="st">""</span>;
+
+    <span class="cm">// [Column(TypeName)] → exact SQL Server column type</span>
+    <span class="cm">// Without this, decimal defaults to decimal(18,2) but it's good practice to be explicit</span>
+    [<span class="at">Column</span>(TypeName = <span class="st">"decimal(18,2)"</span>)]
+    <span class="kw">public decimal</span> Salary { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="tp">DateTime</span> JoiningDate { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cm">// IsActive = soft-delete flag</span>
+    <span class="cm">// When we "delete" an employee, we set this to false</span>
+    <span class="cm">// instead of physically removing the row</span>
+    <span class="kw">public bool</span> IsActive { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">true</span>;
+
+    <span class="cm">// ToString() for easy Console.WriteLine output</span>
+    <span class="kw">public override string</span> <span class="fn">ToString</span>() =>
+        <span class="st">$"[{Id}] {Name,-20} | {Department,-12} | ₹{Salary,8} | Active:{IsActive}"</span>;
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p><strong>Build the project</strong> to confirm no errors: <strong>Build → Build Solution</strong> (or press <strong>Ctrl+Shift+B</strong>)</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected — Output window</div>
+              <div class="out-box"><pre>Build succeeded.
+0 Error(s)    0 Warning(s)</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf3')">✓ Employee.cs created — Build succeeded with 0 errors</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 4: AppDbContext -->
+  <div class="step-card" id="cf4">
+    <div class="step-head" onclick="toggle('cf4')">
+      <div class="step-num">4</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 4</div>
+        <div class="step-title">Create AppDbContext — your gateway to the database</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--cf-bg);border:1px solid var(--cf-border);border-radius:6px;padding:16px 18px;margin-bottom:16px">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--cf);margin-bottom:8px">🧠 What is DbContext?</p>
+        <p style="font-size:13.5px;color:var(--text);margin-bottom:6px"><strong>DbContext</strong> is your connection to the database. One <ic>DbSet&lt;T&gt;</ic> = one table. <ic>OnConfiguring</ic> is where you tell EF Core which database server and database to use. <ic>SaveChanges()</ic> sends all pending INSERT/UPDATE/DELETE in one transaction.</p>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>Add a new file called AppDbContext.cs</strong> (same way as Employee.cs)</p>
+            <p>Right-click project → Add → New Item → C# Class → <strong>AppDbContext.cs</strong> → Add</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>Paste this code into AppDbContext.cs:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>AppDbContext.cs</span><div class="code-head-right"><span class="file-tag file-cs">C#</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="kw">using</span> Microsoft.EntityFrameworkCore;
+
+<span class="kw">namespace</span> EFCodeFirst;
+
+<span class="kw">public class</span> <span class="tp">AppDbContext</span> : <span class="tp">DbContext</span>
+{
+    <span class="cm">// DbSet = represents the Employees table</span>
+    <span class="cm">// EF Core generates: CREATE TABLE Employees (...)</span>
+    <span class="cm">// Property name 'Employees' = table name in the database</span>
+    <span class="kw">public</span> <span class="tp">DbSet</span>&lt;<span class="tp">Employee</span>&gt; Employees { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">protected override void</span> <span class="fn">OnConfiguring</span>(<span class="tp">DbContextOptionsBuilder</span> options)
+    {
+        <span class="cm">// UseSqlServer = connect to SQL Server / LocalDB</span>
+        <span class="cm">// (localdb)\MSSQLLocalDB = LocalDB that ships with Visual Studio</span>
+        <span class="cm">// Database=EFCodeFirstDB = EF Core creates this database if it doesn't exist</span>
+        <span class="cm">// Trusted_Connection=True = use Windows Authentication (no username/password needed)</span>
+        <span class="cm">// TrustServerCertificate=True = avoid SSL certificate warnings for LocalDB</span>
+        options.<span class="fn">UseSqlServer</span>(
+            <span class="st">@"Server=(localdb)\MSSQLLocalDB;"</span> +
+            <span class="st">"Database=EFCodeFirstDB;"</span> +
+            <span class="st">"Trusted_Connection=True;"</span> +
+            <span class="st">"TrustServerCertificate=True;"</span>
+        );
+    }
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p>Press <strong>Ctrl+Shift+B</strong> to build. Confirm <strong>0 errors</strong>.</p>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf4')">✓ AppDbContext.cs created — Build succeeded with 0 errors</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 5: Add Migration -->
+  <div class="step-card" id="cf5">
+    <div class="step-head" onclick="toggle('cf5')">
+      <div class="step-num">5</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 5</div>
+        <div class="step-title">Add the first migration — EF Core reads your classes and generates SQL</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--cf-bg);border:1px solid var(--cf-border);border-radius:6px;padding:16px 18px;margin-bottom:16px">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--cf);margin-bottom:8px">🧠 What is a Migration?</p>
+        <p style="font-size:13.5px;color:var(--text);margin-bottom:0">A migration is a <strong>versioned snapshot of your schema</strong>. EF Core reads your entity classes, compares them to the previous migration, and generates a C# file with <ic>Up()</ic> (apply changes) and <ic>Down()</ic> (undo changes) methods. Think of it as git for your database schema.</p>
+      </div>
+
+      <div class="vs-guide">
+        <div class="vs-guide-title">📦 Open Package Manager Console</div>
+        <ol>
+          <li>In the top menu: <strong>Tools → NuGet Package Manager → Package Manager Console</strong></li>
+          <li>A console panel opens at the bottom of Visual Studio</li>
+          <li>Make sure the <strong>Default project</strong> dropdown (top of the console) shows <strong>EFCodeFirst</strong></li>
+        </ol>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>Run this command in Package Manager Console:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre>Add-Migration InitialCreate</pre>
+            </div>
+            <p class="sub-note">Wait for it to complete. It may take 10–20 seconds the first time.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>Confirm the Migrations folder was created</strong> in Solution Explorer:</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Solution Explorer — new files</div>
+              <div class="out-box"><pre>EFCodeFirst
+├── Migrations/
+│   ├── 20250512xxxxxx_InitialCreate.cs   ← the migration
+│   └── AppDbContextModelSnapshot.cs      ← current schema snapshot
+├── AppDbContext.cs
+├── Employee.cs
+└── Program.cs</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p><strong>Open the generated migration file</strong> — double-click <ic>20250512xxxxxx_InitialCreate.cs</ic> in Solution Explorer and read it:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Generated Migration — read this, understand it</span><div class="code-head-right"><span class="file-tag file-cs">C#</span></div></div>
+              <pre><span class="cm">// EF Core generated this entire file from your Employee.cs class</span>
+<span class="cm">// You did not write any SQL — EF Core wrote it for you</span>
+
+<span class="kw">protected override void</span> <span class="fn">Up</span>(<span class="tp">MigrationBuilder</span> migrationBuilder)
+{
+    migrationBuilder.<span class="fn">CreateTable</span>(
+        name: <span class="st">"Employees"</span>,
+        columns: table => <span class="kw">new</span>
+        {
+            Id         = table.<span class="fn">Column</span>&lt;<span class="kw">int</span>&gt;(nullable: <span class="kw">false</span>)
+                              .<span class="fn">Annotation</span>(<span class="st">"SqlServer:Identity"</span>, <span class="st">"1, 1"</span>),
+            Name       = table.<span class="fn">Column</span>&lt;<span class="kw">string</span>&gt;(maxLength: <span class="nm">100</span>, nullable: <span class="kw">false</span>),
+            Email      = table.<span class="fn">Column</span>&lt;<span class="kw">string</span>&gt;(maxLength: <span class="nm">150</span>, nullable: <span class="kw">false</span>),
+            Department = table.<span class="fn">Column</span>&lt;<span class="kw">string</span>&gt;(maxLength: <span class="nm">50</span>, nullable: <span class="kw">false</span>),
+            Salary     = table.<span class="fn">Column</span>&lt;<span class="kw">decimal</span>&gt;(type: <span class="st">"decimal(18,2)"</span>),
+            JoiningDate= table.<span class="fn">Column</span>&lt;<span class="tp">DateTime</span>&gt;(),
+            IsActive   = table.<span class="fn">Column</span>&lt;<span class="kw">bool</span>&gt;(defaultValue: <span class="kw">true</span>)
+        },
+        constraints: table => table.<span class="fn">PrimaryKey</span>(<span class="st">"PK_Employees"</span>, x => x.Id)
+    );
+}
+
+<span class="cm">// Down() = UNDO this migration (drops the table)</span>
+<span class="kw">protected override void</span> <span class="fn">Down</span>(<span class="tp">MigrationBuilder</span> migrationBuilder)
+{
+    migrationBuilder.<span class="fn">DropTable</span>(name: <span class="st">"Employees"</span>);
+}</pre>
+            </div>
+            <p class="sub-note">This is version control for your database. <ic>Up()</ic> applies the change. <ic>Down()</ic> undoes it. EF Core tracks which migrations have been applied in <ic>dbo.__EFMigrationsHistory</ic>.</p>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf5')">✓ Migration created — I can see the Migrations folder in Solution Explorer</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 6: Update Database -->
+  <div class="step-card" id="cf6">
+    <div class="step-head" onclick="toggle('cf6')">
+      <div class="step-num">6</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 6</div>
+        <div class="step-title">Update-Database — apply the migration to LocalDB</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>In Package Manager Console, run:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre>Update-Database</pre>
+            </div>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected PM Console output</div>
+              <div class="out-box"><pre>Build started...
+Build succeeded.
+Applying migration '20250512xxxxxx_InitialCreate'.
+Done.</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>Verify the database was created in SQL Server Object Explorer:</strong></p>
+            <div class="ss-guide">
+              <div class="ss-title">📂 SQL Server Object Explorer navigation</div>
+              <div class="ss-path"><span>View →</span> SQL Server Object Explorer <span>→</span> SQL Server <span>→</span> (localdb)\MSSQLLocalDB <span>→</span> Databases <span>→</span> EFCodeFirstDB <span>→</span> Tables</div>
+              <div class="ss-note">You should see <ic>dbo.Employees</ic> and <ic>dbo.__EFMigrationsHistory</ic>. Right-click <ic>dbo.Employees</ic> → <strong>View Designer</strong> to confirm the column names and types match your Employee class.</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p><strong>Right-click dbo.Employees → View Data</strong> — the table is empty for now. You will insert data in the next step.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p><strong>__EFMigrationsHistory</strong> is how EF Core tracks which migrations have run. It records the migration name and EF Core version. Never edit this table manually — it is EF Core's own tracking system.</p>
+      </div>
+      <button class="done-btn" onclick="markDone('cf6')">✓ I can see dbo.Employees in SQL Server Object Explorer</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 7: CRUD -->
+  <div class="step-card" id="cf7">
+    <div class="step-head" onclick="toggle('cf7')">
+      <div class="step-num">7</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 7</div>
+        <div class="step-title">Full CRUD in Program.cs — Add, Read, Update, Delete</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>Open Program.cs and replace ALL content with this code:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>Program.cs — Complete CRUD Demo</span><div class="code-head-right"><span class="file-tag file-cs">C#</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="kw">using</span> EFCodeFirst;
+
+Console.<span class="fn">WriteLine</span>(<span class="st">"=== EF Core — Code First Demo ==="</span>);
+Console.<span class="fn">WriteLine</span>();
+
+<span class="cm">// 'using' ensures the database connection closes cleanly when done</span>
+<span class="kw">using</span> <span class="tp">AppDbContext</span> context = <span class="kw">new</span> <span class="tp">AppDbContext</span>();
+
+<span class="cm">// ── ADD (INSERT) ─────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 1 — Adding 3 employees..."</span>);
+
+<span class="tp">Employee</span> emp1 = <span class="kw">new</span>()
+{
+    Name        = <span class="st">"Raushan Ranjan"</span>,
+    Email       = <span class="st">"raushan@rrskillverse.com"</span>,
+    Department  = <span class="st">"Training"</span>,
+    Salary      = <span class="nm">85000m</span>,
+    JoiningDate = <span class="kw">new</span> <span class="tp">DateTime</span>(<span class="nm">2020</span>, <span class="nm">6</span>, <span class="nm">1</span>),
+    IsActive    = <span class="kw">true</span>
+};
+<span class="tp">Employee</span> emp2 = <span class="kw">new</span>()
+{
+    Name        = <span class="st">"Priya Sharma"</span>,
+    Email       = <span class="st">"priya@example.com"</span>,
+    Department  = <span class="st">"Development"</span>,
+    Salary      = <span class="nm">72000m</span>,
+    JoiningDate = <span class="kw">new</span> <span class="tp">DateTime</span>(<span class="nm">2021</span>, <span class="nm">3</span>, <span class="nm">15</span>),
+    IsActive    = <span class="kw">true</span>
+};
+<span class="tp">Employee</span> emp3 = <span class="kw">new</span>()
+{
+    Name        = <span class="st">"Rahul Gupta"</span>,
+    Email       = <span class="st">"rahul@example.com"</span>,
+    Department  = <span class="st">"HR"</span>,
+    Salary      = <span class="nm">60000m</span>,
+    JoiningDate = <span class="tp">DateTime</span>.Today,
+    IsActive    = <span class="kw">true</span>
+};
+
+context.Employees.<span class="fn">Add</span>(emp1);   <span class="cm">// queues INSERT — nothing sent yet</span>
+context.Employees.<span class="fn">Add</span>(emp2);
+context.Employees.<span class="fn">Add</span>(emp3);
+context.<span class="fn">SaveChanges</span>();         <span class="cm">// NOW sends all 3 INSERTs to SQL Server</span>
+
+Console.<span class="fn">WriteLine</span>(<span class="st">$"  ✓ emp1 added — Id={emp1.Id} (SQL Server assigned)"</span>);
+Console.<span class="fn">WriteLine</span>(<span class="st">$"  ✓ emp2 added — Id={emp2.Id}"</span>);
+Console.<span class="fn">WriteLine</span>(<span class="st">$"  ✓ emp3 added — Id={emp3.Id}"</span>);
+
+<span class="cm">// ── READ ALL (SELECT * FROM Employees) ───────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 2 — All employees:"</span>);
+<span class="kw">foreach</span> (<span class="tp">Employee</span> e <span class="kw">in</span> context.Employees)
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  "</span> + e);
+
+<span class="cm">// ── FIND BY ID ───────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 3 — Find by Id:"</span>);
+<span class="tp">Employee</span>? found = context.Employees.<span class="fn">Find</span>(emp2.Id);
+Console.<span class="fn">WriteLine</span>(<span class="st">"  Found: "</span> + (found?.Name ?? <span class="st">"not found"</span>));
+
+<span class="cm">// ── FILTER WITH LINQ ─────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 4 — Training department only:"</span>);
+<span class="kw">var</span> trainers = context.Employees
+    .<span class="fn">Where</span>(e => e.Department == <span class="st">"Training"</span> &amp;&amp; e.IsActive)
+    .<span class="fn">OrderBy</span>(e => e.Name)
+    .<span class="fn">ToList</span>();
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> trainers)
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  "</span> + e);
+
+<span class="cm">// ── UPDATE ────────────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 5 — Update Rahul's salary and department:"</span>);
+<span class="tp">Employee</span>? rahul = context.Employees
+    .<span class="fn">FirstOrDefault</span>(e => e.Name == <span class="st">"Rahul Gupta"</span>);
+<span class="kw">if</span> (rahul != <span class="kw">null</span>)
+{
+    rahul.Salary     = <span class="nm">75000m</span>;
+    rahul.Department = <span class="st">"Operations"</span>;
+    context.<span class="fn">SaveChanges</span>();   <span class="cm">// UPDATE Employees SET Salary=..., Department=... WHERE Id=3</span>
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  Updated: "</span> + rahul);
+}
+
+<span class="cm">// ── SOFT DELETE (preferred in real apps) ─────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 6 — Soft delete Priya (mark inactive):"</span>);
+<span class="kw">if</span> (found != <span class="kw">null</span>)
+{
+    found.IsActive = <span class="kw">false</span>;
+    context.<span class="fn">SaveChanges</span>();   <span class="cm">// UPDATE Employees SET IsActive=0 WHERE Id=2</span>
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  Deactivated: "</span> + found.Name);
+}
+
+<span class="cm">// ── READ ACTIVE ONLY ─────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 7 — Active employees only:"</span>);
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> context.Employees.<span class="fn">Where</span>(e => e.IsActive))
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  "</span> + e);
+
+<span class="cm">// ── HARD DELETE (physically remove) ──────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">$"Step 8 — Hard delete Rahul (Id={emp3.Id}):"</span>);
+<span class="tp">Employee</span>? toDelete = context.Employees.<span class="fn">Find</span>(emp3.Id);
+<span class="kw">if</span> (toDelete != <span class="kw">null</span>)
+{
+    context.Employees.<span class="fn">Remove</span>(toDelete);
+    context.<span class="fn">SaveChanges</span>();   <span class="cm">// DELETE FROM Employees WHERE Id=3</span>
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  Deleted."</span>);
+}
+
+<span class="cm">// ── FINAL STATE ───────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 9 — Final state of database:"</span>);
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> context.Employees)
+    Console.<span class="fn">WriteLine</span>(<span class="st">"  "</span> + e);
+
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"✓ Done. In SQL Server Object Explorer:"</span>);
+Console.<span class="fn">WriteLine</span>(<span class="st">"  Right-click dbo.Employees → View Data"</span>);</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>Press F5</strong> to run. Confirm this output in the console window:</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected Console Output</div>
+              <div class="out-box"><pre>=== EF Core — Code First Demo ===
+
+Step 1 — Adding 3 employees...
+  ✓ emp1 added — Id=1 (SQL Server assigned)
+  ✓ emp2 added — Id=2
+  ✓ emp3 added — Id=3
+
+Step 2 — All employees:
+  [1] Raushan Ranjan       | Training     |   ₹85000 | Active:True
+  [2] Priya Sharma         | Development  |   ₹72000 | Active:True
+  [3] Rahul Gupta          | HR           |   ₹60000 | Active:True
+
+Step 3 — Find by Id:
+  Found: Priya Sharma
+
+Step 4 — Training department only:
+  [1] Raushan Ranjan       | Training     |   ₹85000 | Active:True
+
+Step 5 — Update Rahul's salary and department:
+  Updated: [3] Rahul Gupta | Operations   |   ₹75000 | Active:True
+
+Step 6 — Soft delete Priya (mark inactive):
+  Deactivated: Priya Sharma
+
+Step 7 — Active employees only:
+  [1] Raushan Ranjan       | Training     |   ₹85000 | Active:True
+  [3] Rahul Gupta          | Operations   |   ₹75000 | Active:True
+
+Step 8 — Hard delete Rahul (Id=3):
+  Deleted.
+
+Step 9 — Final state of database:
+  [1] Raushan Ranjan       | Training     |   ₹85000 | Active:True
+  [2] Priya Sharma         | Development  |   ₹72000 | Active:False
+
+✓ Done. Right-click dbo.Employees → View Data</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p><strong>Verify in SQL Server Object Explorer</strong> — right-click <ic>dbo.Employees</ic> → <strong>View Data</strong>. You should see 2 rows: Raushan (Active=True) and Priya (Active=False).</p>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf7')">✓ I see the expected output and verified data in SQL Server Object Explorer</button>
+    </div>
+  </div>
+
+
+  <!-- CF Step 8: Add column migration -->
+  <div class="step-card" id="cf8">
+    <div class="step-head" onclick="toggle('cf8')">
+      <div class="step-num">8</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--cf)">Code First — Step 8</div>
+        <div class="step-title">Add a new column — the real migration workflow</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px">This is the most important Code First concept: <strong>you change C# → EF Core changes the database</strong>. No manual ALTER TABLE SQL needed.</p>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet cf">1</div>
+          <div class="sub-content">
+            <p><strong>Open Employee.cs</strong> and add this property <strong>after the IsActive property</strong>:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Employee.cs — add this property</span><div class="code-head-right"><span class="file-tag file-cs">C#</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="cm">// New column — add this after IsActive</span>
+[<span class="at">MaxLength</span>(<span class="nm">20</span>)]
+<span class="kw">public string?</span> PhoneNumber { <span class="kw">get</span>; <span class="kw">set</span>; }</pre>
+            </div>
+            <p class="sub-note">The <ic>?</ic> after <ic>string</ic> means nullable — the column allows NULL. Existing rows won't break because PhoneNumber will be NULL for them.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">2</div>
+          <div class="sub-content">
+            <p><strong>In Package Manager Console</strong>, run a second migration:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre>Add-Migration AddPhoneNumber
+Update-Database</pre>
+            </div>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected</div>
+              <div class="out-box"><pre>Applying migration '20250512xxxxxx_AddPhoneNumber'.
+Done.</pre></div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">3</div>
+          <div class="sub-content">
+            <p><strong>Verify in SQL Server Object Explorer</strong> → right-click <ic>dbo.Employees</ic> → <strong>View Designer</strong>. The <ic>PhoneNumber</ic> column now appears. Your existing data (Raushan and Priya) is still there — the column is NULL for them.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet cf">4</div>
+          <div class="sub-content">
+            <p><strong>To roll back</strong> (undo the last migration):</p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console — rollback</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span></div></div>
+              <pre><span class="cm"># Go back to the InitialCreate migration (removes PhoneNumber column)</span>
+Update-Database InitialCreate
+
+<span class="cm"># Delete the AddPhoneNumber migration file</span>
+Remove-Migration</pre>
+            </div>
+            <p class="sub-note">This is how you fix mistakes — roll back to the last good migration, remove the bad file, fix your code, and try again. Your data is preserved through the rollback.</p>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('cf8')">✓ PhoneNumber column appears in dbo.Employees View Designer</button>
+    </div>
+  </div>
+
+</div><!-- /Part 1 -->
+
+<hr class="div"/>
+
+<!-- ═══════════════════════════════════════════════
+     PART 2 — DATABASE FIRST
+═══════════════════════════════════════════════ -->
+<div class="lab-section">
+  <div class="section-head">
+    <span class="section-pill" style="background:var(--db-bg);color:#6b9fe8;border:1px solid var(--db-border)">Part 2 — Database First</span>
+    <h2>Database First Approach</h2>
+  </div>
+  <p class="section-sub">Database and tables exist first. EF Core reads them and generates your C# classes. Project: <ic>EFDatabaseFirst</ic></p>
+
+
+  <!-- DB Step 1: Create Project -->
+  <div class="step-card" id="db1">
+    <div class="step-head" onclick="toggle('db1')">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 1</div>
+        <div class="step-title">Create a new Console App project</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="vs-guide">
+        <div class="vs-guide-title">🖥 Visual Studio 2022 — Create the project</div>
+        <ol>
+          <li>File → New → Project (or open a new VS window)</li>
+          <li>Choose <strong>Console App (C#, .NET)</strong></li>
+          <li>Project name: <strong>EFDatabaseFirst</strong></li>
+          <li>Framework: <strong>.NET 8.0 (Long Term Support)</strong></li>
+          <li>Click <strong>Create</strong></li>
+        </ol>
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">ℹ</span>
+        <p>Keep your <ic>EFCodeFirst</ic> project open in a separate VS window — you will compare the two approaches side by side at the end.</p>
+      </div>
+      <button class="done-btn" onclick="markDone('db1')">✓ EFDatabaseFirst project created</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 2: Install NuGet -->
+  <div class="step-card" id="db2">
+    <div class="step-head" onclick="toggle('db2')">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 2</div>
+        <div class="step-title">Install NuGet packages — same 3 packages, same process</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="vs-guide">
+        <div class="vs-guide-title">📦 Tools → NuGet Package Manager → Manage NuGet Packages for Solution</div>
+        <ol>
+          <li>Browse tab → search and install each package below, version <strong>8.0.x</strong></li>
+          <li>For each: tick <strong>EFDatabaseFirst</strong> → Install</li>
+        </ol>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">A</div>
+          <div class="sub-content">
+            <p>Search: <ic>Microsoft.EntityFrameworkCore.SqlServer</ic> → Install 8.0.x</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">B</div>
+          <div class="sub-content">
+            <p>Search: <ic>Microsoft.EntityFrameworkCore.Tools</ic> → Install 8.0.x</p>
+            <p class="sub-note">This enables <ic>Scaffold-DbContext</ic> in Package Manager Console — the key command for Database First.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">C</div>
+          <div class="sub-content">
+            <p>Search: <ic>Microsoft.EntityFrameworkCore.Design</ic> → Install 8.0.x</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs-guide">
+        <div class="vs-guide-title">✅ Verify .csproj file</div>
+        <ol>
+          <li>Double-click <strong>EFDatabaseFirst.csproj</strong> in Solution Explorer</li>
+          <li>Confirm all 3 PackageReference lines are present with Version 8.x</li>
+        </ol>
+      </div>
+      <button class="done-btn" onclick="markDone('db2')">✓ 3 packages installed — Build succeeds with 0 errors</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 3: Create DB and Tables -->
+  <div class="step-card" id="db3">
+    <div class="step-head" onclick="toggle('db3')">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 3</div>
+        <div class="step-title">Create the database and tables manually in SQL Server Object Explorer</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px">In Database First, <strong>you create the database first</strong> — before any C# code. This is what a DBA would do. The developer then connects to this existing database.</p>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">1</div>
+          <div class="sub-content">
+            <p><strong>Create the database</strong> in SQL Server Object Explorer:</p>
+            <div class="ss-guide">
+              <div class="ss-title">📂 Create new database</div>
+              <div class="ss-path"><span>View →</span> SQL Server Object Explorer <span>→</span> (localdb)\MSSQLLocalDB <span>→</span> right-click <strong>Databases</strong> <span>→</span> <strong>Add New Database</strong></div>
+              <div class="ss-note">Database name: <strong>EFDatabaseFirstDB</strong> → click OK</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">2</div>
+          <div class="sub-content">
+            <p><strong>Open a New Query</strong> against this database:</p>
+            <div class="ss-guide">
+              <div class="ss-title">📂 Open query window</div>
+              <div class="ss-path">Right-click <strong>EFDatabaseFirstDB</strong> <span>→</span> <strong>New Query</strong></div>
+              <div class="ss-note">A SQL editor tab opens. Make sure the database dropdown at the top shows <strong>EFDatabaseFirstDB</strong>.</div>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">3</div>
+          <div class="sub-content">
+            <p><strong>Paste and run this SQL</strong> — creates two related tables and inserts seed data:</p>
+            <div class="code-block">
+              <div class="code-head"><span>SQL — paste into the Query window, then press Execute (green ▶ button)</span><div class="code-head-right"><span class="file-tag file-sql">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="sql-kw">USE</span> EFDatabaseFirstDB;
+<span class="sql-kw">GO</span>
+
+<span class="sql-cm">-- Table 1: Departments (parent table)</span>
+<span class="sql-kw">CREATE TABLE</span> Departments (
+    Id        <span class="sql-type">INT</span>           <span class="sql-kw">IDENTITY</span>(<span class="nm">1</span>,<span class="nm">1</span>) <span class="sql-kw">PRIMARY KEY</span>,
+    Name      <span class="sql-type">NVARCHAR</span>(<span class="nm">100</span>) <span class="sql-kw">NOT NULL</span>,
+    Location  <span class="sql-type">NVARCHAR</span>(<span class="nm">100</span>) <span class="sql-kw">NOT NULL</span>
+);
+<span class="sql-kw">GO</span>
+
+<span class="sql-cm">-- Table 2: Employees (child table — has FK to Departments)</span>
+<span class="sql-kw">CREATE TABLE</span> Employees (
+    Id           <span class="sql-type">INT</span>           <span class="sql-kw">IDENTITY</span>(<span class="nm">1</span>,<span class="nm">1</span>) <span class="sql-kw">PRIMARY KEY</span>,
+    Name         <span class="sql-type">NVARCHAR</span>(<span class="nm">100</span>) <span class="sql-kw">NOT NULL</span>,
+    Email        <span class="sql-type">NVARCHAR</span>(<span class="nm">150</span>) <span class="sql-kw">NOT NULL</span>,
+    Salary       <span class="sql-type">DECIMAL</span>(<span class="nm">18</span>,<span class="nm">2</span>) <span class="sql-kw">NOT NULL</span>,
+    JoiningDate  <span class="sql-type">DATETIME2</span>     <span class="sql-kw">NOT NULL</span>,
+    IsActive     <span class="sql-type">BIT</span>           <span class="sql-kw">NOT NULL DEFAULT</span> <span class="nm">1</span>,
+    DepartmentId <span class="sql-type">INT</span>           <span class="sql-kw">NOT NULL</span>,
+
+    <span class="sql-cm">-- Foreign key: every Employee must belong to a Department</span>
+    <span class="sql-kw">CONSTRAINT</span> FK_Employees_Departments
+        <span class="sql-kw">FOREIGN KEY</span> (DepartmentId)
+        <span class="sql-kw">REFERENCES</span> Departments(Id)
+);
+<span class="sql-kw">GO</span>
+
+<span class="sql-cm">-- Seed data: 3 departments</span>
+<span class="sql-kw">INSERT INTO</span> Departments (Name, Location) <span class="sql-kw">VALUES</span>
+    (<span class="st">'Training'</span>,    <span class="st">'Noida'</span>),
+    (<span class="st">'Development'</span>, <span class="st">'Bangalore'</span>),
+    (<span class="st">'HR'</span>,          <span class="st">'Delhi'</span>);
+<span class="sql-kw">GO</span>
+
+<span class="sql-cm">-- Seed data: 3 employees (DepartmentId references the Departments rows above)</span>
+<span class="sql-kw">INSERT INTO</span> Employees (Name, Email, Salary, JoiningDate, IsActive, DepartmentId) <span class="sql-kw">VALUES</span>
+    (<span class="st">'Raushan Ranjan'</span>, <span class="st">'raushan@rrskillverse.com'</span>, <span class="nm">85000</span>, <span class="st">'2020-06-01'</span>, <span class="nm">1</span>, <span class="nm">1</span>),
+    (<span class="st">'Priya Sharma'</span>,   <span class="st">'priya@example.com'</span>,         <span class="nm">72000</span>, <span class="st">'2021-03-15'</span>, <span class="nm">1</span>, <span class="nm">2</span>),
+    (<span class="st">'Arjun Verma'</span>,    <span class="st">'arjun@example.com'</span>,         <span class="nm">65000</span>, <span class="st">'2022-01-10'</span>, <span class="nm">1</span>, <span class="nm">3</span>);
+<span class="sql-kw">GO</span></pre>
+            </div>
+            <p class="sub-note">Click the green <strong>Execute</strong> button (or press Ctrl+Shift+E). You should see "Query executed successfully" in the results panel.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">4</div>
+          <div class="sub-content">
+            <p><strong>Verify the tables and data</strong> in SQL Server Object Explorer. Expand EFDatabaseFirstDB → Tables. Right-click each table → <strong>View Data</strong>:</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected — Departments table</div>
+              <div class="out-box"><pre>Id  Name         Location
+1   Training     Noida
+2   Development  Bangalore
+3   HR           Delhi</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('db3')">✓ Both tables created and seeded — I can see data in View Data</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 4: Scaffold -->
+  <div class="step-card" id="db4">
+    <div class="step-head" onclick="toggle('db4')">
+      <div class="step-num">4</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 4</div>
+        <div class="step-title">Scaffold-DbContext — EF Core reads the database and generates C# classes</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div style="background:var(--db-bg);border:1px solid var(--db-border);border-radius:6px;padding:16px 18px;margin-bottom:16px">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6b9fe8;margin-bottom:8px">🧠 What is Scaffolding?</p>
+        <p style="font-size:13.5px;color:var(--text)"><strong>Scaffold-DbContext</strong> is the Database First command. EF Core connects to your existing database, reads every table and relationship, and generates the matching C# entity classes and DbContext. You never write these classes manually — EF Core writes them for you.</p>
+      </div>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">1</div>
+          <div class="sub-content">
+            <p><strong>Open Package Manager Console</strong> → Tools → NuGet Package Manager → Package Manager Console</p>
+            <p>Make sure the <strong>Default project</strong> dropdown shows <strong>EFDatabaseFirst</strong></p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">2</div>
+          <div class="sub-content">
+            <p><strong>Run the scaffold command:</strong></p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console — Scaffold command</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre>Scaffold-DbContext `
+  "Server=(localdb)\MSSQLLocalDB;Database=EFDatabaseFirstDB;Trusted_Connection=True;TrustServerCertificate=True;" `
+  Microsoft.EntityFrameworkCore.SqlServer `
+  -OutputDir Models `
+  -ContextDir Data `
+  -Context AppDbContext `
+  -DataAnnotations `
+  -NoOnConfiguring `
+  -Force</pre>
+            </div>
+            <p class="sub-note">Each flag explained:</p>
+            <table style="width:100%;font-size:12.5px;margin-top:8px;border-collapse:collapse">
+              <tr style="border-bottom:1px solid var(--border2)"><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace;width:150px">-OutputDir Models</td><td style="padding:5px 8px;color:var(--text-dim)">Entity classes (Employee.cs, Department.cs) go in the Models\ folder</td></tr>
+              <tr style="border-bottom:1px solid var(--border2)"><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace">-ContextDir Data</td><td style="padding:5px 8px;color:var(--text-dim)">AppDbContext.cs goes in the Data\ folder</td></tr>
+              <tr style="border-bottom:1px solid var(--border2)"><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace">-Context AppDbContext</td><td style="padding:5px 8px;color:var(--text-dim)">Name of the generated DbContext class</td></tr>
+              <tr style="border-bottom:1px solid var(--border2)"><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace">-DataAnnotations</td><td style="padding:5px 8px;color:var(--text-dim)">Use [Required][MaxLength] attributes instead of Fluent API — easier to read</td></tr>
+              <tr style="border-bottom:1px solid var(--border2)"><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace">-NoOnConfiguring</td><td style="padding:5px 8px;color:var(--text-dim)">Don't hardcode the connection string in DbContext — we'll pass it in Program.cs</td></tr>
+              <tr><td style="padding:5px 8px;color:var(--gold);font-family:'JetBrains Mono',monospace">-Force</td><td style="padding:5px 8px;color:var(--text-dim)">Overwrite existing generated files (useful when re-scaffolding after schema changes)</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">3</div>
+          <div class="sub-content">
+            <p><strong>Verify the generated files</strong> in Solution Explorer:</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Solution Explorer — new folders and files</div>
+              <div class="out-box"><pre>EFDatabaseFirst
+├── Data/
+│   └── AppDbContext.cs        ← generated DbContext
+├── Models/
+│   ├── Department.cs          ← generated from dbo.Departments
+│   └── Employee.cs            ← generated from dbo.Employees
+└── Program.cs</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('db4')">✓ Scaffold ran successfully — I can see Models\ and Data\ folders</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 5: Review generated code -->
+  <div class="step-card" id="db5">
+    <div class="step-head" onclick="toggle('db5')">
+      <div class="step-num">5</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 5</div>
+        <div class="step-title">Review the generated code — understand what EF Core wrote for you</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px">Open each generated file and read through it. EF Core wrote these from your SQL tables.</p>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">1</div>
+          <div class="sub-content">
+            <p><strong>Open Models/Department.cs</strong> — read the navigation property at the bottom:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Models/Department.cs — auto-generated</span><div class="code-head-right"><span class="file-tag file-cs">C#</span></div></div>
+              <pre><span class="cm">// This file was AUTO-GENERATED by Scaffold-DbContext</span>
+<span class="cm">// Do NOT edit — re-running scaffold with -Force will overwrite changes</span>
+
+<span class="kw">using</span> System.ComponentModel.DataAnnotations;
+<span class="kw">using</span> System.ComponentModel.DataAnnotations.Schema;
+
+<span class="kw">namespace</span> EFDatabaseFirst.Models;
+
+<span class="kw">public partial class</span> <span class="tp">Department</span>
+{
+    [<span class="at">Key</span>]
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="at">Required</span>]
+    [<span class="at">StringLength</span>(<span class="nm">100</span>)]
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    [<span class="at">Required</span>]
+    [<span class="at">StringLength</span>(<span class="nm">100</span>)]
+    <span class="kw">public string</span> Location { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    <span class="cm">// Navigation property — EF Core detected the FK relationship</span>
+    <span class="cm">// One Department has MANY Employees</span>
+    [<span class="at">InverseProperty</span>(<span class="st">"Department"</span>)]
+    <span class="kw">public virtual</span> ICollection&lt;<span class="tp">Employee</span>&gt; Employees { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span> List&lt;<span class="tp">Employee</span>&gt;();
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">2</div>
+          <div class="sub-content">
+            <p><strong>Open Models/Employee.cs</strong> — notice the FK navigation property:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Models/Employee.cs — auto-generated</span><div class="code-head-right"><span class="file-tag file-cs">C#</span></div></div>
+              <pre><span class="kw">public partial class</span> <span class="tp">Employee</span>
+{
+    [<span class="at">Key</span>]
+    <span class="kw">public int</span> Id { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="at">Required</span>][<span class="at">StringLength</span>(<span class="nm">100</span>)]
+    <span class="kw">public string</span> Name { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    [<span class="at">Required</span>][<span class="at">StringLength</span>(<span class="nm">150</span>)]
+    <span class="kw">public string</span> Email { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+
+    [<span class="at">Column</span>(TypeName = <span class="st">"decimal(18, 2)"</span>)]
+    <span class="kw">public decimal</span> Salary { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public</span> <span class="tp">DateTime</span> JoiningDate { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="kw">public bool</span> IsActive { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cm">// FK column — EF Core found FOREIGN KEY constraint in SQL</span>
+    <span class="kw">public int</span> DepartmentId { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    <span class="cm">// Navigation property — use .Include(e => e.Department) to load this</span>
+    [<span class="at">ForeignKey</span>(<span class="st">"DepartmentId"</span>)]
+    [<span class="at">InverseProperty</span>(<span class="st">"Employees"</span>)]
+    <span class="kw">public virtual</span> <span class="tp">Department</span> Department { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">null</span>!;
+}</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">3</div>
+          <div class="sub-content">
+            <p><strong>Open Data/AppDbContext.cs</strong> — this is the generated DbContext. Notice it has a constructor that accepts options — we will pass the connection string from Program.cs.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠</span>
+        <p><strong>Do NOT edit the generated files directly.</strong> If the database schema changes and you re-run Scaffold with <ic>-Force</ic>, your edits will be overwritten. Use <ic>partial class</ic> to extend the generated classes safely — create a separate file like <ic>Employee.Extensions.cs</ic>.</p>
+      </div>
+      <button class="done-btn" onclick="markDone('db5')">✓ I have read all 3 generated files and understand the navigation properties</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 6: Program.cs CRUD -->
+  <div class="step-card" id="db6">
+    <div class="step-head" onclick="toggle('db6')">
+      <div class="step-num">6</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 6</div>
+        <div class="step-title">Program.cs — connect, query with JOINs, and run CRUD</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">1</div>
+          <div class="sub-content">
+            <p><strong>Replace the entire content of Program.cs</strong> with this code:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Program.cs — Database First Demo</span><div class="code-head-right"><span class="file-tag file-cs">C#</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="kw">using</span> EFDatabaseFirst.Data;
+<span class="kw">using</span> EFDatabaseFirst.Models;
+<span class="kw">using</span> Microsoft.EntityFrameworkCore;
+
+Console.<span class="fn">WriteLine</span>(<span class="st">"=== EF Core — Database First Demo ==="</span>);
+Console.<span class="fn">WriteLine</span>();
+
+<span class="cm">// Build DbContextOptions — connection string passed from here</span>
+<span class="cm">// (We used -NoOnConfiguring in scaffold so it's not inside DbContext)</span>
+<span class="kw">var</span> options = <span class="kw">new</span> <span class="tp">DbContextOptionsBuilder</span>&lt;<span class="tp">AppDbContext</span>&gt;()
+    .<span class="fn">UseSqlServer</span>(
+        <span class="st">@"Server=(localdb)\MSSQLLocalDB;"</span> +
+        <span class="st">"Database=EFDatabaseFirstDB;"</span> +
+        <span class="st">"Trusted_Connection=True;"</span> +
+        <span class="st">"TrustServerCertificate=True;"</span>
+    )
+    .Options;
+
+<span class="kw">using</span> <span class="tp">AppDbContext</span> context = <span class="kw">new</span> <span class="tp">AppDbContext</span>(options);
+
+<span class="cm">// ── READ seeded data ─────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 1 — All employees from seeded database:"</span>);
+<span class="kw">foreach</span> (<span class="tp">Employee</span> e <span class="kw">in</span> context.Employees)
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  [{e.Id}] {e.Name,-20} | ₹{e.Salary,8} | Active:{e.IsActive}"</span>);
+
+<span class="cm">// ── JOIN — employees WITH their department names ──────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 2 — Employees with Department (JOIN using .Include):"</span>);
+<span class="kw">var</span> withDept = context.Employees
+    .<span class="fn">Include</span>(e => e.Department)     <span class="cm">// LEFT JOIN Departments ON DepartmentId</span>
+    .<span class="fn">OrderBy</span>(e => e.Name)
+    .<span class="fn">ToList</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> withDept)
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  {e.Name,-20} | Dept: {e.Department?.Name,-15} | {e.Department?.Location}"</span>);
+
+<span class="cm">// ── GROUP — departments with employee count ───────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 3 — Departments with active employee count:"</span>);
+<span class="kw">var</span> deptSummary = context.Departments
+    .<span class="fn">Include</span>(d => d.Employees)
+    .<span class="fn">Select</span>(d => <span class="kw">new</span>
+    {
+        d.Name,
+        d.Location,
+        ActiveCount = d.Employees.<span class="fn">Count</span>(e => e.IsActive)
+    })
+    .<span class="fn">ToList</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> d <span class="kw">in</span> deptSummary)
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  {d.Name,-15} | {d.Location,-12} | Active: {d.ActiveCount}"</span>);
+
+<span class="cm">// ── ADD — new employee via C# ─────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 4 — Add new employee (Rahul, Training dept):"</span>);
+<span class="tp">Employee</span> newEmp = <span class="kw">new</span>()
+{
+    Name         = <span class="st">"Rahul Gupta"</span>,
+    Email        = <span class="st">"rahul@example.com"</span>,
+    Salary       = <span class="nm">60000m</span>,
+    JoiningDate  = <span class="tp">DateTime</span>.Today,
+    IsActive     = <span class="kw">true</span>,
+    DepartmentId = <span class="nm">1</span>   <span class="cm">// Training (Id=1 from seed data)</span>
+};
+context.Employees.<span class="fn">Add</span>(newEmp);
+context.<span class="fn">SaveChanges</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">$"  ✓ Added: [{newEmp.Id}] {newEmp.Name}"</span>);
+
+<span class="cm">// ── UPDATE ────────────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 5 — Give Rahul a salary raise:"</span>);
+<span class="tp">Employee</span>? rahul = context.Employees.<span class="fn">FirstOrDefault</span>(e => e.Name == <span class="st">"Rahul Gupta"</span>);
+<span class="kw">if</span> (rahul != <span class="kw">null</span>)
+{
+    rahul.Salary = <span class="nm">75000m</span>;
+    context.<span class="fn">SaveChanges</span>();
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  Updated salary: ₹{rahul.Salary}"</span>);
+}
+
+<span class="cm">// ── SOFT DELETE ───────────────────────────────────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 6 — Soft delete Rahul:"</span>);
+<span class="kw">if</span> (rahul != <span class="kw">null</span>)
+{
+    rahul.IsActive = <span class="kw">false</span>;
+    context.<span class="fn">SaveChanges</span>();
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  Deactivated: {rahul.Name}"</span>);
+}
+
+<span class="cm">// ── FINAL READ — active employees with JOIN ───────────────────────</span>
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"Step 7 — Active employees with department:"</span>);
+<span class="kw">var</span> active = context.Employees
+    .<span class="fn">Include</span>(e => e.Department)
+    .<span class="fn">Where</span>(e => e.IsActive)
+    .<span class="fn">OrderBy</span>(e => e.Name)
+    .<span class="fn">ToList</span>();
+
+<span class="kw">foreach</span> (<span class="kw">var</span> e <span class="kw">in</span> active)
+    Console.<span class="fn">WriteLine</span>(<span class="st">$"  {e.Name,-20} | {e.Department?.Name,-15} | ₹{e.Salary}"</span>);
+
+Console.<span class="fn">WriteLine</span>();
+Console.<span class="fn">WriteLine</span>(<span class="st">"✓ Done — check dbo.Employees in SQL Server Object Explorer → View Data"</span>);</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">2</div>
+          <div class="sub-content">
+            <p><strong>Press F5</strong> and confirm this output:</p>
+            <div class="out-wrap">
+              <div class="out-lbl">Expected Console Output</div>
+              <div class="out-box"><pre>=== EF Core — Database First Demo ===
+
+Step 1 — All employees from seeded database:
+  [1] Raushan Ranjan       |   ₹85000 | Active:True
+  [2] Priya Sharma         |   ₹72000 | Active:True
+  [3] Arjun Verma          |   ₹65000 | Active:True
+
+Step 2 — Employees with Department (JOIN using .Include):
+  Arjun Verma          | Dept: HR              | Delhi
+  Priya Sharma         | Dept: Development     | Bangalore
+  Raushan Ranjan       | Dept: Training        | Noida
+
+Step 3 — Departments with active employee count:
+  Training        | Noida        | Active: 1
+  Development     | Bangalore    | Active: 1
+  HR              | Delhi        | Active: 1
+
+Step 4 — Add new employee (Rahul, Training dept):
+  ✓ Added: [4] Rahul Gupta
+
+Step 5 — Give Rahul a salary raise:
+  Updated salary: ₹75000
+
+Step 6 — Soft delete Rahul:
+  Deactivated: Rahul Gupta
+
+Step 7 — Active employees with department:
+  Arjun Verma          | HR              | ₹65000
+  Priya Sharma         | Development     | ₹72000
+  Raushan Ranjan       | Training        | ₹85000
+
+✓ Done — check dbo.Employees in SQL Server Object Explorer → View Data</pre></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="done-btn" onclick="markDone('db6')">✓ I see the expected output and verified data in SQL Server Object Explorer</button>
+    </div>
+  </div>
+
+
+  <!-- DB Step 7: Schema change + re-scaffold -->
+  <div class="step-card" id="db7">
+    <div class="step-head" onclick="toggle('db7')">
+      <div class="step-num">7</div>
+      <div class="step-info">
+        <div class="step-tag" style="color:var(--blue)">Database First — Step 7</div>
+        <div class="step-title">Add a column in SQL → re-run Scaffold to regenerate C# classes</div>
+      </div>
+      <span class="step-arr">▼</span>
+    </div>
+    <div class="step-body">
+      <p style="font-size:14px;color:var(--text);margin-bottom:14px">This is the Database First schema change workflow — the reverse of Code First.</p>
+
+      <div class="sub-steps">
+        <div class="sub-step">
+          <div class="sub-bullet db">1</div>
+          <div class="sub-content">
+            <p><strong>Open a New Query</strong> on EFDatabaseFirstDB and run this SQL to add a column:</p>
+            <div class="code-block">
+              <div class="code-head"><span>SQL — add PhoneNumber column</span><div class="code-head-right"><span class="file-tag file-sql">SQL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre><span class="sql-kw">USE</span> EFDatabaseFirstDB;
+<span class="sql-kw">ALTER TABLE</span> Employees
+<span class="sql-kw">ADD</span> PhoneNumber <span class="sql-type">NVARCHAR</span>(<span class="nm">20</span>) <span class="sql-kw">NULL</span>;   <span class="sql-cm">-- NULL so existing rows don't break</span></pre>
+            </div>
+            <p class="sub-note">Verify in SQL Server Object Explorer → right-click dbo.Employees → View Designer → PhoneNumber column now appears.</p>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">2</div>
+          <div class="sub-content">
+            <p><strong>Re-run Scaffold with -Force</strong> to regenerate the C# classes from the updated schema:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Package Manager Console — re-scaffold</span><div class="code-head-right"><span class="file-tag file-term">PM Console</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div></div>
+              <pre>Scaffold-DbContext `
+  "Server=(localdb)\MSSQLLocalDB;Database=EFDatabaseFirstDB;Trusted_Connection=True;TrustServerCertificate=True;" `
+  Microsoft.EntityFrameworkCore.SqlServer `
+  -OutputDir Models `
+  -ContextDir Data `
+  -Context AppDbContext `
+  -DataAnnotations `
+  -NoOnConfiguring `
+  -Force</pre>
+            </div>
+          </div>
+        </div>
+        <div class="sub-step">
+          <div class="sub-bullet db">3</div>
+          <div class="sub-content">
+            <p><strong>Open Models/Employee.cs</strong> — the <ic>PhoneNumber</ic> property now appears automatically:</p>
+            <div class="code-block">
+              <div class="code-head"><span>Models/Employee.cs — after re-scaffold</span><div class="code-head-right"><span class="file-tag file-cs">C#</span></div></div>
+              <pre><span class="cm">// EF Core added this automatically from the ALTER TABLE SQL</span>
+[<span class="at">StringLength</span>(<span class="nm">20</span>)]
+<span class="kw">public string?</span> PhoneNumber { <span class="kw">get</span>; <span class="kw">set</span>; }</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">💡</span>
+        <p><strong>Database First workflow summary:</strong> SQL Server team adds a column (ALTER TABLE) → developer re-runs Scaffold-DbContext → C# classes update automatically. The developer never touches the schema SQL directly.</p>
+      </div>
+      <button class="done-btn" onclick="markDone('db7')">✓ PhoneNumber property appears in the re-generated Employee.cs</button>
+    </div>
+  </div>
+
+</div><!-- /Part 2 -->
+
+<hr class="div"/>
+
+
+<!-- ═══════════════════════════════════════════════
+     EXPERIMENTS
+═══════════════════════════════════════════════ -->
+<div class="lab-section" id="experiments">
+  <div class="section-head">
+    <span class="section-pill" style="background:rgba(155,122,232,.1);color:var(--purple);border:1px solid rgba(155,122,232,.2)">After Hands-On</span>
+    <h2>Experiments — Try On Your Own</h2>
+  </div>
+  <p class="section-sub">Complete these after finishing both parts. No step-by-step guide — figure it out yourself using what you learned.</p>
+
+  <!-- Experiment 1 -->
+  <div class="exp-card">
+    <div class="exp-num">1</div>
+    <div class="exp-title">Code First — Add a Department relationship</div>
+    <div class="exp-desc">In the EFCodeFirst project, add a <ic>Department</ic> entity with <ic>Id</ic>, <ic>Name</ic>, <ic>Location</ic>. Add a foreign key <ic>DepartmentId</ic> to Employee and a navigation property <ic>Department</ic>. Run a migration and update the database. Then use <ic>.Include()</ic> in Program.cs to load employees with their department names in one query.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Create Department.cs entity class with 3 properties</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Add <ic>DepartmentId</ic> FK and <ic>Department</ic> navigation property to Employee.cs</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Add <ic>DbSet&lt;Department&gt;</ic> to AppDbContext</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Run <ic>Add-Migration AddDepartments</ic> and <ic>Update-Database</ic></span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">In Program.cs, add 2 departments and assign employees to them. Query with <ic>.Include(e =&gt; e.Department)</ic> and print the department name alongside employee name</span></div>
+    </div>
+  </div>
+
+  <!-- Experiment 2 -->
+  <div class="exp-card">
+    <div class="exp-num">2</div>
+    <div class="exp-title">Code First — Roll back a migration</div>
+    <div class="exp-desc">Practice the full rollback workflow. Add a new property to Employee (<ic>LinkedInUrl</ic>), run <ic>Add-Migration AddLinkedInUrl</ic>, then <ic>Update-Database</ic>. Verify the column appears. Then roll back: <ic>Update-Database InitialCreate</ic>, then <ic>Remove-Migration</ic>. Verify the column is gone from both the C# file and the database.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Add <ic>LinkedInUrl</ic> property to Employee.cs and run the migration</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Verify column appears in SQL Server Object Explorer → View Designer</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Roll back using <ic>Update-Database</ic> + migration name and <ic>Remove-Migration</ic></span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Verify column is gone from the table and Employee.cs no longer has the property</span></div>
+    </div>
+  </div>
+
+  <!-- Experiment 3 -->
+  <div class="exp-card">
+    <div class="exp-num">3</div>
+    <div class="exp-title">Code First — See the generated SQL using LogTo</div>
+    <div class="exp-desc">Add one line to <ic>OnConfiguring()</ic> in AppDbContext to print every SQL statement EF Core sends to the database. Run Program.cs — observe exactly what SQL EF Core generates for each LINQ query, INSERT, UPDATE, and DELETE.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Add <ic>options.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);</ic> inside <ic>OnConfiguring()</ic></span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Run F5 — read the SQL for the SELECT (foreach), INSERT (Add + SaveChanges), UPDATE (modify + SaveChanges), DELETE (Remove + SaveChanges)</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Notice that UPDATE only includes columns that changed — not all columns</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Change <ic>LogLevel.Information</ic> to <ic>LogLevel.Warning</ic> — what disappears from the output?</span></div>
+    </div>
+  </div>
+
+  <!-- Experiment 4 -->
+  <div class="exp-card">
+    <div class="exp-num">4</div>
+    <div class="exp-title">Database First — Add a Payroll table and re-scaffold</div>
+    <div class="exp-desc">In the EFDatabaseFirstDB database, create a new table <ic>Payroll</ic> with columns <ic>Id</ic>, <ic>EmployeeId</ic> (FK), <ic>Month</ic> (nvarchar 20), <ic>Amount</ic> (decimal 18,2), <ic>PaidOn</ic> (datetime2). Then re-run <ic>Scaffold-DbContext</ic> with <ic>-Force</ic> and verify the new <ic>Payroll.cs</ic> class appears in the Models folder.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Write and execute the <ic>CREATE TABLE Payroll</ic> SQL with a FK to Employees</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Insert 2 payroll records manually using SQL</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Re-run Scaffold-DbContext with -Force and verify Payroll.cs appears in Models\</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">In Program.cs, query all Payroll records with <ic>.Include(p =&gt; p.Employee)</ic> and print employee name alongside payroll amount</span></div>
+    </div>
+  </div>
+
+  <!-- Experiment 5 -->
+  <div class="exp-card">
+    <div class="exp-num">5</div>
+    <div class="exp-title">Compare: Same query in both approaches</div>
+    <div class="exp-desc">Write the same LINQ query in both projects — "get all active employees, ordered by salary descending, with their department name". Confirm the code is identical. This proves that once set up, both approaches use EF Core exactly the same way. Only the setup differs.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">In EFCodeFirst: add Department entity + FK + DbSet, seed 2 departments, assign employees</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Write: <ic>context.Employees.Include(e =&gt; e.Department).Where(e =&gt; e.IsActive).OrderByDescending(e =&gt; e.Salary).ToList()</ic></span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Write the identical query in EFDatabaseFirst</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Confirm the query code is character-for-character identical in both projects. The LINQ layer is the same regardless of approach.</span></div>
+    </div>
+  </div>
+
+  <!-- Experiment 6 -->
+  <div class="exp-card">
+    <div class="exp-num">6</div>
+    <div class="exp-title">Build a simple Repository pattern on top of EF Core</div>
+    <div class="exp-desc">Create an <ic>IEmployeeRepository</ic> interface with <ic>GetAll()</ic>, <ic>GetById(int id)</ic>, <ic>Add(Employee emp)</ic>, <ic>Update(Employee emp)</ic>, <ic>Delete(int id)</ic>. Implement it in <ic>EmployeeRepository</ic> using AppDbContext. Update Program.cs to use the repository instead of calling context directly. This is exactly the pattern used in Blazor with DI.</div>
+    <div class="exp-tasks">
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Create <ic>IEmployeeRepository.cs</ic> with 5 method signatures</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">Create <ic>EmployeeRepository.cs</ic> implementing the interface, wrapping context calls</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">In Program.cs, use <ic>IEmployeeRepository repo = new EmployeeRepository(context)</ic> and call all 5 methods</span></div>
+      <div class="exp-task"><span class="exp-check" onclick="chk(this)"></span><span class="exp-task-text">In Blazor, this becomes: <ic>builder.Services.AddScoped&lt;IEmployeeRepository, EmployeeRepository&gt;()</ic> in Program.cs — write this as a comment to remember the pattern</span></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- Completion Banner -->
+<div class="completion" id="completion-banner">
+  <h3>🎉 EF Core Lab Complete!</h3>
+  <p>You have completed both <strong>Code First</strong> and <strong>Database First</strong> approaches, run real migrations against LocalDB, scaffolded C# classes from an existing database, and practised full CRUD with EF Core.<br/><br/>
+  You are ready to wire this into a Blazor application using Dependency Injection.</p>
+</div>
+
+<!-- Footer -->
+<div class="lab-foot">
+  <div>
+    <strong style="color:var(--gold)">RR Skillverse</strong> &nbsp;·&nbsp;
+    Raushan Ranjan, MCT &nbsp;·&nbsp;
+    Koenig Solutions, Noida &nbsp;·&nbsp;
+    <a href="mailto:raushan@rrskillverse.com">raushan@rrskillverse.com</a>
+  </div>
+  <a class="next-btn" href="lab-day5.html">← Lab Day 5</a>
+</div>
+
+</main>
+</div>
+
+<script>
+// ── Step IDs ─────────────────────────────────────────────────────
+const CF = ['cf1','cf2','cf3','cf4','cf5','cf6','cf7','cf8'];
+const DB = ['db1','db2','db3','db4','db5','db6','db7'];
+const ALL = [...CF, ...DB];
+let done = JSON.parse(localStorage.getItem('efcorelab') || '{}');
+
+function init() {
+  ALL.forEach(id => { if (done[id]) applyDone(id); });
+  updateProgress();
+}
+
+function toggle(id) {
+  document.getElementById(id).classList.toggle('is-open');
+}
+
+function gotoId(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function markDone(id) {
+  if (done[id]) return;
+  done[id] = true;
+  localStorage.setItem('efcorelab', JSON.stringify(done));
+  applyDone(id);
+  updateProgress();
+  // Auto-open next
+  const idx = ALL.indexOf(id);
+  if (idx >= 0 && idx < ALL.length - 1) {
+    const nxt = document.getElementById(ALL[idx + 1]);
+    if (nxt) {
+      nxt.classList.add('is-open');
+      setTimeout(() => nxt.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
+  }
+  if (Object.keys(done).filter(k => ALL.includes(k)).length === ALL.length) {
+    document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+function applyDone(id) {
+  const card = document.getElementById(id);
+  if (!card) return;
+  card.classList.remove('is-open');
+  card.classList.add('is-done');
+  const num = card.querySelector('.step-num');
+  if (num) num.textContent = '✓';
+  const btn = card.querySelector('.done-btn');
+  if (btn) { btn.textContent = '✓ Completed'; btn.disabled = true; }
+  const tick = document.getElementById('t-' + id);
+  if (tick) {
+    tick.style.background = 'var(--green)';
+    tick.style.borderColor = 'var(--green)';
+    tick.style.color = '#fff';
+  }
+}
+
+function updateProgress() {
+  const count = ALL.filter(id => done[id]).length;
+  const pct = (count / ALL.length * 100).toFixed(0);
+  document.getElementById('ps-fill').style.width = pct + '%';
+  document.getElementById('ps-cnt').textContent = count + ' / ' + ALL.length;
+  // Sidebar done links
+  ALL.forEach(id => {
+    const links = document.querySelectorAll(`.sb-a[data-sid="${id}"]`);
+    links.forEach(a => { if (done[id]) a.classList.add('sl-done'); });
+  });
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+function chk(el) {
+  el.classList.toggle('chk');
+  el.textContent = el.classList.contains('chk') ? '✓' : '';
+}
+
+// Scroll highlight sidebar
+window.addEventListener('scroll', () => {
+  let cur = '';
+  ALL.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && window.scrollY >= el.offsetTop - 140) cur = id;
+  });
+  document.querySelectorAll('.sb-a[data-sid]').forEach(a => {
+    if (!done[a.dataset.sid])
+      a.classList.toggle('sl-active', a.dataset.sid === cur);
+  });
+});
+
+init();
+</script>
+</body>
+</html>
